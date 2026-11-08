@@ -1,0 +1,99 @@
+{
+ "version": 1,
+ "companies": [
+  {
+   "key": "amazon",
+   "name": "Amazon OA Mock",
+   "tagline": "SDE Intern 2026: coding · repo debugging · situational judgement",
+   "questions": 10,
+   "years": [
+    2026,
+    2024
+   ],
+   "roles": [
+    "Intern",
+    "SDE",
+    "SDE Intern"
+   ],
+   "colleges": [
+    "IIIT Delhi"
+   ],
+   "formats": [
+    "SDE Intern OA 2026",
+    "IIITD coding set",
+    "Online coding set 2024",
+    "Debugging section"
+   ],
+   "bytes": 18462182,
+   "download": 7851504
+  },
+  {
+   "key": "flipkart",
+   "name": "Flipkart OA Mock",
+   "tagline": "SDE · Data Engineer · UI Engineer",
+   "questions": 14,
+   "years": [],
+   "roles": [
+    "Data Engineer",
+    "SDE",
+    "UI Engineer"
+   ],
+   "colleges": [
+    "IIT BHU",
+    "IIT Bombay"
+   ],
+   "formats": [
+    "SDE",
+    "Data Engineer",
+    "UI Engineer"
+   ],
+   "bytes": 779395,
+   "download": 259504
+  },
+  {
+   "key": "juspay",
+   "name": "Juspay OA Mock",
+   "tagline": "Converging Maze · HackerEarth · Unstop challenge · Elimination round",
+   "questions": 20,
+   "years": [
+    2026,
+    2025
+   ],
+   "roles": [
+    "SDE Intern",
+    "SDE-1"
+   ],
+   "colleges": [],
+   "formats": [
+    "Converging Maze",
+    "HackerEarth graph set",
+    "Unstop challenge",
+    "Elimination round"
+   ],
+   "bytes": 4262745,
+   "download": 1635079
+  },
+  {
+   "key": "mathworks",
+   "name": "MathWorks OA Mock",
+   "tagline": "Embedded Systems · Software Engineer · IIT Bombay",
+   "questions": 5,
+   "years": [
+    2026
+   ],
+   "roles": [
+    "Embedded Systems",
+    "Software Engineer"
+   ],
+   "colleges": [
+    "IIT Bombay"
+   ],
+   "formats": [
+    "Software Engineer",
+    "Embedded Systems"
+   ],
+   "bytes": 5805445,
+   "download": 2009348
+  }
+ ]
+}

@@ -4,7 +4,7 @@ This is a group effort. If you sat an OA, or have a write-up or photos of one, a
 
 ## How to add an OA
 
-1. **Fork** this repo and create a branch, e.g. `add-google-oa-2026`.
+1. **Fork** this repo and create a branch, e.g. `add-google-oa-2026`. A slim clone is enough: you only need the company you're adding to (download it on the home page, or `git sparse-checkout add data/<company>`). For a new company, `git sparse-checkout add data/<new-key>` before creating the folder, so git tracks it.
 2. **Transcribe the source** into `sources/<company>/` as Markdown, or JSON for structured parts such as an API spec. Put the original PDFs or photos in `raw-sources/` (git-ignored). Never commit them.
 3. **Write the questions** in `data/<company>/`:
    - `company.json`: `key`, `name`, `tagline`, `blurb`, `headline`, `defaultFmt`, `formats` (with `pools` of question ids), `order`, `custom`, `offlist`. Copy `data/flipkart/company.json` as a template.
@@ -20,6 +20,7 @@ This is a group effort. If you sat an OA, or have a write-up or photos of one, a
    ```
    python3 tools/check_dupes.py path/to/question.json    # is it already in the bank? (--deep also compares answers)
    python3 tools/check_refs.py <company>                  # every reference must pass every test
+   python3 tools/build_catalog.py                         # updates data/catalog.json (commit it too)
    python3 run.py                                         # open it and try it in both problem styles
    ```
    Make the hidden tests cover edge cases and at least one maximum-size input, so slow solutions fail.

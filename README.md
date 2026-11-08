@@ -19,9 +19,12 @@
 ## Quick start
 
 ```
-git clone https://github.com/rgabhi/oa-mock.git
+git clone --filter=blob:none --sparse https://github.com/rgabhi/oa-mock.git
 cd oa-mock
+git sparse-checkout set --cone docs oa_mock sources tools web data/flipkart
 ```
+
+That's the slim install: the app plus Flipkart's questions (about 4 MB). Pick more companies on the home page and press **Download**; only those are fetched. A plain `git clone https://github.com/rgabhi/oa-mock.git` gets every company (about 40 MB) and works too. You can remove companies from the home page later.
 
 | OS | First time | After that |
 |---|---|---|
@@ -48,6 +51,16 @@ setup.bat -NoJava -NoStart
 ```
 
 **No scripts?** If you have Python, just run `python3 run.py` (`py run.py` on Windows). Options: `--port 9000`, `--no-browser`. You can also set `OA_PORT`.
+
+### Companies: download only what you need
+
+The home page lists the companies on your computer and the ones you can download, with their question count, years, roles and download size.
+
+- **Download** fetches that company's questions (git sparse checkout).
+- **Check for new questions** looks at GitHub. Companies with changes get **Get new questions**, and a banner offers to update the app.
+- **Remove** deletes a company's questions from this computer. Your past submissions stay. It refuses if you have new or edited questions in that folder.
+
+This needs a git clone. A ZIP download works too, but only shows the companies that came in the ZIP.
 
 ---
 
@@ -172,12 +185,14 @@ A small web app with a Python standard-library backend. There's nothing to `pip 
 run.py                     entry point (python3 run.py [--port N] [--no-browser])
 oa_mock/                   backend (Python 3.8+, stdlib only)
   __main__.py              start-up: prints compilers, binds 127.0.0.1, opens the browser
-  server.py                HTTP routes: pages, static files, /api/companies, POST /run
+  server.py                HTTP routes: pages, static files, /api/companies, /api/library, /api/grade, POST /run
   judge.py                 compiles and runs code: g++/clang (C++17), javac/java, Python
+  grading.py               runs an answer on a question's tests on the server (hidden tests never reach the page)
+  library.py               companies here vs on GitHub; download / update / remove with git sparse checkout
   submissions.py           saves / lists / reads past submissions in .oa-cache/
   data.py                  loads data/<company>/, reloading when files change
 web/                       frontend (plain HTML/CSS/JS, no build step)
-  index.html, app.html     company picker; the test app (one template for every company)
+  index.html, app.html     home page (static/js/landing.js); the test app (one template for every company)
   static/css/              app.css, index.css
   static/js/core/          config.js (data, languages, saved state), util.js
   static/js/run/           workers.js (JavaScript answers in a Web Worker), sql.js, judge.js (calls /run, grades),
@@ -187,6 +202,7 @@ web/                       frontend (plain HTML/CSS/JS, no build step)
   static/js/views/         render.js, home.js, exam.js, report.js, submissions.js (list + viewer)
   static/js/main.js        global listeners and first render (loaded last)
   static/vendor/           CodeMirror 5 (+ add-ons, Sublime/Vim keymaps) and AlaSQL, all MIT
+data/catalog.json          one line per company (name, years, roles, size) so the home page can list ones not downloaded
 data/<company>/            question banks
   company.json             name, test formats, question order, unrunnable entries
   questions/<id>.json      statement, samples, hidden tests, reference solutions, stubs/drivers
@@ -195,6 +211,7 @@ sources/                   text/JSON transcriptions of the source material (no P
 tools/
   check_refs.py            runs every reference solution against its tests
   check_dupes.py           finds questions already in the bank (text overlap; --deep compares answers)
+  build_catalog.py         rewrites data/catalog.json (run after adding or changing questions)
   style/                   specs.py (function signatures) -> convert.py writes LeetCode stubs + hidden drivers
                            in 4 languages; verify.py and selftest.py check them
   meta_backfill.py         one-off: year / role / college from each question's source
@@ -202,7 +219,7 @@ tools/
 setup.sh, setup.ps1/.bat   one-shot installers; start.sh / start.bat launch
 ```
 
-**Request flow.** `GET /amazon` renders `web/app.html`, which loads the vendored editor, then `/api/companies/amazon/data.js` (that company's config and questions), then the app scripts. C++, Java and Python answers are sent to `POST /run`. The server compiles and runs them and returns stdout, stderr and timings, and the page grades them against the tests. JavaScript answers and the debugging repo run in a Web Worker in the page. The server only listens on `127.0.0.1`, checks the `Host` header, and requires a per-run token on `/run`.
+**Request flow.** `GET /amazon` renders `web/app.html`, which loads the vendored editor, then `/api/companies/amazon/data.js` (that company's config and questions, without hidden tests), then the app scripts. C++, Java and Python answers go to `POST /api/grade`: the server runs them on the samples or on all tests and returns a verdict per test. JavaScript answers and the debugging repo run in a Web Worker in the page, which fetches that one question's hidden tests when you submit. The server only listens on `127.0.0.1`, checks the `Host` header, and requires a per-run token on `/run`, `/api/grade`, `/api/library` and `/api/submissions`.
 
 ### Adding or editing questions
 
@@ -210,6 +227,7 @@ setup.sh, setup.ps1/.bat   one-shot installers; start.sh / start.bat launch
 - **Add a question:** create `questions/<id>.json` (copy an existing one as a template) and add the id to `order` in `company.json`. Mention it in a format's `pools` to include it in a test.
 - **Add a company:** create `data/<key>/company.json` and `data/<key>/questions/`. It appears on the home page automatically.
 - **Check:** run `python3 tools/check_refs.py [company]`. Every Python and C++ reference must pass its tests.
+- **Catalog:** run `python3 tools/build_catalog.py` and commit `data/catalog.json` with your questions. It keeps entries for companies you haven't downloaded.
 - **Amazon** is generated: edit the files in `tools/amazon/`, then run `python3 tools/amazon/build.py` (needs `node` and `g++`).
 - **Sources:** keep original PDFs and photos in `raw-sources/` (git-ignored), and commit only text/JSON transcriptions under `sources/`.
 

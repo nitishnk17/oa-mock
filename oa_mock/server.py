@@ -1,23 +1,28 @@
 """HTTP server: serves the web app and runs code. Listens on 127.0.0.1 only.
 
-GET  /                               company picker
+GET  /                               home page: your companies, and ones you can download
+GET  /api/library                    companies here and on GitHub, git status, the running job
+POST /api/library                    {action: check|download|update|remove, company} -> starts a job (see library.py)
+GET  /api/library/job                progress of the running job
 GET  /<company>                      the test app for one company
 GET  /static/...                     CSS, JS and vendored libraries from web/static/
 GET  /api/companies                  JSON list of companies
-GET  /api/companies/<company>/data.js   window.OA_DATA = {config, questions}
+GET  /api/companies/<company>/data.js   window.OA_DATA = {config, questions} without hidden tests
+GET  /api/companies/<company>/questions/<id>/tests   hidden tests (for questions graded in the browser)
+POST /api/grade                      {company, qid, lang, code, scope} -> per-test results (C++, Java, Python)
 POST /run                            {lang, code, inputs[], limit} -> {results[]} or {compile_error}
 GET  /api/submissions?company=&qid=  past submissions, newest first (see submissions.py)
 GET  /api/submissions/<company>/<qid>/<id>    one submission with its code
 POST /api/submissions                save a submission
 DELETE /api/submissions/<company>/<qid>/<id>
 
-/run and /api/submissions need the X-Token header that app.html carries.
+/run, /api/grade, /api/library and /api/submissions need the X-Token header the pages carry.
 """
 import html, json, mimetypes, os, secrets
 from urllib.parse import parse_qs, urlsplit
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from . import data, judge, submissions
+from . import data, grading, judge, library, submissions
 
 WEB_DIR = os.path.join(data.ROOT, "web")
 STATIC_DIR = os.path.join(WEB_DIR, "static")
@@ -109,7 +114,16 @@ class Handler(BaseHTTPRequestHandler):
         if not parts:
             links = "".join('<a class="company" href="/%s">%s<small>%s</small></a>' % (k, html.escape(n), html.escape(t))
                             for k, n, t in data.companies())
-            return self._send(200, _template("index.html", companies=links), "text/html; charset=utf-8")
+            return self._send(200, _template("index.html", companies=links, token=json.dumps(TOKEN)), "text/html; charset=utf-8")
+
+        if parts[:2] == ["api", "library"]:
+            if not self._token_ok():
+                return self._json(403, {"error": "forbidden"})
+            if parts[2:] == ["job"]:
+                return self._json(200, library.job())
+            if not parts[2:]:
+                return self._json(200, library.listing())
+            return self._not_found()
 
         if parts[0] == "static":
             return self._static(parts[1:])
@@ -121,6 +135,9 @@ class Handler(BaseHTTPRequestHandler):
             if len(parts) == 4 and parts[1] == "companies" and parts[3] == "data.js":
                 js = data.as_script(parts[2])
                 return self._send(200, js, "text/javascript; charset=utf-8") if js else self._not_found()
+            if len(parts) == 6 and parts[1] == "companies" and parts[3] == "questions" and parts[5] == "tests":
+                q = data.question(parts[2], parts[4])
+                return self._json(200, {"hidden": q.get("hidden", [])}) if q else self._not_found()
             return self._not_found()
 
         if parts == ["favicon.ico"]:
@@ -156,6 +173,23 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if urlsplit(self.path).path == "/api/submissions":
             return self._submissions("POST", [], "")
+        if urlsplit(self.path).path == "/api/library":
+            if not self._token_ok():
+                return self._json(403, {"error": "forbidden"})
+            try:
+                req = self._body()
+                return self._json(200, library.start(str(req.get("action", "")), req.get("company")))
+            except (ValueError, submissions.BadRequest) as e:
+                return self._json(400, {"error": str(e)})
+        if urlsplit(self.path).path == "/api/grade":
+            if not self._token_ok():
+                return self._json(403, {"error": "forbidden"})
+            try:
+                req = self._body()
+                return self._json(200, grading.grade(req.get("company"), req.get("qid"), req.get("lang"), req.get("code", ""),
+                                                     "all" if req.get("scope") == "all" else "samples"))
+            except (grading.GradeError, submissions.BadRequest, ValueError) as e:
+                return self._json(400, {"error": str(e)})
         if (self.path != "/run" or not self._host_ok() or self.headers.get("X-Token") != TOKEN
                 or "application/json" not in self.headers.get("Content-Type", "")):
             return self._send(403, '{"error":"forbidden"}', "application/json")

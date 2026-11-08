@@ -8,9 +8,23 @@
 </head>
 <body>
   <main>
-    <h1>OA Mock</h1>
-    <p>Pick a company. Your code compiles and runs on this computer.</p>
-    {{companies}}
+    <header>
+      <h1>OA Mock</h1>
+      <p>Practice online assessments. Your code compiles and runs on this computer.</p>
+    </header>
+    <div id="status" class="status" hidden></div>
+    <section>
+      <div class="head"><h2>Your companies</h2><button id="check" class="ghost" hidden>Check for new questions</button></div>
+      <div id="mine">{{companies}}</div>
+    </section>
+    <section id="more" hidden>
+      <div class="head"><h2>Download more</h2></div>
+      <p class="hint">Only the companies you download are kept on this computer. Each one comes with its questions and tests.</p>
+      <div id="avail"></div>
+    </section>
+    <details id="joblog" class="joblog" hidden><summary>Details</summary><pre></pre></details>
   </main>
+  <script>window.LOCAL_TOKEN = {{token}};</script>
+  <script src="/static/js/landing.js"></script>
 </body>
 </html>
