@@ -115,7 +115,8 @@ def main(args):
         print("%-9s %s%-22s %-22s statement overlap %.2f%s" % (level.upper(), mark, a["_key"], b["_key"], j, ("  · " + ", ".join(why)) if why else ""))
         print("          %s  |  %s" % (a.get("title", ""), b.get("title", "")))
     print("\n%d question(s) checked against %d. %s" % (len(subjects), len(bank),
-          "No likely duplicates." if not found else "%d unsettled duplicate(s), %d pair(s) to look at." % (unsettled, len(found))))
+          "No likely duplicates." if not found else "%d unsettled duplicate(s), %d unsettled similar pair(s) to look at, %d settled." % (
+              unsettled, sum(1 for f in found if not f[5] and f[0] != "duplicate"), sum(1 for f in found if f[5]))))
     if found:
         print('Same question? Add "alsoSeen": ["company/id"]. Different problem? Add "distinctFrom": ["company/id"].')
     return 1 if unsettled else 0

@@ -7,7 +7,7 @@ size on disk, about how much a download is). The home page uses it to describe c
 
 Run it after adding or changing questions; commit the result with them.
 """
-import json, os, subprocess, sys, zlib
+import bz2, json, os, subprocess, sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DATA = os.path.join(ROOT, "data")
@@ -24,8 +24,11 @@ def entry(key):
             with open(os.path.join(d, "questions", name), encoding="utf-8") as f:
                 qs.append(json.load(f))
     files = [os.path.join(r, f) for r, _, fs in os.walk(d) for f in fs]
-    size = sum(os.path.getsize(f) for f in files)
-    packed = sum(len(zlib.compress(open(f, "rb").read(), 6)) for f in files)   # about what git downloads
+    blobs = [open(f, "rb").read().replace(b"\r\n", b"\n") for f in files]   # as git stores them (Windows checks out CRLF)
+    size = sum(len(b) for b in blobs)
+    # about what git downloads. bzip2 (unchanged since 2010) rather than zlib, whose output differs between
+    # builds (zlib vs zlib-ng), so every computer and GitHub's runner get the same number; x1.1 matches git.
+    packed = round(sum(len(bz2.compress(b, 9)) for b in blobs) * 1.1 / 1000) * 1000
     vals = lambda k: sorted({q[k] for q in qs if q.get(k)}, key=lambda v: (-v if isinstance(v, int) else 0, str(v)))
     return {
         "key": key, "name": c.get("name", key), "tagline": c.get("tagline", ""),
