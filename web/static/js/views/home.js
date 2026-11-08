@@ -8,7 +8,7 @@ function homeHTML(){
   const bank = bankHTML(best);
   const hrows = hist.map(h => `<tr><td>${new Date(h.at).toLocaleString([], {day:"numeric", month:"short", hour:"2-digit", minute:"2-digit"})}</td><td>${esc(FORMATS[h.fmt] ? FORMATS[h.fmt].name : h.fmt)}</td><td>${h.per.map(p => esc(QMAP[p.id] ? QMAP[p.id].title : p.id) + " " + p.s).join(" · ")}</td><td class="n">${h.score}/${h.max}</td><td class="n">${fmtTime(h.used)}${h.untimed ? ` <span class="muted">untimed</span>` : ""}</td></tr>`).join("");
   return `
-  <header class="bar"><div class="brand">${esc(CFG.name)}<small>${LOCAL ? "Local runner · C++ ready" : "Practice test room"}</small></div>${LOCAL ? `<div class="spacer"></div><a class="btn" href="/">All companies</a>` : ""}</header>
+  <header class="bar"><div class="brand">${esc(CFG.name)}<small>${LOCAL ? "Runs on this computer" : "Practice test room"}</small></div><div class="spacer"></div>${LOCAL ? `<a class="btn" href="/">All companies</a>` : ""}${THEME_BTN}</header>
   <main class="wrap">
     ${S.exam && !S.exam.ended ? resumeHTML() : ""}
     <section class="hero"><h1>${esc(CFG.headline)}</h1>

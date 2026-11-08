@@ -52,12 +52,13 @@ async function viewSubmission(qid, sid, back){
     <div id="sub-code" class="sub-code"></div>
     <p class="status" style="margin:0">File: <code>${esc(meta.path)}</code></p>
     <div class="row" style="justify-content:space-between">
-      <div style="display:flex;gap:8px;flex-wrap:wrap">${back ? `<button class="btn" id="sv-back">◀ All submissions</button>` : ""}<button class="btn danger" id="sv-del">Delete</button></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${back ? `<button class="btn" id="sv-back">‹ All submissions</button>` : ""}<button class="btn danger" id="sv-del">Delete</button></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="sv-copy">Copy</button>
         ${canLoad ? `<button class="btn primary" id="sv-load">${inExam ? "Load into editor" : "Practise with this code"}</button>` : ""}<button class="btn" id="m-no">Close</button></div>
     </div></div>`;
   m.hidden = false;
   const host = $("#sub-code");
+  applyEditorColors();
   if (window.CodeMirror){
     const v = CodeMirror(host, {value: hit.code, mode: LANGS[meta.lang] ? LANGS[meta.lang].mode : "text/plain", readOnly: true, lineNumbers: true, tabSize: 4});
     setTimeout(() => v.refresh(), 0);
@@ -100,7 +101,7 @@ async function fillHomeSubs(){
   try {
     const all = await SUBS.list(null, 500);
     const shown = all.slice(0, 12);
-    box.innerHTML = subsRowsHTML(shown, true) + (all.length > shown.length ? `<p class="status" style="margin:8px 0 0">Showing the latest ${shown.length} of ${all.length}. Each question's full list is under <b>🕘 Submissions</b> in the editor.</p>` : "")
+    box.innerHTML = subsRowsHTML(shown, true) + (all.length > shown.length ? `<p class="status" style="margin:8px 0 0">Showing the latest ${shown.length} of ${all.length}. Each question's full list is under <b>Submissions</b> in the editor.</p>` : "")
       + (all.length ? `<p class="status" style="margin:6px 0 0">Files: <code>.oa-cache/submissions/${esc(COMPANY)}/</code></p>` : "");
     bindSubRows(box, null);
   } catch (err){ box.innerHTML = `<p class="muted">Past submissions aren't available: ${esc(err.message)}</p>`; }

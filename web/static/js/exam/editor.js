@@ -18,6 +18,7 @@ const ED_DEFAULTS = {
   keymap: "sublime",      // sublime (VS Code-like) | default | vim
   tabSize: 4,
   fontSize: 14,
+  colors: "match",        // editor colours: match (follow the app theme) | light | dark
 };
 const ED = Object.assign({}, ED_DEFAULTS, store.get("oa-editor", {}));
 const saveED = () => store.set("oa-editor", ED);
@@ -201,16 +202,26 @@ function applyEditorLook(el){
   if (!host) return;
   host.classList.toggle("no-hl", !ED.highlight);
   host.style.setProperty("--ed-font", ED.fontSize + "px");
+  applyEditorColors();
+}
+// Editor colours can differ from the app theme (a dark editor in the light app, or the reverse)
+function applyEditorColors(){
+  document.querySelectorAll(".editor, .sub-code, .custom-in").forEach(el => {
+    el.classList.toggle("ed-light", ED.colors === "light");
+    el.classList.toggle("ed-dark", ED.colors === "dark");
+  });
 }
 
 function setEditorOption(key, value){
   ED[key] = value; saveED();
+  if (key === "colors") applyEditorColors();
   if (!cm) return;
   const lang = cm.getOption("oaLang"), o = editorOptions(lang);
   const map = {matchBrackets:["matchBrackets"], closeBrackets:["autoCloseBrackets"], activeLine:["styleActiveLine"], lineWrap:["lineWrapping"],
                keymap:["keyMap"], matchWords:["highlightSelectionMatches"], fold:["foldGutter", "gutters"], tabSize:["indentUnit", "tabSize"]};
   for (const opt of map[key] || []) cm.setOption(opt, o[opt]);
   applyEditorLook();
+  if (key === "colors") applyEditorColors();
   cm.refresh();
 }
 
@@ -235,7 +246,10 @@ function editorSettingsHTML(){
         <label class="ed-row" title="LeetCode: you write a function and a hidden driver reads the input. HackerRank: you get the whole program, input reading included.">Problem style <select id="ed-style"><option value="leetcode" ${STYLE === "leetcode" ? "selected" : ""}>LeetCode</option><option value="hackerrank" ${STYLE === "hackerrank" ? "selected" : ""}>HackerRank</option></select></label>
         <label class="ed-row">Keys <select data-ed="keymap">${[["sublime", "VS Code / Sublime"], ["default", "Basic"], ["vim", "Vim"]].map(([v, l]) => `<option value="${v}" ${ED.keymap === v ? "selected" : ""}>${l}</option>`).join("")}</select></label></div>
     </div>
-    <div class="ed-foot"><button class="btn" id="ed-keys">⌨ Keyboard shortcuts</button><button class="btn" id="ed-reset">Restore defaults</button></div>
+    <div class="ed-appear"><div class="ed-h">Appearance</div>
+      <label class="ed-row">Theme <select id="ed-theme"><option value="light" ${getTheme() === "light" ? "selected" : ""}>Light</option><option value="dark" ${getTheme() === "dark" ? "selected" : ""}>Dark</option></select></label>
+      <label class="ed-row">Editor colours <select data-ed="colors">${[["match", "Match the theme"], ["light", "Always light"], ["dark", "Always dark"]].map(([v, l]) => `<option value="${v}" ${ED.colors === v ? "selected" : ""}>${l}</option>`).join("")}</select></label></div>
+    <div class="ed-foot"><button class="btn" id="ed-keys">Keyboard shortcuts</button><button class="btn" id="ed-reset">Restore defaults</button></div>
   </div>`;
 }
 function bindEditorSettings(){
@@ -247,10 +261,11 @@ function bindEditorSettings(){
     const pop = $("#edpop");
     pop.addEventListener("click", e => e.stopPropagation());
     pop.querySelectorAll("[data-ed]").forEach(inp => inp.addEventListener("change", () => {
-      const k = inp.dataset.ed, v = inp.type === "checkbox" ? inp.checked : (k === "keymap" ? inp.value : +inp.value);
+      const k = inp.dataset.ed, v = inp.type === "checkbox" ? inp.checked : (k === "keymap" || k === "colors" ? inp.value : +inp.value);
       setEditorOption(k, v);
     }));
     $("#ed-keys").addEventListener("click", () => { pop.remove(); showShortcuts(); });
+    $("#ed-theme").addEventListener("change", ev => setTheme(ev.target.value));
     $("#ed-style").addEventListener("change", ev => { pop.remove(); setStyle(ev.target.value); toast(ev.target.value === "hackerrank" ? "HackerRank style: the whole program is in the editor" : "LeetCode style: write the function, the I/O is hidden"); });
     $("#ed-reset").addEventListener("click", () => { for (const k in ED_DEFAULTS) setEditorOption(k, ED_DEFAULTS[k]); pop.remove(); toast("Editor settings restored"); });
     setTimeout(() => document.addEventListener("click", function close(){ const p = $("#edpop"); if (p) p.remove(); document.removeEventListener("click", close); }), 0);
@@ -260,7 +275,7 @@ function showShortcuts(){
   const m = $("#modal");
   m.innerHTML = `<div class="box wide" role="dialog" aria-modal="true" aria-labelledby="m-t"><h3 id="m-t" style="font-size:20px">Keyboard shortcuts</h3>
     <table class="keys-table">${SHORTCUTS.map(([a, k]) => `<tr><td>${esc(a)}</td><td><kbd>${esc(k)}</kbd></td></tr>`).join("")}</table>
-    <p class="muted" style="margin:0">Key style: ${ED.keymap === "vim" ? "Vim (Esc for normal mode)" : ED.keymap === "sublime" ? "VS Code / Sublime" : "basic"}. Change it under ⚙ Editor.</p>
+    <p class="muted" style="margin:0">Key style: ${ED.keymap === "vim" ? "Vim (Esc for normal mode)" : ED.keymap === "sublime" ? "VS Code / Sublime" : "basic"}. Change it in the editor settings.</p>
     <div class="row"><button class="btn primary" id="m-no">Close</button></div></div>`;
   m.hidden = false; $("#m-no").focus(); $("#m-no").onclick = () => { closeModal(); if (cm) cm.focus(); };
 }

@@ -37,3 +37,6 @@ const cmpOut = (q, out) => norm(q.type === "debug" ? String(out).split("\n").fil
 const sjtMax = q => q.items.length * 2;
 const sjtScore = (q, ans) => { const a = ans || {}; let p = 0; q.items.forEach((it, i) => { if (a[i] != null) p += it.o[a[i]][1]; }); return p; };
 const sjtAnswered = (q, ans) => Object.keys(ans || {}).length;
+
+/* ---------- light / dark switch for the top bars (theme.js does the work) ---------- */
+const THEME_BTN = `<button class="icon-btn theme-btn" data-theme-toggle aria-label="Dark mode" aria-pressed="false"><svg class="i-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 9.6A5.6 5.6 0 0 1 6.4 2.5a5.6 5.6 0 1 0 7.1 7.1Z"/></svg><svg class="i-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.3M8 13.2v1.3M1.5 8h1.3M13.2 8h1.3M3.4 3.4l.9.9M11.7 11.7l.9.9M3.4 12.6l.9-.9M11.7 4.3l.9-.9"/></svg></button>`;
