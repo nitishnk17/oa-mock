@@ -226,7 +226,7 @@ tools/
   check_refs.py            runs every reference solution against its tests
   check_dupes.py           finds questions already in the bank (text overlap; --deep compares answers)
   add_question.py          the question checks (same as the app and the pull-request check); --save adds it
-  build_catalog.py         rewrites data/catalog.json (GitHub does this after each merge)
+  build_catalog.py         rewrites data/catalog.json (pull requests include it; the PR check verifies it)
   smoke.py                 starts the app, loads its pages and grades an answer (pull-request check)
   style/                   specs.py (function signatures) -> convert.py writes LeetCode stubs + hidden drivers
                            in 4 languages; verify.py and selftest.py check them
@@ -234,7 +234,7 @@ tools/
   amazon/                  generators that build data/amazon/ (statements, tests, debugging repo, SJT)
 install.sh, install.ps1    one-line installers: slim clone, then setup
 setup.sh, setup.ps1/.bat   install Python / C++ / Java if missing; start.sh / start.bat launch
-.github/                   PR checks and catalog workflows, CODEOWNERS
+.github/                   PR checks workflow, CODEOWNERS
 ```
 
 **Request flow.** `GET /amazon` renders `web/app.html`, which loads the vendored editor, then `/api/companies/amazon/data.js` (that company's config and questions, without hidden tests), then the app scripts. C++, Java and Python answers go to `POST /api/grade`: the server runs them on the samples or on all tests and returns a verdict per test, with the data of only the first failing hidden test. JavaScript answers and the debugging repo run in a Web Worker in the page, which fetches that one question's hidden tests when you submit. The server only listens on `127.0.0.1`, checks the `Host` header, and requires a per-run token on `/run`, `/api/grade`, `/api/library` and `/api/submissions`.

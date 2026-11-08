@@ -25,7 +25,7 @@ The app, `tools/add_question.py` and the pull-request check on GitHub all run th
 | Tests catch wrong answers | hidden tests don't all have the same answer, and every solution in `wrong` (brute force, off-by-one…) fails at least one test |
 | Not already in the bank | no near-identical statement or identical sample. If it's the same question asked again, add `"alsoSeen": ["company/id"]` to the new one. If it only looks alike, add `"distinctFrom": ["company/id"]`. |
 
-`data/catalog.json` (the company list on the home page) is rebuilt automatically after a pull request is merged, so you don't need to change it.
+`data/catalog.json` is the company list on the home page. The app updates it in your pull request; by hand, run `python3 tools/build_catalog.py` and commit it with your question. The check fails if it's out of date.
 
 ## Add a question by hand
 
@@ -36,6 +36,7 @@ The app, `tools/add_question.py` and the pull-request check on GitHub all run th
    python3 tools/add_question.py <company> question.json                 # run the checks
    python3 tools/add_question.py <company> question.json --save          # then write data/<company>/questions/<id>.json
    python3 tools/add_question.py <company> question.json --save --name "Google"   # a new company also gets its company.json
+   python3 tools/build_catalog.py                                        # (--save does this too) commit data/catalog.json
    ```
    To change a question that's already in the bank, edit its file (not `stub`/`driver`; they're generated from `spec`) and run `python3 tools/add_question.py <company> data/<company>/questions/<id>.json --save --replace`.
 4. Also transcribe the source into `sources/<company>/` as Markdown, or JSON for structured parts. Keep original PDFs and photos in `raw-sources/` (git-ignored) and never commit them.

@@ -23,6 +23,8 @@ jobs:
         run: python3 tools/smoke.py
       - name: Changed questions (format, references, 4 language drivers, known-wrong solutions, duplicates)
         run: python3 tools/add_question.py --changed "origin/${{ github.base_ref || 'main' }}"
+      - name: data/catalog.json is up to date
+        run: python3 tools/build_catalog.py --check || { echo "::error::Run python3 tools/build_catalog.py and commit data/catalog.json"; exit 1; }
       - name: No unsettled duplicates in the bank
         run: python3 tools/check_dupes.py
       - name: Function specs still verify (when tools/style changed)

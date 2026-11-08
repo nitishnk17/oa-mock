@@ -318,6 +318,19 @@ def share_status():
     return out
 
 
+def _catalog_with(build_catalog, base_text, company):
+    """GitHub's catalog with only this company's entry recomputed from the files here. Each company's entry is
+    on its own lines, so pull requests for different companies merge without conflicts."""
+    try:
+        cat = json.loads(base_text) if base_text else {"version": 1, "companies": []}
+    except ValueError:
+        cat = {"version": 1, "companies": []}
+    entries = {c["key"]: c for c in cat.get("companies", [])}
+    entries[company] = build_catalog.entry(company)
+    cat["companies"] = [entries[k] for k in sorted(entries)]
+    return json.dumps(cat, indent=1, ensure_ascii=False) + "\n"
+
+
 def share(company, qid, note=""):
     """Opens a pull request with data/<company>/questions/<qid>.json (+ company.json if the company is new)."""
     if not (data.KEY_RE.match(company or "") and ID_RE.match(qid or "")):
@@ -353,7 +366,9 @@ def share(company, qid, note=""):
                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode != 0
     if new_company:
         files[cfg] = open(os.path.join(data.ROOT, cfg), "rb").read()
-    # data/catalog.json is left out: GitHub rebuilds it after the merge (.github/workflows/catalog.yml)
+    _, _, _, _, build_catalog = _tools()
+    rc, base_cat, _ = _run(["git", "show", base + ":data/catalog.json"], 60)
+    files["data/catalog.json"] = _catalog_with(build_catalog, base_cat if rc == 0 else "", company).encode("utf-8")
 
     # a commit on top of GitHub's main with just these files, built in a temporary index (your files stay as they are)
     with tempfile.TemporaryDirectory() as tmp:
