@@ -4,25 +4,46 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>OA Mock</title>
+  <link rel="preload" href="/static/vendor/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/static/css/site.css">
   <link rel="stylesheet" href="/static/css/index.css">
+  <script src="/static/js/theme.js"></script>
 </head>
 <body>
+  <nav class="bar">
+    <span class="dots"><i></i><i></i><i></i></span>
+    <a class="tab" href="/">~/oa-mock</a>
+    <a class="tab off" href="/contribute">add-question.json</a>
+    <span class="sp"></span>
+    <a class="lnk wide" href="https://github.com/rgabhi/oa-mock" target="_blank" rel="noopener">github ↗</a>
+    <button id="theme" class="icon-btn" title="Light / dark">☀</button>
+  </nav>
   <main>
-    <header>
-      <h1>OA Mock</h1>
-      <p>Practice online assessments. Your code compiles and runs on this computer.</p>
-    </header>
+    <section class="hero">
+      <h1 class="prompt"><span class="ps">$</span> oa-mock <span class="flag">--practice</span><span class="caret"></span></h1>
+      <p class="comment">// real OA questions, timed or not. your code compiles and runs on this computer.</p>
+      <ul class="checks" id="checks"></ul>
+    </section>
     <div id="status" class="status" hidden></div>
-    <section>
-      <div class="head"><h2>Your companies</h2><button id="check" class="ghost" hidden>Check for new questions</button></div>
-      <div id="mine">{{companies}}</div>
-    </section>
-    <section id="more" hidden>
-      <div class="head"><h2>Download more</h2></div>
-      <p class="hint">Only the companies you download are kept on this computer. Each one comes with its questions and tests.</p>
+
+    <label class="search panel"><span class="gt">&gt;</span><input id="q" placeholder="filter companies, roles, years…" autocomplete="off" spellcheck="false"><kbd>/</kbd></label>
+
+    <div class="sec-h"><h2>your companies</h2><span class="rule"></span><button id="check" class="btn quiet" hidden>⟳ check for new questions</button></div>
+    <div id="mine">{{companies}}</div>
+
+    <div id="more" hidden>
+      <div class="sec-h"><h2>download more</h2><span class="rule"></span></div>
+      <p class="hint">Only the companies you download are kept on this computer, with their questions and tests.</p>
       <div id="avail"></div>
-    </section>
-    <details id="joblog" class="joblog" hidden><summary>Details</summary><pre></pre></details>
+    </div>
+
+    <a class="cta panel" href="/contribute" style="text-decoration:none;color:inherit">
+      <span class="glyph">{+}</span>
+      <span class="txt"><b>Sat an OA recently?</b><p>Add its questions with your favourite LLM. The app checks them and opens the pull request for you.</p></span>
+      <span class="btn ghost">add a question →</span>
+    </a>
+    <details id="joblog" class="log" hidden><summary>details</summary><pre></pre></details>
+    <footer class="foot"><span>made by students, for students</span><a href="https://github.com/rgabhi/oa-mock/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">contributing</a><span><kbd>/</kbd> filter · <kbd>↵</kbd> open first</span></footer>
   </main>
   <script>window.LOCAL_TOKEN = {{token}};</script>
   <script src="/static/js/landing.js"></script>
