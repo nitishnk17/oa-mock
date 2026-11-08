@@ -2,10 +2,10 @@
 
 **Practice online assessments for Flipkart, Juspay, Amazon and MathWorks on your own computer.** The tests use questions reported from real OAs, with hidden test cases, HackerRank-style partial marks and a scorecard at the end. You can sit a test timed or untimed.
 
-![Amazon OA Mock home](docs/home.png)
+![OA Mock home](docs/home.png)
 
 - **Real formats:** each company's test layout is reproduced (for example, Amazon's 3-section SDE Intern OA), or you can build a custom set. The question bank is grouped by year, with filters for role, college and difficulty.
-- **LeetCode or HackerRank style:** by default you complete a function and the input/output is handled for you. Switch to HackerRank style (on the home page or under ⚙ in the editor) to get the whole program, input reading included.
+- **LeetCode or HackerRank style:** by default you complete a function and the input/output is handled for you. Switch to HackerRank style (on the company page or in the editor settings) to get the whole program, input reading included.
 - **Your languages:** C++17, Java, Python 3 and JavaScript compile and run natively on your machine.
 - **Graded like the real thing:** Run checks the samples, and Submit runs every hidden test. Score = tests passed / total × 100, and your best submission counts. Hidden tests only show pass/fail, except the first one that fails: you can see it, load it as custom input, or download its input and expected output as text.
 - **Timed or not:** a countdown that auto-submits, or **No timer** with a count-up clock.
@@ -94,7 +94,7 @@ This needs a git clone. A ZIP download works too, but only shows the companies t
 
 ## The editor
 
-Click **⚙** in the editor toolbar to turn features on or off. Your choices are saved in the browser.
+Click the settings button (the sliders, next to **Submissions**) in the editor toolbar to turn features on or off, switch between light and dark, or give the editor its own colours (a dark editor in the light app, say). Your choices are saved in the browser.
 
 ![Editor settings](docs/editor-settings.png)
 
@@ -109,6 +109,11 @@ Click **⚙** in the editor toolbar to turn features on or off. Your choices are
 Indentation follows the language. Enter indents after `{` or `:`, `}` / `else:` dedent, Tab and Shift+Tab indent or dedent the line or selection, Backspace removes a whole indent level, and `Ctrl+Shift+I` re-indents the file or selection.
 
 Shortcuts (`Cmd` instead of `Ctrl` on a Mac; **F1** shows them all): `Ctrl+Enter` run · `Ctrl+Shift+Enter` submit · `Ctrl+S` save · `Ctrl+/` comment · `Ctrl+F` / `Ctrl+H` find / replace · `Ctrl+G` go to line · `Ctrl+D` next occurrence · `Ctrl+Shift+D` duplicate line · `Ctrl+Shift+K` delete line · `Ctrl+Shift+↑/↓` move line · `Ctrl+M` matching bracket · `Ctrl+Q` fold · `Alt+PageUp/PageDown` previous / next question.
+
+
+## Look and feel
+
+Light by default, with a dark theme (the moon button on the home page and in the top bars, or the editor settings). Warm ivory surfaces, charcoal text and a muted forest green for actions; Geist Sans for the interface and JetBrains Mono for code. Everything comes from one file of design tokens, [`web/static/css/tokens.css`](web/static/css/tokens.css), and `python3 tools/check_contrast.py` checks that every pairing of text and background stays readable (WCAG 4.5:1 for text) in both themes.
 
 ## Past submissions
 
@@ -206,7 +211,9 @@ oa_mock/                   backend (Python 3.8+, stdlib only)
 web/                       frontend (plain HTML/CSS/JS, no build step)
   index.html, app.html     home page (static/js/landing.js); the test app (one template for every company)
   contribute.html          "Add a question" (static/js/contribute.js; static/llm-prompt.md is the prompt for your LLM)
-  static/css/site.css      shared look of the home and contribute pages (JetBrains Mono + Inter, vendored, OFL)
+  static/css/tokens.css    the design tokens every page uses: colours (light and dark), type, radii, shadows, motion
+  static/css/site.css      shared parts of the home and contribute pages; app.css is the test app
+  static/vendor/fonts/     Geist Sans and JetBrains Mono (OFL), bundled so pages work offline
   static/css/              app.css, index.css
   static/js/core/          config.js (data, languages, saved state), util.js
   static/js/run/           workers.js (JavaScript answers in a Web Worker), sql.js, judge.js (calls /run, grades),
@@ -228,6 +235,7 @@ tools/
   add_question.py          the question checks (same as the app and the pull-request check); --save adds it
   build_catalog.py         rewrites data/catalog.json (pull requests include it; the PR check verifies it)
   smoke.py                 starts the app, loads its pages and grades an answer (pull-request check)
+  check_contrast.py        checks every text/background pair in tokens.css meets WCAG contrast, light and dark
   style/                   specs.py (function signatures) -> convert.py writes LeetCode stubs + hidden drivers
                            in 4 languages; verify.py and selftest.py check them
   meta_backfill.py         one-off: year / role / college from each question's source

@@ -46,6 +46,8 @@ SQL, debugging and situational-judgement questions don't have the automatic chec
 
 Older questions keep their function specs in `tools/style/specs.py`. New ones carry `spec` in their own JSON.
 
+**Company logo (optional).** The home page shows a monogram for each company. To show a logo instead, put `logo.svg` (or `.png` / `.webp`, at most 24 KB) next to `company.json`, add `"logo": "logo.svg"` to it, and run `python3 tools/build_catalog.py`. Only use a logo you're allowed to share.
+
 ## Rules
 
 - Paraphrase statements in your own words. Don't paste the test platform's text wholesale.
@@ -53,3 +55,4 @@ Older questions keep their function specs in `tools/style/specs.py`. New ones ca
 - If a statement is too incomplete to grade, add it to `offlist` in `company.json` with a short reason instead of guessing.
 - `main` is protected: everything goes through a pull request. Pull requests that only touch `data/` and `sources/` can be merged once the PR checks pass. Changes to anything else (the app, tools, setup scripts) also need the maintainer's review (`.github/CODEOWNERS`). Open an issue first for big changes.
 - Keep the server dependency-free (Python standard library only) and the frontend build-free.
+- Styling: use the variables in `web/static/css/tokens.css` rather than raw colours, and run `python3 tools/check_contrast.py` if you change them.
