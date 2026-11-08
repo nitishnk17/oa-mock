@@ -6,7 +6,7 @@ function reportHTML(){
   let ids = e.practice ? e.ids.filter(id => touched(e, id)) : e.ids;
   if (!ids.length) ids = [e.ids[e.cur]];
   const total = ids.reduce((a, id) => a + ((e.best[id] || {}).score || 0), 0), max = ids.length * 100;
-  const rows = ids.map((id, i) => { const q = QMAP[id], b = e.best[id], s = b ? b.score : 0, code = (e.code[id] || {})[e.lang[id]];
+  const rows = ids.map((id, i) => { const q = QMAP[id], b = e.best[id], s = b ? b.score : 0, cb = e.code[id] || {}, code = cb[bufKey(q, e.lang[id])] != null ? cb[bufKey(q, e.lang[id])] : cb[e.lang[id]] != null ? cb[e.lang[id]] : cb[e.lang[id] + "@hr"];
     return `<div class="rq"><div class="rq-head"><span class="pill d-${q.diff}">${q.diff}</span><span class="t">${e.practice ? "" : `Q${i + 1}. `}${esc(q.title)}</span><span class="sc">${s}/100</span></div>
       <div class="bar-meter" aria-hidden="true"><i style="width:${s}%"></i></div>
       <div class="status">${q.type === "sjt" ? `${sjtAnswered(q, e.ans && e.ans[id])}/${q.items.length} answered · ${b ? b.passed : 0}/${sjtMax(q)} points` : b ? `${b.passed}/${b.total} tests passed · ${LANGS[b.lang].label}` : "Not submitted"}</div>

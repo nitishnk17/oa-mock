@@ -81,5 +81,7 @@
    "pre": "",
    "post": "\n\n;(() => {\n    const _d = require(\"fs\").readFileSync(0, \"utf8\").trim().split(/\\s+/);\n    const n = Number(_d[0]);\n    const patterns = _d.slice(1, 1 + n);\n    console.log(String(minQuestionMarks(patterns)));\n})();\n"
   }
- }
+ },
+ "year": 2024,
+ "role": "SDE"
 }

@@ -85,5 +85,6 @@
    "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _n = Number(_t[_p++]);\n    const u = [], v = [];\n    for (let _i = 0; _i < (_n); _i++) { u.push(_t[_p++]); v.push(_t[_p++]); }\n    const _r = adSequence(u, v);\n    console.log(_r.join(\" \"));\n})();\n"
   }
  },
- "refcppProgram": true
+ "refcppProgram": true,
+ "role": "SDE"
 }

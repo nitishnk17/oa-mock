@@ -85,5 +85,6 @@
    "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _R = Number(_t[_p++]);\n    const _C = Number(_t[_p++]);\n    const grid = []; for (let _i = 0; _i < (_R); _i++) { grid.push(_t.slice(_p, _p + (_C)).map(Number)); _p += (_C); }\n    const _r = maxGoods(grid);\n    console.log(String(_r));\n})();\n"
   }
  },
- "refcppProgram": true
+ "refcppProgram": true,
+ "role": "SDE"
 }

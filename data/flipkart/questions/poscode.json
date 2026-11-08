@@ -85,5 +85,7 @@
    "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const word = _t[_p++];\n    const _r = positionCode(word);\n    console.log(String(_r));\n})();\n"
   }
  },
- "refcppProgram": true
+ "refcppProgram": true,
+ "college": "IIT BHU",
+ "role": "Data Engineer"
 }

@@ -80,5 +80,8 @@
    "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const m = Number(_t[_p++]);\n    const n = Number(_t[_p++]);\n    const _k = Number(_t[_p++]);\n    const cells = []; for (let _i = 0; _i < (_k); _i++) { cells.push(_t.slice(_p, _p + 2).map(Number)); _p += 2; }\n    const _r = countPuddles(m, n, cells);\n    console.log(_r.join(\" \"));\n})();\n"
   }
  },
- "refcppProgram": true
+ "refcppProgram": true,
+ "year": 2025,
+ "month": 8,
+ "role": "SDE-1"
 }

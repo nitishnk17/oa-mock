@@ -6729,5 +6729,7 @@
  ],
  "ref": "SELECT c.company_name, d.department_name, AVG(e.salary) AS average_salary\nFROM employees e\nJOIN departments d ON e.department_id = d.department_id\nJOIN companies c ON d.company_id = c.company_id\nWHERE c.company_name = 'Acme Corp' AND d.department_name = 'Finance'\nGROUP BY c.company_name, d.department_name;",
  "lc": "1075 Project Employees I",
- "lcurl": "https://leetcode.com/problems/project-employees-i/"
+ "lcurl": "https://leetcode.com/problems/project-employees-i/",
+ "college": "IIT BHU",
+ "role": "Data Engineer"
 }

@@ -21,7 +21,7 @@ const SUBS = {
 // Called after every Submit. Never blocks grading: a failed save only shows a note.
 function recordSubmission(q, lang, code, score, passed, total, e){
   if (q.type === "sjt") return;
-  SUBS.save({qid: q.id, title: q.title, lang, code, score, passed, total, practice: e.practice,
+  SUBS.save({qid: q.id, title: q.title, lang, code, score, passed, total, practice: e.practice, style: isHR(q, lang) ? "hackerrank" : "leetcode",
              format: e.practice ? "Practice" : (FORMATS[e.fmt] ? FORMATS[e.fmt].name : e.fmt)})
     .then(() => { const b = $("#subs-btn"); if (b) b.classList.add("pulse"); setTimeout(() => b && b.classList.remove("pulse"), 1200); })
     .catch(err => toast("Couldn't save this submission: " + err.message));

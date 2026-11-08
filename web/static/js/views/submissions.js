@@ -48,7 +48,7 @@ async function viewSubmission(qid, sid, back){
   const canLoad = q && (q.type === "sql" ? meta.lang === "sql" : q.type === "debug" ? meta.lang === "js" : CODE_LANGS.includes(meta.lang));
   m.innerHTML = `<div class="box wide" role="dialog" aria-modal="true" aria-labelledby="m-t">
     <h3 id="m-t" style="font-size:20px">${esc(q ? q.title : meta.title)}</h3>
-    <div class="kpis" style="margin:0"><span>${whenHTML(meta.at)}</span><span><b>${esc(langLabel(meta.lang))}</b></span><span class="res ${scoreCls(meta.score)}">${meta.score}/100</span><span>${meta.passed}/${meta.total} tests</span><span>${esc(meta.format || meta.mode)}</span></div>
+    <div class="kpis" style="margin:0"><span>${whenHTML(meta.at)}</span><span><b>${esc(langLabel(meta.lang))}</b></span><span class="res ${scoreCls(meta.score)}">${meta.score}/100</span><span>${meta.passed}/${meta.total} tests</span><span>${esc(meta.format || meta.mode)}</span>${meta.style ? `<span>${meta.style === "hackerrank" ? "HackerRank style" : "LeetCode style"}</span>` : ""}</div>
     <div id="sub-code" class="sub-code"></div>
     <p class="status" style="margin:0">File: <code>${esc(meta.path)}</code></p>
     <div class="row" style="justify-content:space-between">
@@ -69,10 +69,10 @@ async function viewSubmission(qid, sid, back){
     if ($("#sv-del").dataset.sure !== "1"){ $("#sv-del").dataset.sure = "1"; $("#sv-del").textContent = "Click again to delete"; return; }
     try { await SUBS.remove(qid, sid); toast("Deleted"); if (back) back(); else { closeModal(); render(); } } catch (err){ toast("Couldn't delete: " + err.message); }
   };
-  if (canLoad) $("#sv-load").onclick = () => loadSubmission(qid, meta.lang, hit.code);
+  if (canLoad) $("#sv-load").onclick = () => loadSubmission(qid, meta.lang, hit.code, meta.style);
 }
 
-function loadSubmission(qid, lang, code){
+function loadSubmission(qid, lang, code, style){
   closeModal();
   const ids = bankIds();
   const here = S.view === "exam" && S.exam && !S.exam.ended && S.exam.ids[S.exam.cur] === qid;
@@ -84,7 +84,8 @@ function loadSubmission(qid, lang, code){
     }
     const e = S.exam, id = e.ids[e.cur];
     saveCode();
-    e.lang[id] = lang; e.code[id] = e.code[id] || {}; e.code[id][lang] = code;
+    if (style && style !== STYLE){ STYLE = style; store.set("oa-style", style); }   // open it in the style it was written in
+    e.lang[id] = lang; e.code[id] = e.code[id] || {}; e.code[id][bufKey(QMAP[id], lang)] = code;
     saveExam(); S.view = "exam"; render(); toast("Loaded your " + langLabel(lang) + " submission");
   };
   here ? go() : guardStart(go);

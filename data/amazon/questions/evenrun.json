@@ -105,5 +105,9 @@
    "pre": "",
    "post": "\n\n;(() => { const _d = require(\"fs\").readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number); console.log(String(countArrangements(_d.slice(1, 1 + _d[0])))); })();\n"
   }
- }
+ },
+ "year": 2026,
+ "month": 7,
+ "college": "IIIT Delhi",
+ "role": "Intern"
 }

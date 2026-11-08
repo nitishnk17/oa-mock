@@ -51,6 +51,7 @@ def save(req):
             "id": sid, "company": company, "qid": qid, "title": str(req.get("title", qid))[:200],
             "lang": lang, "score": score, "passed": int(req.get("passed", 0) or 0), "total": int(req.get("total", 0) or 0),
             "mode": "practice" if req.get("practice") else "test", "format": str(req.get("format", ""))[:60],
+            "style": "hackerrank" if req.get("style") == "hackerrank" else "leetcode",
             "at": int(now * 1000), "file": "%s.%s" % (sid, EXT[lang]),
         }
         with open(os.path.join(d, meta["file"]), "w", encoding="utf-8", newline="\n") as f:

@@ -37,12 +37,18 @@ function endExam(auto){
 
 /* ---------- editor ---------- */
 let cm = null, ta = null;
-function codeOf(id, lang){ const c = S.exam.code[id] || {}; return c[lang] != null ? c[lang] : starterOf(QMAP[id], lang); }
+function codeOf(id, lang){
+  const q = QMAP[id], c = S.exam.code[id] || {}, key = bufKey(q, lang);
+  if (c[key] != null) return c[key];
+  // first time in HackerRank style: carry over the function you already wrote in LeetCode style
+  if (key.endsWith("@hr") && c[lang] != null && c[lang] !== stubOf(q, lang)) return fullProgram(q, lang, c[lang]);
+  return starterOf(q, key);
+}
 function saveCode(){
   if (!S.exam || S.view !== "exam") return;
   const id = S.exam.ids[S.exam.cur], lang = S.exam.lang[id];
   const v = cm ? cm.getValue() : ta ? ta.value : null;
-  if (v != null){ S.exam.code[id] = S.exam.code[id] || {}; S.exam.code[id][lang] = v; saveExam(); }
+  if (v != null){ S.exam.code[id] = S.exam.code[id] || {}; S.exam.code[id][bufKey(QMAP[id], lang)] = v; saveExam(); }
 }
 function mountEditor(el, value, lang){
   cm = null; ta = null;

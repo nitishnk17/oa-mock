@@ -81,5 +81,7 @@
    "pre": "",
    "post": "\n\n;(() => {\n    const _d = require(\"fs\").readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\n    let _i = 0;\n    const n = _d[_i++];\n    const a = _d.slice(_i, _i + n); _i += n + 1;\n    const b = _d.slice(_i, _i + n); _i += n + 1;\n    const c = _d.slice(_i, _i + n);\n    console.log(String(findCapableWinners(a, b, c)));\n})();\n"
   }
- }
+ },
+ "year": 2024,
+ "role": "SDE"
 }

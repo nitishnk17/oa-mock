@@ -115,6 +115,12 @@ CFG = {
 CFG["order"] = [q["id"] for q in QS]
 os.makedirs(os.path.join(OUT, "questions"), exist_ok=True)
 json.dump(CFG, open(os.path.join(OUT, "company.json"), "w", encoding="utf-8"), indent=2, ensure_ascii=False)
+META_KEYS = ("year", "month", "college", "role", "alsoSeen")   # kept from the existing file, so a rebuild doesn't drop them
 for q in QS:
-    json.dump(q, open(os.path.join(OUT, "questions", q["id"] + ".json"), "w", encoding="utf-8"), indent=1, ensure_ascii=False)
+    p = os.path.join(OUT, "questions", q["id"] + ".json")
+    if os.path.isfile(p):
+        old = json.load(open(p, encoding="utf-8"))
+        for k in META_KEYS:
+            if k in old and k not in q: q[k] = old[k]
+    json.dump(q, open(p, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
 print("wrote", OUT, [q["id"] for q in QS])

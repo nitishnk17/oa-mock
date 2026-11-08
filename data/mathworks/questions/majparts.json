@@ -105,5 +105,8 @@
    "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _n = Number(_t[_p++]);\n    const arr = _t.slice(_p, _p + (_n)).map(Number); _p += (_n);\n    const _r = minSubsequences(arr);\n    console.log(String(_r));\n})();\n"
   }
  },
- "refcppProgram": true
+ "refcppProgram": true,
+ "year": 2026,
+ "college": "IIT Bombay",
+ "role": "Software Engineer"
 }

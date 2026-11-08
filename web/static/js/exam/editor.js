@@ -232,6 +232,7 @@ function editorSettingsHTML(){
         ${ck("lineWrap", "Wrap long lines")}
         <label class="ed-row">Font size <select data-ed="fontSize">${[12, 13, 14, 15, 16, 18, 20].map(n => `<option ${ED.fontSize === n ? "selected" : ""}>${n}</option>`).join("")}</select></label>
         <label class="ed-row">Indent <select data-ed="tabSize">${[2, 4].map(n => `<option value="${n}" ${ED.tabSize === n ? "selected" : ""}>${n} spaces</option>`).join("")}</select></label>
+        <label class="ed-row" title="LeetCode: you write a function and a hidden driver reads the input. HackerRank: you get the whole program, input reading included.">Problem style <select id="ed-style"><option value="leetcode" ${STYLE === "leetcode" ? "selected" : ""}>LeetCode</option><option value="hackerrank" ${STYLE === "hackerrank" ? "selected" : ""}>HackerRank</option></select></label>
         <label class="ed-row">Keys <select data-ed="keymap">${[["sublime", "VS Code / Sublime"], ["default", "Basic"], ["vim", "Vim"]].map(([v, l]) => `<option value="${v}" ${ED.keymap === v ? "selected" : ""}>${l}</option>`).join("")}</select></label></div>
     </div>
     <div class="ed-foot"><button class="btn" id="ed-keys">⌨ Keyboard shortcuts</button><button class="btn" id="ed-reset">Restore defaults</button></div>
@@ -250,6 +251,7 @@ function bindEditorSettings(){
       setEditorOption(k, v);
     }));
     $("#ed-keys").addEventListener("click", () => { pop.remove(); showShortcuts(); });
+    $("#ed-style").addEventListener("change", ev => { pop.remove(); setStyle(ev.target.value); toast(ev.target.value === "hackerrank" ? "HackerRank style: the whole program is in the editor" : "LeetCode style: write the function, the I/O is hidden"); });
     $("#ed-reset").addEventListener("click", () => { for (const k in ED_DEFAULTS) setEditorOption(k, ED_DEFAULTS[k]); pop.remove(); toast("Editor settings restored"); });
     setTimeout(() => document.addEventListener("click", function close(){ const p = $("#edpop"); if (p) p.remove(); document.removeEventListener("click", close); }), 0);
   });

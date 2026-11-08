@@ -46,7 +46,7 @@ function bindExam(){
   mountEditor($("#editor"), codeOf(id, e.lang[id]), e.lang[id]);
   bindNav(e);
   $("#lang").addEventListener("change", ev => { saveCode(); e.lang[id] = ev.target.value; if (q.type === "code") { S.lang = ev.target.value; store.set(K + "-lang", S.lang); } saveExam(); render(); });
-  $("#reset").addEventListener("click", () => { const v = starterOf(q, e.lang[id]); if (cm) cm.setValue(v); else if (ta) ta.value = v; saveCode(); });
+  $("#reset").addEventListener("click", () => { const v = starterOf(q, bufKey(q, e.lang[id])); if (cm) cm.setValue(v); else if (ta) ta.value = v; saveCode(); });
   $("#run").addEventListener("click", () => doRun(false));
   $("#submit").addEventListener("click", () => doRun(true));
   const uc = $("#usecustom"); if (uc) uc.addEventListener("change", () => { $("#custom").hidden = !uc.checked; if (uc.checked && !$("#custom").value) $("#custom").value = q.samples[0].in; });

@@ -4,13 +4,22 @@
 function stmtHTML(q){
   const samples = q.type === "sql"
     ? q.samples.map((s, i) => `<h3>Sample data ${i}</h3>${Object.entries(s.tables).map(([t, d]) => tableHTML(t, d.cols, d.rows)).join("")}<h3>Expected output ${i}</h3>${tableHTML("result", ["company_name", "department_name", "average_salary"], s.out)}<p class="ex">${esc(s.ex)}</p>`).join("")
-    : q.samples.map((s, i) => `<h3>Sample case ${i}</h3><div class="sample"><div><div class="lbl">Input</div><pre>${esc(s.in)}</pre></div><div><div class="lbl">Output</div><pre>${esc(s.out)}</pre></div></div><p class="ex">${esc(s.ex)}</p>`).join("");
+    : STYLE === "hackerrank"
+      ? q.samples.map((s, i) => `<h3>Sample Input ${i}</h3><pre>${esc(s.in)}</pre><h3>Sample Output ${i}</h3><pre>${esc(s.out)}</pre>${s.ex ? `<h3>Explanation ${i}</h3><p class="ex">${esc(s.ex)}</p>` : ""}`).join("")
+      : q.samples.map((s, i) => `<h3>Example ${i + 1}</h3><div class="sample"><div><div class="lbl">Input</div><pre>${esc(s.in)}</pre></div><div><div class="lbl">Output</div><pre>${esc(s.out)}</pre></div></div>${s.ex ? `<p class="ex"><b>Explanation:</b> ${esc(s.ex)}</p>` : ""}`).join("");
   const schema = q.schema ? `<h3>Tables</h3>${q.schema.map(t => `<p><code>${t.t}</code>(${t.cols.map(c => `${c[0]} <span class="muted">${c[1]}</span>`).join(", ")})</p>`).join("")}` : "";
   const lc = S.exam && S.exam.practice && q.lc ? ` · <a href="${esc(q.lcurl || "#")}" target="_blank" rel="noopener">${esc(q.lc)}</a>` : "";
-  return `<div class="meta"><span class="pill d-${q.diff}">${q.diff}</span><span>${esc(q.src)}${lc}</span></div>
-    <h2>${esc(q.title)}</h2>${q.body}${schema}
-    <h3>Input format</h3><p>${q.inp}</p><h3>Output format</h3><p>${q.out}</p>
-    <h3>Constraints</h3><ul>${q.cons.map(c => `<li>${c}</li>`).join("")}</ul>${samples}`;
+  const tags = qTags(q).map(t => `<span class="tag">${esc(String(t))}</span>`).join("");
+  const head = `<div class="meta"><span class="pill d-${q.diff}">${q.diff}</span>${tags}<span>${esc(q.src)}${lc}</span></div><h2>${esc(q.title)}</h2>`;
+  const cons = `<h3>Constraints</h3><ul>${q.cons.map(c => `<li>${c}</li>`).join("")}</ul>`;
+  const fmt = `<h3>Input format</h3><p>${q.inp}</p><h3>Output format</h3><p>${q.out}</p>`;
+  const lang = S.exam && S.exam.lang ? S.exam.lang[q.id] : null;
+  if (STYLE === "hackerrank" || !hasDriver(q, lang || "py")){
+    const body = hasDriver(q, lang || "py") ? q.body.replace(/<p class="muted">Input reading and printing are handled for you[^<]*(<i>[^<]*<\/i>[^<]*)?<\/p>/,
+      '<p class="muted">The editor holds the whole program: reading the input and printing the result are already written, so complete the function. You may also rewrite the I/O yourself.</p>') : q.body;
+    return head + body + schema + fmt + cons + samples;
+  }
+  return head + q.body + schema + samples + cons + `<details class="iofmt"><summary>Input and output format (for Custom input)</summary>${fmt}</details>`;
 }
 function tableHTML(name, cols, rows){
   return `<div class="scroll-x"><table class="dtable"><caption>${esc(name)}</caption><thead><tr>${cols.map(c => `<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${rows.length ? rows.map(r => `<tr>${r.map(v => `<td>${esc(typeof v === "number" && !Number.isInteger(v) ? v.toFixed(4) : v)}</td>`).join("")}</tr>`).join("") : `<tr><td colspan="${cols.length}" class="muted">no rows</td></tr>`}</tbody></table></div>`;

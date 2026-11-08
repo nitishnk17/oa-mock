@@ -86,5 +86,7 @@
    "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _m = Number(_t[_p++]);\n    const start = _t[_p++];\n    const machine = [], dependsOn = [], time = [];\n    for (let _i = 0; _i < (_m); _i++) { machine.push(_t[_p++]); dependsOn.push(_t[_p++]); time.push(Number(_t[_p++])); }\n    const _r = failureCascade(start, machine, dependsOn, time);\n    console.log(_r.join(\" \"));\n})();\n"
   }
  },
- "refcppProgram": true
+ "refcppProgram": true,
+ "college": "IIT Bombay",
+ "role": "UI Engineer"
 }

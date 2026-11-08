@@ -259,3 +259,15 @@ table.subs td{vertical-align:middle}
 .toolbar .btn{padding:6px 11px}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .toolbar select#lang{max-width:150px}
+
+/* ---- question bank: year groups, tags, filters ---- */
+.bank-head{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:end;justify-content:space-between;margin-bottom:6px}
+.bank-head h2{margin-bottom:0}
+.bank-filters{display:flex;gap:10px;flex-wrap:wrap}
+.field.bf select{padding:4px 8px}
+.bank-year{font:600 13px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 2px}
+.bank-year:first-child{margin-top:4px}
+.bank-row .tag{display:inline-block;font:600 11px var(--f-body);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:0 6px;margin-right:6px;color:var(--ink)}
+.stmt .meta .tag{font:600 11px var(--f-body);background:var(--panel-2);border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--ink)}
+.stmt details.iofmt{margin-top:18px;border-top:1px solid var(--line);padding-top:10px}
+.stmt details.iofmt summary{cursor:pointer;color:var(--muted);font-size:13px}

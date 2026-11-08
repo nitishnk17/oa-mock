@@ -85,5 +85,8 @@
    "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _d = Number(_t[_p++]);\n    const deadends = _t.slice(_p, _p + (_d)); _p += (_d);\n    const target = _t[_p++];\n    const _r = openLock(deadends, target);\n    console.log(String(_r));\n})();\n"
   }
  },
- "refcppProgram": true
+ "refcppProgram": true,
+ "year": 2026,
+ "month": 3,
+ "role": "SDE-1"
 }

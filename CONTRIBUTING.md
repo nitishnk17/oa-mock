@@ -9,15 +9,21 @@ This is a group effort. If you sat an OA, or have a write-up or photos of one, a
 3. **Write the questions** in `data/<company>/`:
    - `company.json`: `key`, `name`, `tagline`, `blurb`, `headline`, `defaultFmt`, `formats` (with `pools` of question ids), `order`, `custom`, `offlist`. Copy `data/flipkart/company.json` as a template.
    - `questions/<id>.json`, one per question. Copy an existing one. A coding question needs `id`, `type: "code"`, `title`, `diff` (Easy/Medium/Hard), `src`, `body`, `inp`, `out`, `cons`, `samples` (each `{in, out, ex}`), `hidden` (each `{in, out}`), `ref` (Python) and ideally `refcpp`.
-   - **Give every coding question a `stub`** with starter code for all four languages (`py`, `cpp`, `java`, `js`). The stub must already do the question's own I/O — read exactly the format described in `inp` and print exactly the format described in `out` — and leave an empty function for the candidate to fill, as in `data/mathworks/questions/twodenom.json`. Without `stub` the editor falls back to a generic "read all of stdin" skeleton, so the candidate burns OA time writing parsing instead of solving. Use a 64-bit return type where the answer can exceed 2<sup>31</sup>.
-   - For LeetCode-style questions (the user fills in a function and the harness does the I/O), add `driver` per language alongside `stub`, as in `data/amazon/questions/flip.json`.
+   - **Add when and where it was asked**, so the bank can sort by year: `year` (e.g. `2026`), and if known `month` (1–12), `college`, `role`. Leave out anything the source doesn't say; don't guess.
+   - **Questions are LeetCode-style by default:** the candidate completes a function, and a hidden driver reads the input and prints the result. Users can switch to HackerRank style in the app, where the same function is shown inside the full program. Both views are built from `stub` (the function, per language) and `driver` (`{pre, post}`, per language). Don't write them by hand. Describe the function once and generate them:
+     1. Add an entry to `tools/style/specs.py`: function name, how to read the input (`int`, `str`, `int[]`, `int[][]`, rows of mixed columns, or a whole line), the return type, and a function-style Python reference. The file's docstring explains each field, and the 38 existing entries are examples.
+     2. `python3 tools/style/verify.py <company>/<id>`: the Python reference, through the generated driver, must pass every test. It also flags numbers that don't fit in an `int`; use `long` for those.
+     3. `python3 tools/style/selftest.py <company>/<id>`: Python, C++, Java and JavaScript must read every test input identically, and every untouched stub must compile and run.
+     4. `python3 tools/style/convert.py`: writes `stub`, `driver` and the "Function to complete" section into the question file.
+   - **The same question at another company or in another year?** Don't copy it. Add `"alsoSeen": ["company/id"]` to the new one instead.
 4. **Check it:**
    ```
-   python3 tools/check_refs.py <company>     # every reference must pass every test
-   python3 run.py                            # open it and try the question yourself
+   python3 tools/check_dupes.py path/to/question.json    # is it already in the bank? (--deep also compares answers)
+   python3 tools/check_refs.py <company>                  # every reference must pass every test
+   python3 run.py                                         # open it and try it in both problem styles
    ```
    Make the hidden tests cover edge cases and at least one maximum-size input, so slow solutions fail.
-   Also switch the editor to each of the four languages and run the untouched stub against sample 1: it must compile and print output of the right shape (placeholder values are fine). A stub that does not compile, or that misparses the input, is worse than no stub.
+   If the duplicate checker flags a pair that's actually a different problem, add `"distinctFrom": ["company/id"]` to your question so it's marked as checked.
 5. **Open a pull request.** Say where the questions come from (company, role, college, date) and what you guessed where the source was incomplete.
 
 ## Rules
@@ -29,6 +35,6 @@ This is a group effort. If you sat an OA, or have a write-up or photos of one, a
 
 ## Prompt you can give an LLM
 
-> Here are my notes/photos from the `<Company>` OA. Following the format of `data/amazon/questions/flip.json` in https://github.com/rgabhi/oa-mock, write one JSON file per question with a clear statement, 2 samples with explanations, 8–12 hidden tests (edge cases plus one large input), reference solutions in Python and C++, and a `stub` for all four languages (`py`, `cpp`, `java`, `js`) that reads the question's input format and prints its output format, leaving an empty function for me to fill. Also write a Markdown transcription of the notes for `sources/<company>/`. List anything you had to assume.
+> Here are my notes/photos from the `<Company>` OA. Following https://github.com/rgabhi/oa-mock (see `CONTRIBUTING.md`, `data/flipkart/questions/houses.json` and `tools/style/specs.py`), write for each question: a JSON file with a clear statement, `year`/`month`/`college`/`role` where the notes say them, 2 samples with explanations, 8–12 hidden tests (edge cases plus one maximum-size input) and a C++ reference; plus a `tools/style/specs.py` entry with the function signature, the input layout, the return type and a function-style Python reference. Also write a Markdown transcription of the notes for `sources/<company>/`. List anything you had to assume.
 
-Then run `tools/check_refs.py` before you open the PR. LLM-written tests are often wrong.
+Then run the checks in step 4 (and `verify.py` / `selftest.py`) before you open the PR. LLM-written tests are often wrong.

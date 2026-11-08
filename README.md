@@ -4,7 +4,8 @@
 
 ![Amazon OA Mock home](docs/home.png)
 
-- **Real formats:** each company's test layout is reproduced (for example, Amazon's 3-section SDE Intern OA), or you can build a custom set.
+- **Real formats:** each company's test layout is reproduced (for example, Amazon's 3-section SDE Intern OA), or you can build a custom set. The question bank is grouped by year, with filters for role, college and difficulty.
+- **LeetCode or HackerRank style:** by default you complete a function and the input/output is handled for you. Switch to HackerRank style (on the home page or under ⚙ in the editor) to get the whole program, input reading included.
 - **Your languages:** C++17, Java, Python 3 and JavaScript compile and run natively on your machine.
 - **Graded like the real thing:** Run checks the samples, and Submit runs every hidden test. Score = tests passed / total × 100, and your best submission counts.
 - **Timed or not:** a countdown that auto-submits, or **No timer** with a count-up clock.
@@ -193,6 +194,10 @@ sources/                   text/JSON transcriptions of the source material (no P
 .oa-cache/                 your past submissions (git-ignored, created on first Submit)
 tools/
   check_refs.py            runs every reference solution against its tests
+  check_dupes.py           finds questions already in the bank (text overlap; --deep compares answers)
+  style/                   specs.py (function signatures) -> convert.py writes LeetCode stubs + hidden drivers
+                           in 4 languages; verify.py and selftest.py check them
+  meta_backfill.py         one-off: year / role / college from each question's source
   amazon/                  generators that build data/amazon/ (statements, tests, debugging repo, SJT)
 setup.sh, setup.ps1/.bat   one-shot installers; start.sh / start.bat launch
 ```
