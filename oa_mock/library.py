@@ -44,7 +44,9 @@ def git_state():
     st["sparse"] = _git("config", "--get", "core.sparseCheckout", timeout=10)[1].strip() == "true"
     st["remote"] = _git("rev-parse", "--verify", "-q", BRANCH, timeout=10)[0] == 0
     st["behind"] = int(_git("rev-list", "--count", "HEAD.." + BRANCH, timeout=10)[1].strip() or 0) if st["remote"] else 0
-    st["dirty"] = bool(_git("status", "--porcelain", "--untracked-files=no", timeout=20)[1].strip())
+    # data/catalog.json is generated (saving a question rewrites it), so it doesn't count
+    st["dirty"] = any(l[3:].strip() != "data/catalog.json"
+                      for l in _git("status", "--porcelain", "--untracked-files=no", timeout=20)[1].splitlines() if l.strip())
     return st
 
 
@@ -125,6 +127,25 @@ def _cone(keys):
     return lambda: ["sparse-checkout", "set", "--cone"] + _platform_dirs() + ["data/" + k for k in sorted(set(keys))]
 
 
+def _tidy():
+    """Before pulling: drop local changes to the generated catalog, and your own copies of question files that are
+    now on GitHub byte for byte (e.g. a question you sent as a pull request that got merged); git would refuse
+    to overwrite them otherwise."""
+    done = []
+    if _git("diff", "--quiet", "--", "data/catalog.json", timeout=20)[0]:
+        _git("checkout", "--", "data/catalog.json", timeout=20); done.append("reset data/catalog.json (it's regenerated)")
+    rc, out = _git("ls-files", "--others", "--exclude-standard", "--", "data", timeout=30)
+    for path in out.splitlines() if rc == 0 else []:
+        rc1, theirs = _git("rev-parse", "-q", "--verify", "%s:%s" % (BRANCH, path), timeout=10)
+        if rc1 or not theirs.strip():
+            continue
+        mine = _git("hash-object", path, timeout=10)[1].strip()
+        if mine == theirs.strip():
+            os.remove(os.path.join(ROOT, path)); done.append("%s is now on GitHub" % path)
+    return "\n".join(done)
+_tidy.python = True
+
+
 def _run_job(steps):
     log = []
     def say(line):
@@ -132,8 +153,12 @@ def _run_job(steps):
             log.append(line); _job["log"] = "\n".join(log)[-8000:]
     try:
         for desc, args, timeout in steps:
-            args = args() if callable(args) else args
             with _lock: _job["step"] = desc
+            if getattr(args, "python", False):
+                note = args()
+                if note: say(note)
+                continue
+            args = args() if callable(args) else args
             say("$ git " + " ".join(args))
             rc, out = _git(*args, timeout=timeout)
             if out.strip(): say(out.strip()[-3000:])
@@ -157,12 +182,13 @@ def start(kind, key=None):
     installed = _installed_keys()
     in_head = key in _trees("HEAD") if key else False
     pull = ("update", ["pull", "--ff-only", "--quiet"], 600)
+    tidy = ("tidy", _tidy, 0)
     if kind == "download":
         if key in installed: raise ValueError("already downloaded")
         if not in_head and key not in _trees(BRANCH): raise ValueError("no such company in the repository")
         if not in_head and st.get("dirty"):
             raise ValueError("%s needs an app update first, and you have uncommitted changes to files from the repository; commit or stash them" % key)
-        steps = [] if in_head else [pull]                  # new on GitHub: bring this copy up to date first
+        steps = [] if in_head else [tidy, pull]            # new on GitHub: bring this copy up to date first
         if st["sparse"] or in_head:                         # (a full clone has it after the pull)
             steps.append(("download", _cone(installed + [key]), 900))
     elif kind == "remove":
@@ -173,7 +199,7 @@ def start(kind, key=None):
         steps = [("remove", _cone([k for k in installed if k != key]), 120)]
     elif kind == "update":
         if st.get("dirty"): raise ValueError("you have uncommitted changes to files from the repository; commit or stash them first")
-        steps = [pull]
+        steps = [tidy, pull]
         if st["sparse"]:
             steps.append(("refresh", _cone(installed), 900))
     elif kind == "check":

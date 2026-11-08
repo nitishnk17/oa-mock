@@ -70,8 +70,18 @@ def run_js(src, inputs):
 def main(keys):
     bad = 0
     for key in keys or SPECS:
-        spec = SPECS[key]; company, qid = key.split("/")
-        q = json.load(open(os.path.join(ROOT, "data", company, "questions", qid + ".json"), encoding="utf-8"))
+        company, qid = key.split("/")
+        with open(os.path.join(ROOT, "data", company, "questions", qid + ".json"), encoding="utf-8") as f:
+            q = json.load(f)
+        bad += check(key, convert.spec_for(key, q), q)
+    print("\n" + ("all drivers agree" if not bad else "%d problem(s)" % bad))
+    return 1 if bad else 0
+
+
+def check(key, spec, q):
+    """Prints one line for the question; returns 1 if the drivers disagree or a stub doesn't run."""
+    if True:
+        bad = 0
         tests = [t["in"] for t in q["samples"] + q["hidden"] if len(t["in"]) < 50_000]
         stub, driver = convert.build(spec); probe, ret_text = probes(spec)
         outs = {}
@@ -79,13 +89,11 @@ def main(keys):
             src = driver[lang]["pre"] + probe[lang] + driver[lang]["post"]
             res = run_js(src, tests) if lang == "js" else judge.judge(lang, src, tests, 20000)
             if "compile_error" in res:
-                print("FAIL %-20s %s probe: %s" % (key, lang, res["compile_error"][-500:])); bad += 1; outs = None; break
+                print("FAIL %-20s %s probe: %s" % (key, lang, res["compile_error"][-500:])); return 1
             errs = [r["err"] for r in res["results"] if r.get("err") or r.get("tle")]
             if errs:
-                print("FAIL %-20s %s probe crashed: %s" % (key, lang, errs[0][-300:])); bad += 1; outs = None; break
+                print("FAIL %-20s %s probe crashed: %s" % (key, lang, errs[0][-300:])); return 1
             outs[lang] = [r["out"].rstrip("\n") for r in res["results"]]
-        if outs is None:
-            continue
         same = all(outs[l] == outs["py"] for l in outs)
         shape = all(o.endswith(ret_text) for o in outs["py"])
         # untouched stubs: compile and run on sample 0
@@ -103,8 +111,7 @@ def main(keys):
         if not same:
             l = next(l for l in outs if outs[l] != outs["py"]); i = next(i for i in range(len(tests)) if outs[l][i] != outs["py"][i])
             print("      py : %r\n      %-3s: %r" % (outs["py"][i][:200], l, outs[l][i][:200]))
-    print("\n" + ("all drivers agree" if not bad else "%d problem(s)" % bad))
-    return 1 if bad else 0
+        return bad
 
 
 if __name__ == "__main__":

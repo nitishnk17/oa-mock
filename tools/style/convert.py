@@ -251,17 +251,41 @@ FN_DOC = ('<h3>Function to complete</h3><p>Complete <code>%s(%s)</code>. It retu
           '<p class="muted">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>')
 
 
+def spec_for(key, q):
+    """A question's function spec: its entry in specs.py, or the "spec" field of its JSON. In the JSON the spec has
+    no "ref": the question's own "ref" (class Solution with the function) is the reference."""
+    if key in SPECS:
+        return SPECS[key]
+    s = q.get("spec")
+    if not s:
+        return None
+    spec = dict(s)
+    ref = q.get("ref", "")
+    if "class Solution" not in ref:
+        raise ValueError('"ref" must be a Python class Solution with the method %s(...)' % spec.get("fn"))
+    spec["ref"] = ref.split("class Solution", 1)[1].split(":", 1)[1]
+    return spec
+
+
+def apply(q, spec):
+    """Writes stub, driver and the "Function to complete" section into question q (a dict)."""
+    stub, driver = build(spec)
+    q["stub"], q["driver"] = stub, driver
+    q["ref"] = "class Solution:" + spec["ref"].rstrip() + "\n"
+    if q.get("refcpp") and "class Solution" not in q["refcpp"]:
+        q["refcppProgram"] = True        # a full-program C++ reference keeps working as it is
+    q["body"] = re.sub(r"<h3>Function to complete</h3>.*$", "", q["body"], flags=re.S)
+    q["body"] += FN_DOC % (spec["fn"], ", ".join(n for n, _ in params(spec)), spec["returns"])
+    return q
+
+
 def convert(key, spec, write=True):
     company, qid = key.split("/")
     path = os.path.join(ROOT, "data", company, "questions", qid + ".json")
     with open(path, encoding="utf-8") as f:
         q = json.load(f)
-    stub, driver = build(spec)
-    q["stub"], q["driver"] = stub, driver
-    q["ref"] = "class Solution:" + spec["ref"].rstrip() + "\n"
+    apply(q, spec)
     q["refcppProgram"] = True
-    q["body"] = re.sub(r"<h3>Function to complete</h3>.*$", "", q["body"], flags=re.S)
-    q["body"] += FN_DOC % (spec["fn"], ", ".join(n for n, _ in params(spec)), spec["returns"])
     if write:
         with open(path, "w", encoding="utf-8") as f:
             json.dump(q, f, indent=1, ensure_ascii=False)

@@ -49,17 +49,31 @@ def token_types(spec):
     return walk
 
 
+def load_q(key):
+    company, qid = key.split("/")
+    with open(os.path.join(ROOT, "data", company, "questions", qid + ".json"), encoding="utf-8") as f:
+        return json.load(f)
+
+
 def main(keys):
     bad = 0
     for key in keys or SPECS:
-        spec = SPECS[key]; company, qid = key.split("/")
-        q = json.load(open(os.path.join(ROOT, "data", company, "questions", qid + ".json"), encoding="utf-8"))
+        q = load_q(key)
+        bad += check(key, convert.spec_for(key, q), q)
+    print("\n" + ("all specs verified" if not bad else "%d problem(s)" % bad))
+    return 1 if bad else 0
+
+
+def check(key, spec, q):
+    """Prints one line for the question; returns 1 if there's a problem."""
+    if True:
+        bad = 0
         tests = q["samples"] + q["hidden"]
         stub, driver = convert.build(spec)
         src = driver["py"]["pre"] + "class Solution:" + spec["ref"] + driver["py"]["post"]
         res = judge.judge("py", src, [t["in"] for t in tests], 20000)
         if "compile_error" in res:
-            print("FAIL %-20s %s" % (key, res["compile_error"][-400:])); bad += 1; continue
+            print("FAIL %-20s %s" % (key, res["compile_error"][-400:])); return 1
         fails = [i for i, (t, r) in enumerate(zip(tests, res["results"])) if r["tle"] or r["err"] or norm(r["out"]) != norm(t["out"])]
         # ranges
         warn = []
@@ -86,8 +100,7 @@ def main(keys):
         if fails:
             r = res["results"][fails[0]]
             print("      first failure  got: %r  expected: %r  err: %s" % (r["out"][:80], tests[fails[0]]["out"][:80], r["err"][-300:]))
-    print("\n" + ("all specs verified" if not bad else "%d problem(s)" % bad))
-    return 1 if bad else 0
+        return bad
 
 
 if __name__ == "__main__":

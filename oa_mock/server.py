@@ -4,6 +4,11 @@ GET  /                               home page: your companies, and ones you can
 GET  /api/library                    companies here and on GitHub, git status, the running job
 POST /api/library                    {action: check|download|update|remove, company} -> starts a job (see library.py)
 GET  /api/library/job                progress of the running job
+GET  /contribute                     "Add a question" page
+GET  /api/contribute/status          companies here, and what sending a pull request needs (git, gh, sign-in)
+POST /api/contribute/check           {company, question} -> the checks (see contribute.py)
+POST /api/contribute/save            {company, question, name?, tagline?} -> writes it into data/
+POST /api/contribute/share           {company, qid, note?} -> opens a pull request with the GitHub CLI
 GET  /<company>                      the test app for one company
 GET  /static/...                     CSS, JS and vendored libraries from web/static/
 GET  /api/companies                  JSON list of companies
@@ -16,13 +21,13 @@ GET  /api/submissions/<company>/<qid>/<id>    one submission with its code
 POST /api/submissions                save a submission
 DELETE /api/submissions/<company>/<qid>/<id>
 
-/run, /api/grade, /api/library and /api/submissions need the X-Token header the pages carry.
+/run and every /api/ route except companies/data.js need the X-Token header the pages carry.
 """
 import html, json, mimetypes, os, secrets
 from urllib.parse import parse_qs, urlsplit
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from . import data, grading, judge, library, submissions
+from . import contribute, data, grading, judge, library, submissions
 
 WEB_DIR = os.path.join(data.ROOT, "web")
 STATIC_DIR = os.path.join(WEB_DIR, "static")
@@ -71,11 +76,11 @@ class Handler(BaseHTTPRequestHandler):
     def _json(self, code, obj):
         self._send(code, json.dumps(obj), "application/json")
 
-    def _body(self):
+    def _body(self, limit=2 * 1024 * 1024):
         if "application/json" not in self.headers.get("Content-Type", ""):
             raise submissions.BadRequest("expected JSON")
         n = int(self.headers.get("Content-Length", "0"))
-        if n > 2 * 1024 * 1024:
+        if n > limit:
             raise submissions.BadRequest("request too large")
         return json.loads(self.rfile.read(n) or b"{}")
 
@@ -112,9 +117,18 @@ class Handler(BaseHTTPRequestHandler):
             return self._submissions("GET", parts[2:], url.query)
 
         if not parts:
-            links = "".join('<a class="company" href="/%s">%s<small>%s</small></a>' % (k, html.escape(n), html.escape(t))
-                            for k, n, t in data.companies())
+            links = "".join('<a class="company panel mine" href="/%s"><span class="body"><span class="name">%s</span>'
+                            '<div class="tag">%s</div></span></a>' % (k, html.escape(n), html.escape(t)) for k, n, t in data.companies())
             return self._send(200, _template("index.html", companies=links, token=json.dumps(TOKEN)), "text/html; charset=utf-8")
+
+        if parts == ["contribute"]:
+            return self._send(200, _template("contribute.html", token=json.dumps(TOKEN)), "text/html; charset=utf-8")
+        if parts == ["api", "contribute", "status"]:
+            if not self._token_ok():
+                return self._json(403, {"error": "forbidden"})
+            st = contribute.share_status()
+            st["companies"] = [{"key": k, "name": n} for k, n, _ in data.companies()]
+            return self._json(200, st)
 
         if parts[:2] == ["api", "library"]:
             if not self._token_ok():
@@ -122,7 +136,9 @@ class Handler(BaseHTTPRequestHandler):
             if parts[2:] == ["job"]:
                 return self._json(200, library.job())
             if not parts[2:]:
-                return self._json(200, library.listing())
+                out = library.listing()
+                out["langs"] = {"cpp": bool(judge.GPP), "java": bool(judge.JAVAC and judge.JAVA), "py": True, "js": True}
+                return self._json(200, out)
             return self._not_found()
 
         if parts[0] == "static":
@@ -173,6 +189,27 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if urlsplit(self.path).path == "/api/submissions":
             return self._submissions("POST", [], "")
+        if urlsplit(self.path).path.startswith("/api/contribute/"):
+            if not self._token_ok():
+                return self._json(403, {"error": "forbidden"})
+            action = urlsplit(self.path).path.rsplit("/", 1)[1]
+            try:
+                req = self._body(limit=contribute.MAX_BYTES + 1024 * 1024)
+                q = req.get("question")
+                if action == "check":
+                    res = contribute.check(req.get("company"), q, replace=bool(req.get("replace")))
+                    res["question"] = _preview(res["question"])
+                    return self._json(200, res)
+                if action == "save":
+                    return self._json(200, {"written": contribute.save(req.get("company"), q, req.get("name"), req.get("tagline"),
+                                                                      replace=bool(req.get("replace")))})
+                if action == "share":
+                    return self._json(200, contribute.share(req.get("company"), req.get("qid"), str(req.get("note") or "")))
+            except (contribute.Problem, submissions.BadRequest, ValueError) as e:
+                return self._json(400, {"error": str(e)})
+            except Exception as e:
+                return self._json(500, {"error": "%s: %s" % (type(e).__name__, e)})
+            return self._json(404, {"error": "not found"})
         if urlsplit(self.path).path == "/api/library":
             if not self._token_ok():
                 return self._json(403, {"error": "forbidden"})
@@ -201,6 +238,15 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as e:
             res = {"compile_error": "Runner error: %s" % e}
         self._send(200, json.dumps(res), "application/json")
+
+
+def _preview(q):
+    """What the check page shows of a question: no test data (it can be megabytes)."""
+    if not isinstance(q, dict):
+        return q
+    out = {k: v for k, v in q.items() if k not in ("hidden", "samples", "wrong", "driver")}
+    out["samples"] = len(q.get("samples") or []); out["hidden"] = len(q.get("hidden") or [])
+    return out
 
 
 def serve(port, tries=20):

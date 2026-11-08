@@ -46,8 +46,11 @@ def load(key):
     with open(os.path.join(d, "company.json"), encoding="utf-8") as f:
         cfg = json.load(f)
     order = cfg.pop("order", None)
+    files = sorted(f[:-5] for f in os.listdir(os.path.join(d, "questions")) if f.endswith(".json"))
     if order is None:
-        order = sorted(f[:-5] for f in os.listdir(os.path.join(d, "questions")) if f.endswith(".json"))
+        order = files
+    else:   # questions not listed in "order" (e.g. just added) come last
+        order = [q for q in order if q in files] + [q for q in files if q not in order]
     questions = []
     for qid in order:
         with open(os.path.join(d, "questions", qid + ".json"), encoding="utf-8") as f:
@@ -69,8 +72,8 @@ def question(key, qid):
 
 
 def _light(q):
-    """What the page gets: everything except the hidden tests, which stay on the server."""
-    out = {k: v for k, v in q.items() if k != "hidden"}
+    """What the page gets: everything except the hidden tests (and known-wrong solutions), which stay on the server."""
+    out = {k: v for k, v in q.items() if k not in ("hidden", "wrong")}
     out["hiddenCount"] = len(q.get("hidden", []))
     return out
 

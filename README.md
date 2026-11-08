@@ -18,15 +18,26 @@
 
 ## Quick start
 
+One command downloads the app with Flipkart's questions (about 4 MB) into an `oa-mock` folder, installs what's missing and opens it:
+
+| OS | Install (first time) | Start (after that) |
+|---|---|---|
+| **macOS / Linux** | `curl -fsSL https://raw.githubusercontent.com/rgabhi/oa-mock/main/install.sh \| bash` | `cd oa-mock && ./start.sh` |
+| **Windows 10/11** (PowerShell) | `irm https://raw.githubusercontent.com/rgabhi/oa-mock/main/install.ps1 \| iex` | double-click **`start.bat`** in `oa-mock` |
+
+Then pick more companies on the home page and press **Download**; only those are fetched. Options: `| bash -s -- --no-java` skips the JDK, `| OA_DIR=path bash` picks another folder, and `| OA_FULL=1 bash` gets every company (about 40 MB).
+
+**Prefer git yourself?** The same slim install by hand:
+
 ```
 git clone --filter=blob:none --sparse https://github.com/rgabhi/oa-mock.git
 cd oa-mock
-git sparse-checkout set --cone docs oa_mock sources tools web data/flipkart
+git sparse-checkout set --cone .github docs oa_mock sources tools web data/flipkart
 ```
 
-That's the slim install: the app plus Flipkart's questions (about 4 MB). Pick more companies on the home page and press **Download**; only those are fetched. A plain `git clone https://github.com/rgabhi/oa-mock.git` gets every company (about 40 MB) and works too. You can remove companies from the home page later.
+Then run the setup script below. A plain `git clone` (every company) works too, and you can remove companies from the home page later.
 
-| OS | First time | After that |
+| OS | Setup (in the folder) | After that |
 |---|---|---|
 | **Windows 10/11** | double-click **`setup.bat`** | double-click **`start.bat`** |
 | **macOS** | `./setup.sh` | `./start.sh` |
@@ -189,10 +200,13 @@ oa_mock/                   backend (Python 3.8+, stdlib only)
   judge.py                 compiles and runs code: g++/clang (C++17), javac/java, Python
   grading.py               runs an answer on a question's tests on the server (hidden tests never reach the page)
   library.py               companies here vs on GitHub; download / update / remove with git sparse checkout
+  contribute.py            checks a new question, saves it, opens a pull request with the GitHub CLI
   submissions.py           saves / lists / reads past submissions in .oa-cache/
   data.py                  loads data/<company>/, reloading when files change
 web/                       frontend (plain HTML/CSS/JS, no build step)
   index.html, app.html     home page (static/js/landing.js); the test app (one template for every company)
+  contribute.html          "Add a question" (static/js/contribute.js; static/llm-prompt.md is the prompt for your LLM)
+  static/css/site.css      shared look of the home and contribute pages (JetBrains Mono + Inter, vendored, OFL)
   static/css/              app.css, index.css
   static/js/core/          config.js (data, languages, saved state), util.js
   static/js/run/           workers.js (JavaScript answers in a Web Worker), sql.js, judge.js (calls /run, grades),
@@ -211,28 +225,30 @@ sources/                   text/JSON transcriptions of the source material (no P
 tools/
   check_refs.py            runs every reference solution against its tests
   check_dupes.py           finds questions already in the bank (text overlap; --deep compares answers)
-  build_catalog.py         rewrites data/catalog.json (run after adding or changing questions)
+  add_question.py          the question checks (same as the app and the pull-request check); --save adds it
+  build_catalog.py         rewrites data/catalog.json (GitHub does this after each merge)
+  smoke.py                 starts the app, loads its pages and grades an answer (pull-request check)
   style/                   specs.py (function signatures) -> convert.py writes LeetCode stubs + hidden drivers
                            in 4 languages; verify.py and selftest.py check them
   meta_backfill.py         one-off: year / role / college from each question's source
   amazon/                  generators that build data/amazon/ (statements, tests, debugging repo, SJT)
-setup.sh, setup.ps1/.bat   one-shot installers; start.sh / start.bat launch
+install.sh, install.ps1    one-line installers: slim clone, then setup
+setup.sh, setup.ps1/.bat   install Python / C++ / Java if missing; start.sh / start.bat launch
+.github/                   PR checks and catalog workflows, CODEOWNERS
 ```
 
 **Request flow.** `GET /amazon` renders `web/app.html`, which loads the vendored editor, then `/api/companies/amazon/data.js` (that company's config and questions, without hidden tests), then the app scripts. C++, Java and Python answers go to `POST /api/grade`: the server runs them on the samples or on all tests and returns a verdict per test. JavaScript answers and the debugging repo run in a Web Worker in the page, which fetches that one question's hidden tests when you submit. The server only listens on `127.0.0.1`, checks the `Host` header, and requires a per-run token on `/run`, `/api/grade`, `/api/library` and `/api/submissions`.
 
 ### Adding or editing questions
 
-- **Edit:** change `data/<company>/questions/<id>.json` and reload the page. The server picks up changed files automatically.
-- **Add a question:** create `questions/<id>.json` (copy an existing one as a template) and add the id to `order` in `company.json`. Mention it in a format's `pools` to include it in a test.
-- **Add a company:** create `data/<key>/company.json` and `data/<key>/questions/`. It appears on the home page automatically.
-- **Check:** run `python3 tools/check_refs.py [company]`. Every Python and C++ reference must pass its tests.
-- **Catalog:** run `python3 tools/build_catalog.py` and commit `data/catalog.json` with your questions. It keeps entries for companies you haven't downloaded.
+See [CONTRIBUTING.md](CONTRIBUTING.md). In short: open **add a question** in the app, paste the JSON your LLM wrote from the prompt there, run the checks, save, and open the pull request. Or use `python3 tools/add_question.py <company> question.json --save` from a terminal.
+
+- Edits to a question file show up on the next page load. Re-run `tools/add_question.py --check <file>` afterwards.
 - **Amazon** is generated: edit the files in `tools/amazon/`, then run `python3 tools/amazon/build.py` (needs `node` and `g++`).
 - **Sources:** keep original PDFs and photos in `raw-sources/` (git-ignored), and commit only text/JSON transcriptions under `sources/`.
 
 ## Contributing
 
-Sat an OA recently? Add it. Fork the repo, put your questions in `data/<company>/` (an LLM can do most of the writing from your notes), check them with `tools/check_refs.py`, and open a pull request. [CONTRIBUTING.md](CONTRIBUTING.md) has the format, a checklist and a ready-made LLM prompt. The more people add, the more useful this is for everyone.
+Sat an OA recently? Add it. Open **add a question** in the app, give the prompt there to your LLM along with your notes, and paste back what it writes. The app checks the question (references, drivers in 4 languages, known-wrong solutions, duplicates) and opens the pull request for you. [CONTRIBUTING.md](CONTRIBUTING.md) has the details. The more people add, the more useful this is for everyone.
 
 The questions are paraphrased from candidates' reports and are for personal practice only.
