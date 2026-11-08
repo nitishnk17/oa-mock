@@ -51,5 +51,5 @@ Older questions keep their function specs in `tools/style/specs.py`. New ones ca
 - Paraphrase statements in your own words. Don't paste the test platform's text wholesale.
 - No personal data: no names, emails or roll numbers of candidates. Demo credentials shown inside a test are fine.
 - If a statement is too incomplete to grade, add it to `offlist` in `company.json` with a short reason instead of guessing.
-- Changes outside `data/` and `sources/` (the app, tools, setup scripts) need a review from the maintainer (`.github/CODEOWNERS`). Open an issue first for big changes.
+- `main` is protected: everything goes through a pull request. Pull requests that only touch `data/` and `sources/` can be merged once the PR checks pass. Changes to anything else (the app, tools, setup scripts) also need the maintainer's review (`.github/CODEOWNERS`). Open an issue first for big changes.
 - Keep the server dependency-free (Python standard library only) and the frontend build-free.
