@@ -10,15 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0          # every company, so the duplicate check sees the whole bank
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with: { python-version: "3.12" }
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with: { distribution: temurin, java-version: "21" }
-      - uses: actions/setup-node@v4
-        with: { node-version: "20" }
+      - uses: actions/setup-node@v5
+        with: { node-version: "22" }
       - name: App starts and grades
         run: python3 tools/smoke.py
       - name: Changed questions (format, references, 4 language drivers, known-wrong solutions, duplicates)
