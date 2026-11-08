@@ -74,9 +74,17 @@ async function doRun(full){
       setStat(r.tle ? "Time limit exceeded" : r.ce ? "Compilation error" : r.err ? "Runtime error" : "Custom run finished", r.tle || r.err ? "bad" : "ok");
       return;
     }
-    const tests = full ? [...q.samples, ...q.hidden] : q.samples;
-    out.innerHTML = `<p class="muted" id="prog">Running… 0/${tests.length}</p>`;
-    const res = await judge(q, lang, code, tests, i => { const p = $("#prog"); if (p) p.textContent = `Running… ${i + 1}/${tests.length}`; });
+    let tests, res;
+    if (serverGraded(q, lang)){
+      const n = full ? q.samples.length + (q.hiddenCount || 0) : q.samples.length;
+      out.innerHTML = `<p class="muted" id="prog">Running ${n} test case${n === 1 ? "" : "s"} on your computer…</p>`;
+      ({tests, res} = await gradeOnServer(q, lang, code, full));
+    } else {
+      if (full) out.innerHTML = `<p class="muted" id="prog">Loading the hidden tests…</p>`;
+      tests = full ? [...q.samples, ...(await hiddenOf(q))] : q.samples;
+      out.innerHTML = `<p class="muted" id="prog">Running… 0/${tests.length}</p>`;
+      res = await judge(q, lang, code, tests, i => { const p = $("#prog"); if (p) p.textContent = `Running… ${i + 1}/${tests.length}`; });
+    }
     const passed = res.filter(r => r.ok).length, score = Math.round(passed / tests.length * 100);
     if (full){
       const prev = e.best[id];

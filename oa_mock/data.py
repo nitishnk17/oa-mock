@@ -25,7 +25,7 @@ def _signature(key):
 def companies():
     """[(key, name, blurb)] for every folder in data/ with a company.json, sorted by name."""
     out = []
-    for key in sorted(os.listdir(DATA_DIR)):
+    for key in sorted(os.listdir(DATA_DIR)) if os.path.isdir(DATA_DIR) else []:
         p = os.path.join(DATA_DIR, key, "company.json")
         if KEY_RE.match(key) and os.path.isfile(p):
             with open(p, encoding="utf-8") as f:
@@ -57,9 +57,37 @@ def load(key):
     return payload
 
 
-def as_script(key):
-    """The company payload as a JS file that sets window.OA_DATA."""
+def question(key, qid):
+    """One question with all its tests (the server grades with these), or None."""
     p = load(key)
     if p is None:
         return None
-    return "window.OA_DATA = " + json.dumps(p, ensure_ascii=False).replace("</", "<\\/") + ";\n"
+    for q in p["questions"]:
+        if q.get("id") == qid:
+            return q
+    return None
+
+
+def _light(q):
+    """What the page gets: everything except the hidden tests, which stay on the server."""
+    out = {k: v for k, v in q.items() if k != "hidden"}
+    out["hiddenCount"] = len(q.get("hidden", []))
+    return out
+
+
+_script_cache = {}
+
+
+def as_script(key):
+    """The company payload as a JS file that sets window.OA_DATA (without hidden tests)."""
+    p = load(key)
+    if p is None:
+        return None
+    sig = _cache[key][0]
+    hit = _script_cache.get(key)
+    if hit and hit[0] == sig:
+        return hit[1]
+    light = {"config": p["config"], "questions": [_light(q) for q in p["questions"]]}
+    js = "window.OA_DATA = " + json.dumps(light, ensure_ascii=False).replace("</", "<\\/") + ";\n"
+    _script_cache[key] = (sig, js)
+    return js

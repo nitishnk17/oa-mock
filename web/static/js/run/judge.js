@@ -13,6 +13,32 @@ async function runOne(lang, code, inp){
   return RUN[lang].run(code, inp, LIMIT[lang]);
 }
 
+/* ---------- server-side grading (C++, Java, Python) ---------- */
+// The page doesn't carry hidden tests; the server runs them and sends back each result with a preview.
+const serverGraded = (q, lang) => LOCAL && q.type === "code" && lang !== "js";
+async function gradeOnServer(q, lang, code, full){
+  const r = await fetch("/api/grade", {method:"POST", headers:{"Content-Type":"application/json", "X-Token":window.LOCAL_TOKEN || ""},
+    body:JSON.stringify({company:window.OA_COMPANY, qid:q.id, lang, code, scope: full ? "all" : "samples"})});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || "the local runner answered " + r.status);
+  const n = full ? q.samples.length + (q.hiddenCount || 0) : q.samples.length;
+  if (j.compile_error != null){
+    const res = [{ok:false, kind:"Compilation error", err:j.compile_error, out:"", ms:0}];
+    while (res.length < n) res.push({ok:false, kind:"Compilation error", err:"", out:"", ms:0});
+    return {res, tests: res.map((_, i) => i < q.samples.length ? q.samples[i] : {in:"", out:""})};
+  }
+  const tests = j.results.map((x, i) => x.sample ? q.samples[i] : {in:x.in, out:x.expected});
+  return {res: j.results, tests};
+}
+// Hidden tests for questions graded in the browser (JavaScript, SQL, the debugging repo), fetched once on Submit
+async function hiddenOf(q){
+  if (q._hidden) return q._hidden;
+  const r = await fetch(`/api/companies/${encodeURIComponent(window.OA_COMPANY)}/questions/${encodeURIComponent(q.id)}/tests`);
+  if (!r.ok) throw new Error("couldn't load the hidden tests (" + r.status + ")");
+  q._hidden = (await r.json()).hidden;
+  return q._hidden;
+}
+
 /* ---------- judge ---------- */
 async function judge(q, lang, code, tests, onEach){
   const out = []; judge.batch = null;
