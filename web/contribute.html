@@ -4,67 +4,74 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Add a question · OA Mock</title>
-  <link rel="preload" href="/static/vendor/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/static/vendor/fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/static/css/tokens.css">
   <link rel="stylesheet" href="/static/css/site.css">
   <link rel="stylesheet" href="/static/css/contribute.css">
   <script src="/static/js/theme.js"></script>
 </head>
 <body>
-  <nav class="bar">
-    <span class="dots"><i></i><i></i><i></i></span>
-    <a class="tab off" href="/">~/oa-mock</a>
-    <a class="tab" href="/contribute">add-question.json</a>
+  <nav class="nav"><div class="nav-in">
+    <a class="brand" href="/"><span class="mark">oa</span>OA Mock</a>
+    <div class="nav-links">
+      <a class="nav-link" href="/">Companies</a>
+      <a class="nav-link" href="/contribute" aria-current="page">Add a question</a>
+      <a class="nav-link wide" href="https://github.com/rgabhi/oa-mock/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Guidelines</a>
+    </div>
     <span class="sp"></span>
-    <a class="lnk wide" href="https://github.com/rgabhi/oa-mock/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">contributing ↗</a>
-    <button id="theme" class="icon-btn" title="Light / dark">☀</button>
-  </nav>
+    <button class="icon-btn theme-btn" data-theme-toggle aria-label="Dark mode" aria-pressed="false">
+      <svg class="i-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 9.6A5.6 5.6 0 0 1 6.4 2.5a5.6 5.6 0 1 0 7.1 7.1Z"/></svg>
+      <svg class="i-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.3M8 13.2v1.3M1.5 8h1.3M13.2 8h1.3M3.4 3.4l.9.9M11.7 11.7l.9.9M3.4 12.6l.9-.9M11.7 4.3l.9-.9"/></svg>
+    </button>
+  </div></nav>
   <main>
-    <section class="hero">
-      <h1 class="prompt"><span class="ps">$</span> oa-mock <span class="flag">add</span><span class="caret"></span></h1>
-      <p class="comment">// turn your OA notes into a question. it's checked here, then sent as a pull request.</p>
-    </section>
+    <header class="head">
+      <p class="eyebrow"><span>contribute</span><i></i><span>checked on your computer</span><i></i><span>sent as a pull request</span></p>
+      <h1 class="page-title">Add a question from your OA.</h1>
+      <p class="lede">Your LLM writes it from your notes. The app checks it the same way the pull-request check does, then sends it for you.</p>
+    </header>
 
     <ol class="steps">
-      <li class="step panel">
+      <li class="step">
         <div class="sh"><span class="num">01</span><h2>Ask your LLM</h2></div>
         <p>Copy this prompt into ChatGPT, Claude, Gemini or any LLM, then add your notes, photos or what you remember of one question.</p>
-        <div class="row"><button class="btn" id="copy">⧉ copy the prompt</button><button class="btn quiet" id="show">view it</button><span id="copied" class="ok-note" hidden>copied</span></div>
+        <div class="row"><button class="btn primary" id="copy">Copy the prompt</button><button class="btn" id="show">View it</button><span id="copied" class="ok-note" hidden>Copied</span></div>
         <pre id="prompt" class="code" hidden></pre>
       </li>
 
-      <li class="step panel">
+      <li class="step">
         <div class="sh"><span class="num">02</span><h2>Paste what it wrote</h2></div>
         <div class="row">
-          <label class="field">company
+          <label class="field">Company
             <select id="company"></select>
           </label>
           <span id="newco" hidden class="row">
-            <label class="field">key <input id="ckey" placeholder="google" spellcheck="false"></label>
-            <label class="field">name <input id="cname" placeholder="Google"></label>
+            <label class="field">Key <input id="ckey" placeholder="google" spellcheck="false"></label>
+            <label class="field">Name <input id="cname" placeholder="Google"></label>
           </span>
         </div>
         <div class="drop" id="drop">
           <textarea id="json" spellcheck="false" placeholder='{ "id": "...", "title": "...", ... }   paste the JSON here, or drop a .json file'></textarea>
         </div>
-        <div class="row"><button class="btn" id="run">▶ run checks</button><kbd>Ctrl</kbd><kbd>↵</kbd><span class="sp"></span><label class="btn quiet file">open .json<input type="file" id="file" accept=".json,application/json" hidden></label></div>
+        <div class="row"><button class="btn primary" id="run">Run checks</button><span class="keys"><kbd>Ctrl</kbd> <kbd>↵</kbd></span><span class="sp"></span><label class="btn file">Open a .json file<input type="file" id="file" accept=".json,application/json" hidden></label></div>
       </li>
 
-      <li class="step panel" id="s3" hidden>
-        <div class="sh"><span class="num">03</span><h2>Checks</h2><span class="sp"></span><span id="summary" class="mono"></span></div>
+      <li class="step" id="s3" hidden>
+        <div class="sh"><span class="num">03</span><h2>Checks</h2><span class="sp"></span><span id="summary" class="summary"></span></div>
         <div id="results" class="results"></div>
         <div id="preview" hidden>
           <div class="tabs" id="ptabs"></div>
           <pre class="code" id="pcode"></pre>
         </div>
-        <div class="row"><button class="btn" id="save" disabled>save to my bank</button><span id="saved" class="mono"></span></div>
+        <div class="row"><button class="btn primary" id="save" disabled>Save to my bank</button><span id="saved" class="saved"></span></div>
       </li>
 
-      <li class="step panel" id="s4" hidden>
+      <li class="step" id="s4" hidden>
         <div class="sh"><span class="num">04</span><h2>Share it</h2></div>
         <div id="share"></div>
       </li>
     </ol>
-    <footer class="foot"><a href="/">← companies</a><a href="/static/llm-prompt.md" target="_blank">the prompt</a><span>the same checks run on every pull request</span></footer>
+    <footer class="foot"><a href="/">Companies</a><a href="/static/llm-prompt.md" target="_blank">The prompt as text</a><span class="sp"></span><span>The same checks run on every pull request</span></footer>
   </main>
   <script>window.LOCAL_TOKEN = {{token}};</script>
   <script src="/static/js/contribute.js"></script>

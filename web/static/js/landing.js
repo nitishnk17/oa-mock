@@ -4,7 +4,7 @@
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const H = { "Content-Type": "application/json", "X-Token": window.LOCAL_TOKEN };
-  const VERB = { download: "downloading", update: "updating", remove: "removing", check: "checking for new questions" };
+  const VERB = { download: "Downloading", update: "Updating", remove: "Removing", check: "Checking for new questions" };
   let lib = null, polling = false, filter = "";
 
   const api = (path, body) => fetch(path, body ? { method: "POST", headers: H, body: JSON.stringify(body) } : { headers: H })
@@ -12,37 +12,45 @@
 
   const mb = (b) => !b ? "" : b < 1e6 ? Math.max(1, Math.round(b / 1e3)) + " KB" : (b / 1e6).toFixed(b < 1e7 ? 1 : 0) + " MB";
   const busy = () => lib && lib.job && lib.job.state === "running";
-  const hue = (k) => { let h = 0; for (const c of k) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
-  const nameOf = (k) => { const c = lib && lib.companies.find((x) => x.key === k); return c ? c.name || k : k; };
   const short = (n) => String(n || "").replace(/\s*OA Mock$/i, "");
+  const nameOf = (k) => { const c = lib && lib.companies.find((x) => x.key === k); return c ? short(c.name) || k : k; };
+  const plural = (n, w) => n + " " + w + (n === 1 ? "" : "s");
 
-  function meta(c) {   // one line, coloured like code:  amazon/  10 questions · 2026, 2024 · SDE Intern
-    const bits = ['<span class="k">' + esc(c.key) + "/</span>"];
-    if (c.questions) bits.push('<span class="n">' + c.questions + "</span> question" + (c.questions === 1 ? "" : "s"));
-    if (c.years && c.years.length) bits.push('<span class="n">' + esc(c.years.join(", ")) + "</span>");
-    if (c.roles && c.roles.length) bits.push('<span class="s">' + esc(c.roles.slice(0, 3).join(" · ")) + "</span>");
-    if (!c.installed && (c.download || c.bytes)) bits.push('<span class="c">' + mb(c.download || c.bytes) + "</span>");
-    return bits.join('<span class="c">  ·  </span>');
+  function monogram(c) {   // "Amazon" -> "Am", "Goldman Sachs" -> "GS"
+    const words = short(c.name || c.key).split(/[\s-]+/).filter(Boolean);
+    return words.length > 1 ? (words[0][0] + words[1][0]).toUpperCase() : (words[0] || c.key).slice(0, 2).replace(/^./, (x) => x.toUpperCase());
+  }
+  const logo = (c) => '<div class="logo" aria-hidden="true">' + (c.logo && /^data:image\/(svg\+xml|png|webp);base64,/.test(c.logo)
+    ? '<img src="' + esc(c.logo) + '" alt="">' : '<span class="mono-gram">' + esc(monogram(c)) + "</span>") + "</div>";
+
+  function meta(c) {
+    const bits = [];
+    if (c.questions) bits.push("<span><b>" + c.questions + "</b> question" + (c.questions === 1 ? "" : "s") + "</span>");
+    if (c.years && c.years.length) bits.push("<span>" + esc(c.years.join(", ")) + "</span>");
+    if (c.roles && c.roles.length) bits.push("<span>" + esc(c.roles.slice(0, 2).join(", ")) + (c.roles.length > 2 ? " +" + (c.roles.length - 2) : "") + "</span>");
+    return bits.length ? '<div class="meta">' + bits.join("") + "</div>" : "";
   }
 
-  function card(c) {
+  function tile(c) {
     const running = busy() && lib.job.company === c.key;
     const dis = busy() ? " disabled" : "";
-    let acts = "", state = "";
+    const name = esc(short(c.name) || c.key);
+    let state = "", acts = "";
     if (c.installed) {
-      acts += '<a class="btn ghost" href="/' + esc(c.key) + '">open →</a>';
-      if (c.update) acts += '<button class="btn" data-act="update" data-key="' + esc(c.key) + '"' + dis + ">get new questions</button>";
-      if (lib.git.git && !c.onlyLocal) acts += '<button class="btn quiet danger" data-act="remove" data-key="' + esc(c.key) + '"' + dis +
-        ' title="Delete its questions from this computer (download again any time). Your past submissions are kept.">remove</button>';
-      state = c.update ? '<span class="state new">● new questions</span>' : c.onlyLocal ? '<span class="state">● only on this computer</span>' : '<span class="state ok">● ready</span>';
+      state = c.update ? '<span class="state new">New questions</span>' : c.onlyLocal ? '<span class="state">Only here</span>' : '<span class="state ready">Ready</span>';
+      acts += '<a class="btn primary sm" href="/' + esc(c.key) + '">Open</a>';
+      if (c.update) acts += '<button class="btn sm" data-act="update" data-key="' + esc(c.key) + '"' + dis + ">Get new questions</button>";
+      acts += '<span class="sp"></span>';
+      if (lib.git.git && !c.onlyLocal) acts += '<button class="btn quiet sm danger" data-act="remove" data-key="' + esc(c.key) + '"' + dis +
+        ' title="Delete its questions from this computer. You can download it again; past submissions are kept.">Remove</button>';
     } else {
-      acts += '<button class="btn" data-act="download" data-key="' + esc(c.key) + '"' + dis + ">" + (running ? VERB[lib.job.kind] + "…" : "↓ download") + "</button>";
+      acts += '<button class="btn sm" data-act="download" data-key="' + esc(c.key) + '"' + dis + ">" +
+        (running ? VERB[lib.job.kind] + "…" : "Download" + (c.download || c.bytes ? ' <span class="k">' + mb(c.download || c.bytes) + "</span>" : "")) + "</button>";
     }
-    const title = esc(short(c.name) || c.key);
-    const name = c.installed ? '<a class="name" href="/' + esc(c.key) + '">' + title + "</a>" : '<span class="name">' + title + "</span>";
-    return '<div class="company panel' + (c.installed ? " mine" : "") + (running ? " running" : "") + '" style="--hue:' + hue(c.key) + '">' +
-      '<div class="body"><div class="top">' + name + state + "</div>" + (c.tagline ? '<div class="tag">' + esc(c.tagline) + "</div>" : "") +
-      '<div class="meta">' + meta(c) + "</div></div>" + '<div class="acts">' + acts + "</div></div>";
+    return '<div class="tile ' + (c.installed ? "mine" : "avail") + (running ? " running" : "") + '">' +
+      (c.installed ? '<a class="cover" href="/' + esc(c.key) + '" aria-label="Open ' + name + '"></a>' : "") +
+      '<div class="tile-head">' + logo(c) + '<div><div class="tile-name">' + name + "</div>" + (c.tagline ? '<div class="tile-tag">' + esc(c.tagline) + "</div>" : "") + "</div>" + state + "</div>" +
+      meta(c) + '<div class="tile-acts">' + acts + "</div></div>";
   }
 
   function matches(c) {
@@ -53,41 +61,44 @@
 
   function status() {
     const st = lib.git, j = lib.job, el = $("status");
-    let msg = "", cls = "status";
-    if (j && j.state === "running") msg = "<span class=mono>" + VERB[j.kind] + (j.company ? " " + esc(short(nameOf(j.company))) : "") + "…</span>";
+    let msg = "", cls = "notice";
+    if (j && j.state === "running") msg = "<b>" + VERB[j.kind] + (j.company ? " " + esc(nameOf(j.company)) : "") + "…</b>";
     else if (j && j.state === "failed") { msg = "That didn't work: " + esc(j.error); cls += " bad"; }
-    else if (!st.git) msg = "Showing the companies in this folder. To download more, get the app with git (see the README). " + esc(st.why ? "(" + st.why + ")" : "");
+    else if (!st.git) msg = "Showing the companies in this folder. To download more, install the app with git (see the README).";
     else if (!st.remote) msg = "This copy has no GitHub remote to download from.";
-    else if (st.behind) { msg = "An update is available: " + st.behind + " new change" + (st.behind === 1 ? "" : "s") + ' on GitHub. <button class="btn" data-act="update">update</button>'; cls += " info"; }
+    else if (st.behind) { msg = "<b>An update is available.</b> " + plural(st.behind, "new change") + ' on GitHub.<span class="sp"></span><button class="btn primary sm" data-act="update">Update</button>'; cls += " info"; }
     el.className = cls; el.innerHTML = msg; el.hidden = !msg;
     const log = $("joblog");
     log.hidden = !(j && j.log); log.querySelector("pre").textContent = (j && j.log) || "";
   }
 
-  function checks() {
+  function header() {
     const L = lib.langs || {}, mine = lib.companies.filter((c) => c.installed);
-    const qs = mine.reduce((n, c) => n + (c.questions || 0), 0);
-    const items = [
-      ["", "<b>" + mine.length + "</b> compan" + (mine.length === 1 ? "y" : "ies") + " · <b>" + qs + "</b> questions here"],
-      [L.cpp ? "" : "no", "C++17"], [L.java ? "" : "no", "Java"], ["", "Python"], ["", "JavaScript"],
-    ];
-    $("checks").innerHTML = items.map(([c, t]) => "<li" + (c ? ' class="' + c + '"' : "") + ">" + t + "</li>").join("");
+    const qs = mine.reduce((n, c) => n + (c.questions || 0), 0), years = new Set();
+    mine.forEach((c) => (c.years || []).forEach((y) => years.add(y)));
+    $("langs").innerHTML = [["C++17", L.cpp], ["Java", L.java], ["Python", true], ["JavaScript", true]]
+      .map(([n, ok]) => "<li" + (ok ? "" : ' class="no" title="Not installed on this computer"') + ">" + n + "</li>").join("");
+    const facts = [["Companies", mine.length], ["Questions", qs], ["Available", lib.companies.length - mine.length], ["Years", years.size ? Math.min(...years) + "–" + String(Math.max(...years)).slice(2) : "—"]];
+    $("facts").innerHTML = facts.map(([k, v]) => "<div><dt>" + k + "</dt><dd>" + v + "</dd></div>").join("");
+    $("facts").hidden = false;
   }
 
   function render() {
     const all = lib.companies.filter(matches);
     const mine = all.filter((c) => c.installed), avail = all.filter((c) => !c.installed);
-    $("mine").innerHTML = mine.length ? mine.map(card).join("") : '<p class="empty">' + (filter ? "// nothing here matches" : "// no companies yet. download one below") + "</p>";
-    $("avail").innerHTML = avail.map(card).join("");
+    $("mine").innerHTML = mine.length ? mine.map(tile).join("") : '<p class="empty">' + (filter ? "No company matches “" + esc(filter) + "”." : "No companies yet. Download one below.") + "</p>";
+    $("avail").innerHTML = avail.map(tile).join("");
     $("more").hidden = !avail.length;
+    $("n-mine").textContent = mine.length ? String(mine.length) : "";
+    $("n-avail").textContent = avail.length ? String(avail.length) : "";
     $("check").hidden = !(lib.git.git && lib.git.remote);
     $("check").disabled = busy();
-    checks(); status();
+    header(); status();
   }
 
   function load() {
     return api("/api/library").then((j) => { lib = j; render(); if (busy()) poll(); })
-      .catch((e) => { const s = $("status"); s.hidden = false; s.className = "status bad"; s.textContent = "Couldn't load the company list: " + e.message; });
+      .catch((e) => { const s = $("status"); s.hidden = false; s.className = "notice bad"; s.textContent = "Couldn't load the company list: " + e.message; });
   }
 
   function poll() {
@@ -102,7 +113,7 @@
   }
 
   function act(kind, key) {
-    if (kind === "remove" && !confirm("Remove " + short(nameOf(key)) + " from this computer?\n\nYou can download it again any time. Your past submissions are kept.")) return;
+    if (kind === "remove" && !confirm("Remove " + nameOf(key) + " from this computer?\n\nYou can download it again any time. Your past submissions are kept.")) return;
     api("/api/library", { action: kind, company: key || null }).then((j) => { lib.job = j; render(); poll(); })
       .catch((e) => { lib.job = { state: "failed", error: e.message }; render(); });
   }
@@ -114,11 +125,12 @@
   $("check").addEventListener("click", () => act("check"));
   $("q").addEventListener("input", (e) => { filter = e.target.value.trim().toLowerCase(); if (lib) render(); });
   $("q").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") { const a = document.querySelector("#mine a.name"); if (a) location.href = a.href; }
-    if (e.key === "Escape") { e.target.value = ""; filter = ""; render(); e.target.blur(); }
+    if (e.key === "Enter") { const a = document.querySelector("#mine .tile .cover"); if (a) location.href = a.href; }
+    if (e.key === "Escape") { e.target.value = ""; filter = ""; if (lib) render(); e.target.blur(); }
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "/" && document.activeElement !== $("q") && !e.ctrlKey && !e.metaKey) { e.preventDefault(); $("q").focus(); }
+    const t = e.target;
+    if (e.key === "/" && !/INPUT|TEXTAREA|SELECT/.test(t.tagName) && !e.ctrlKey && !e.metaKey) { e.preventDefault(); $("q").focus(); }
   });
   load();
 })();

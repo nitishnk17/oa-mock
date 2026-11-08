@@ -16,13 +16,13 @@
   const getPrompt = () => promptText ? Promise.resolve(promptText) : fetch("/static/llm-prompt.md").then((r) => r.text()).then((t) => (promptText = t));
   $("copy").onclick = () => getPrompt().then((t) => navigator.clipboard.writeText(t)).then(() => { $("copied").hidden = false; setTimeout(() => ($("copied").hidden = true), 1800); })
     .catch(() => { $("show").click(); });
-  $("show").onclick = () => getPrompt().then((t) => { const p = $("prompt"); p.textContent = t; p.hidden = !p.hidden; $("show").textContent = p.hidden ? "view it" : "hide it"; });
+  $("show").onclick = () => getPrompt().then((t) => { const p = $("prompt"); p.textContent = t; p.hidden = !p.hidden; $("show").textContent = p.hidden ? "View it" : "Hide it"; });
 
   /* ---- step 2: company + JSON ---- */
   function companies() {
     const sel = $("company"), keep = sel.value;
     sel.innerHTML = status.companies.map((c) => '<option value="' + esc(c.key) + '">' + esc(c.name.replace(/\s*OA Mock$/i, "")) + "</option>").join("") +
-      '<option value="__new">+ new company…</option>';
+      '<option value="__new">New company…</option>';
     if (keep) sel.value = keep;
     $("newco").hidden = sel.value !== "__new";
   }
@@ -49,9 +49,9 @@
   /* ---- step 3: checks ---- */
   function showResults(res) {
     const n = (s) => res.checks.filter((c) => c.status === s).length;
-    $("summary").innerHTML = '<span style="color:var(--acc)">' + n("ok") + " passed</span> · " +
-      '<span style="color:var(--warn)">' + n("warn") + " warning" + (n("warn") === 1 ? "" : "s") + "</span> · " +
-      '<span style="color:var(--bad)">' + n("fail") + " failed</span>";
+    $("summary").innerHTML = '<span class="t-ok">' + n("ok") + " passed</span>" +
+      '<span class="t-warn">' + n("warn") + " warning" + (n("warn") === 1 ? "" : "s") + "</span>" +
+      '<span class="t-bad">' + n("fail") + " failed</span>";
     $("results").innerHTML = res.checks.map((c) => {
       const lines = (c.detail || "").split("\n");
       return '<details class="res ' + c.status + '"' + (c.status === "fail" ? " open" : "") + "><summary><span class=ic>" + ICON[c.status] + "</span>" +
@@ -62,7 +62,7 @@
     $("preview").hidden = !st;
     if (st) {
       const langs = Object.keys(st);
-      $("ptabs").innerHTML = '<span class="mono hint" style="margin-right:8px">what solvers see:</span>' +
+      $("ptabs").innerHTML = '<span class="ptab-lbl">What solvers see</span>' +
         langs.map((l, i) => '<button data-l="' + l + '"' + (i ? "" : ' class="on"') + ">" + LANG[l] + "</button>").join("");
       $("pcode").textContent = st[langs[0]];
       $("ptabs").querySelectorAll("button").forEach((b) => (b.onclick = () => {
@@ -70,7 +70,7 @@
       }));
     }
     $("save").disabled = !res.ok;
-    $("save").textContent = res.ok ? "save to my bank" : "fix the failed checks first";
+    $("save").textContent = res.ok ? "Save to my bank" : "Fix the failed checks first";
   }
 
   function run() {
@@ -84,7 +84,7 @@
       $("results").innerHTML = '<details class="res fail" open><summary><span class=ic>✗</span><span class="nm">Read the JSON</span><span class="first">' + esc(e.message) + "</span></summary></details>";
       return;
     }
-    $("results").innerHTML = '<div class="running-line">running the checks: format, function spec, references, 4 language drivers, wrong answers, duplicates </div>';
+    $("results").innerHTML = '<div class="running-line"><span class="spin"></span>Running the checks: format, function spec, references, drivers in 4 languages, wrong answers, duplicates…</div>';
     $("summary").textContent = ""; $("save").disabled = true; $("run").disabled = true;
     last = { company: company(), question: q };
     api("/api/contribute/check", last).then(showResults)
@@ -99,11 +99,11 @@
     $("save").disabled = true; $("saved").textContent = "saving…";
     api("/api/contribute/save", Object.assign({ name: $("cname").value, replace: false }, last)).then((r) => {
       saved = { company: last.company, qid: last.question.id };
-      $("saved").innerHTML = '<span style="color:var(--acc)">✓ saved</span> ' + r.written.map((p) => "<code>" + esc(p) + "</code>").join(" ") +
-        ' · <a href="/' + esc(saved.company) + '">try it →</a>';
+      $("saved").innerHTML = '<span class="t-ok">Saved</span> ' + r.written.map((p) => "<code>" + esc(p) + "</code>").join(" ") +
+        ' <a href="/' + esc(saved.company) + '">Try it</a>';
       try { localStorage.removeItem(DRAFT); } catch (e) {}
       share();
-    }).catch((e) => { $("saved").innerHTML = '<span style="color:var(--bad)">' + esc(e.message) + "</span>"; $("save").disabled = false; });
+    }).catch((e) => { $("saved").innerHTML = '<span class="t-bad">' + esc(e.message) + "</span>"; $("save").disabled = false; });
   };
 
   /* ---- step 4: pull request ---- */
@@ -120,12 +120,12 @@
     el.innerHTML = '<div class="share"><p>Signed in to GitHub as <b>' + esc(s.login) + "</b>. This opens a pull request to <code>" + esc(s.upstream) +
       "</code> with just this question" + (s.login.toLowerCase() === (s.upstream || "").split("/")[0].toLowerCase() ? "" : " (from your fork, which is created if you don't have one)") +
       ". Your files here stay as they are.</p><textarea id=note placeholder=\"Anything to tell the reviewer? Where it's from, what you had to assume…\"></textarea>" +
-      '<div class="row"><button class="btn" id="pr">⇡ open pull request</button><span id="prout" class="pr"></span></div></div>';
+      '<div class="row"><button class="btn primary" id="pr">Open pull request</button><span id="prout" class="pr"></span></div></div>';
     $("pr").onclick = () => {
-      $("pr").disabled = true; $("prout").textContent = "pushing…";
+      $("pr").disabled = true; $("prout").textContent = "Pushing…";
       api("/api/contribute/share", { company: saved.company, qid: saved.qid, note: $("note").value })
-        .then((r) => { $("prout").innerHTML = '<span style="color:var(--acc)">✓ opened</span> <a href="' + esc(r.url) + '" target="_blank" rel="noopener">' + esc(r.url) + "</a>"; })
-        .catch((e) => { $("prout").innerHTML = '<span style="color:var(--bad)">' + esc(e.message) + "</span>"; $("pr").disabled = false; });
+        .then((r) => { $("prout").innerHTML = '<span class="t-ok">Opened</span> <a href="' + esc(r.url) + '" target="_blank" rel="noopener">' + esc(r.url) + "</a>"; })
+        .catch((e) => { $("prout").innerHTML = '<span class="t-bad">' + esc(e.message) + "</span>"; $("pr").disabled = false; });
     };
   }
 

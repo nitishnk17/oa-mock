@@ -117,8 +117,9 @@ class Handler(BaseHTTPRequestHandler):
             return self._submissions("GET", parts[2:], url.query)
 
         if not parts:
-            links = "".join('<a class="company panel mine" href="/%s"><span class="body"><span class="name">%s</span>'
-                            '<div class="tag">%s</div></span></a>' % (k, html.escape(n), html.escape(t)) for k, n, t in data.companies())
+            links = "".join('<div class="tile mine"><a class="cover" href="/%s" aria-label="%s"></a><div class="tile-head"><div class="logo">'
+                            '<span class="mono-gram">%s</span></div><div><div class="tile-name">%s</div><div class="tile-tag">%s</div></div></div></div>'
+                            % (k, html.escape(n), html.escape(k[:1].upper() + k[1:2]), html.escape(n), html.escape(t)) for k, n, t in data.companies())
             return self._send(200, _template("index.html", companies=links, token=json.dumps(TOKEN)), "text/html; charset=utf-8")
 
         if parts == ["contribute"]:

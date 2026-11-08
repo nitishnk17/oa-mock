@@ -4,46 +4,66 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>OA Mock</title>
-  <link rel="preload" href="/static/vendor/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/static/vendor/fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/static/css/tokens.css">
   <link rel="stylesheet" href="/static/css/site.css">
   <link rel="stylesheet" href="/static/css/index.css">
   <script src="/static/js/theme.js"></script>
 </head>
 <body>
-  <nav class="bar">
-    <span class="dots"><i></i><i></i><i></i></span>
-    <a class="tab" href="/">~/oa-mock</a>
-    <a class="tab off" href="/contribute">add-question.json</a>
+  <nav class="nav"><div class="nav-in">
+    <a class="brand" href="/"><span class="mark">oa</span>OA Mock</a>
+    <div class="nav-links">
+      <a class="nav-link" href="/" aria-current="page">Companies</a>
+      <a class="nav-link" href="/contribute">Add a question</a>
+      <a class="nav-link wide" href="https://github.com/rgabhi/oa-mock" target="_blank" rel="noopener">GitHub</a>
+    </div>
     <span class="sp"></span>
-    <a class="lnk wide" href="https://github.com/rgabhi/oa-mock" target="_blank" rel="noopener">github ↗</a>
-    <button id="theme" class="icon-btn" title="Light / dark">☀</button>
-  </nav>
+    <button class="icon-btn theme-btn" data-theme-toggle aria-label="Dark mode" aria-pressed="false">
+      <svg class="i-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 9.6A5.6 5.6 0 0 1 6.4 2.5a5.6 5.6 0 1 0 7.1 7.1Z"/></svg>
+      <svg class="i-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.3M8 13.2v1.3M1.5 8h1.3M13.2 8h1.3M3.4 3.4l.9.9M11.7 11.7l.9.9M3.4 12.6l.9-.9M11.7 4.3l.9-.9"/></svg>
+    </button>
+  </div></nav>
+
   <main>
     <section class="hero">
-      <h1 class="prompt"><span class="ps">$</span> oa-mock <span class="flag">--practice</span><span class="caret"></span></h1>
-      <p class="comment">// real OA questions, timed or not. your code compiles and runs on this computer.</p>
-      <ul class="checks" id="checks"></ul>
+      <div>
+        <p class="eyebrow"><span>practice</span><i></i><span>runs on your computer</span><i></i><span>open source</span></p>
+        <h1 class="page-title">Practise the online assessments you'll actually sit.</h1>
+        <p class="lede">Questions reported from real OAs, with hidden tests, partial marks and a scorecard. Timed like the real thing, or untimed while you learn.</p>
+        <ul class="langs" id="langs"></ul>
+      </div>
+      <dl class="facts card" id="facts" hidden></dl>
     </section>
-    <div id="status" class="status" hidden></div>
 
-    <label class="search panel"><span class="gt">&gt;</span><input id="q" placeholder="filter companies, roles, years…" autocomplete="off" spellcheck="false"><kbd>/</kbd></label>
+    <div id="status" class="notice" hidden></div>
 
-    <div class="sec-h"><h2>your companies</h2><span class="rule"></span><button id="check" class="btn quiet" hidden>⟳ check for new questions</button></div>
-    <div id="mine">{{companies}}</div>
-
-    <div id="more" hidden>
-      <div class="sec-h"><h2>download more</h2><span class="rule"></span></div>
-      <p class="hint">Only the companies you download are kept on this computer, with their questions and tests.</p>
-      <div id="avail"></div>
+    <div class="toolbar">
+      <label class="search">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg>
+        <input id="q" placeholder="Filter by company, role or year" autocomplete="off" spellcheck="false" aria-label="Filter companies">
+        <kbd>/</kbd>
+      </label>
+      <button id="check" class="btn" hidden>Check for new questions</button>
     </div>
 
-    <a class="cta panel" href="/contribute" style="text-decoration:none;color:inherit">
-      <span class="glyph">{+}</span>
-      <span class="txt"><b>Sat an OA recently?</b><p>Add its questions with your favourite LLM. The app checks them and opens the pull request for you.</p></span>
-      <span class="btn ghost">add a question →</span>
+    <div class="sec"><h2>Your companies</h2><span class="count" id="n-mine"></span></div>
+    <div class="tiles" id="mine">{{companies}}</div>
+
+    <div id="more" hidden>
+      <div class="sec"><h2>Download more</h2><span class="count" id="n-avail"></span></div>
+      <p class="hint" style="margin:-6px 0 14px">Only the companies you download are kept on this computer, with their questions and tests.</p>
+      <div class="tiles" id="avail"></div>
+    </div>
+
+    <a class="cta card" href="/contribute">
+      <span class="glyph"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></span>
+      <span class="txt"><b>Sat an OA recently?</b><p>Turn your notes into a question with any LLM. The app checks it and opens the pull request for you.</p></span>
+      <span class="btn">Add a question</span>
     </a>
-    <details id="joblog" class="log" hidden><summary>details</summary><pre></pre></details>
-    <footer class="foot"><span>made by students, for students</span><a href="https://github.com/rgabhi/oa-mock/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">contributing</a><span><kbd>/</kbd> filter · <kbd>↵</kbd> open first</span></footer>
+
+    <details id="joblog" class="log" hidden><summary>Details</summary><pre></pre></details>
+    <footer class="foot"><span>Made by students, for students</span><a href="https://github.com/rgabhi/oa-mock/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a><span class="sp"></span><span><kbd>/</kbd> filter &nbsp; <kbd>↵</kbd> open the first match</span></footer>
   </main>
   <script>window.LOCAL_TOKEN = {{token}};</script>
   <script src="/static/js/landing.js"></script>
