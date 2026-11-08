@@ -1,6 +1,6 @@
 """Grades a submission on the server: runs the question's tests and compares the output.
 
-The browser no longer receives hidden tests with the page. For C++, Java and Python it sends only the
+The browser no longer receives hidden tests with the page, and a Submit only reveals the first failing hidden test. For C++, Java and Python it sends only the
 code here; for JavaScript, SQL and the debugging repo (graded in the browser) it fetches the hidden tests
 on Submit from /api/companies/<company>/questions/<id>/tests.
 """
@@ -43,10 +43,18 @@ def grade(company, qid, lang, code, scope):
     res = judge.judge(lang, code, [t["in"] for t in tests], LIMIT_MS[lang])
     if "compile_error" in res:
         return res
-    out = []
+    out, shown = [], False
+    ns = len(q["samples"])
     for i, (t, r) in enumerate(zip(tests, res["results"])):
         ok = not r["tle"] and not r["err"] and norm(r["out"]) == norm(t["out"])
         kind = "Time limit exceeded" if r["tle"] else "Runtime error" if r["err"] else "Passed" if ok else "Wrong answer"
-        out.append({"ok": ok, "kind": kind, "ms": r["ms"], "out": preview(r["out"]), "err": preview(r["err"]),
-                    "in": preview(t["in"]), "expected": preview(t["out"]), "sample": i < len(q["samples"])})
-    return {"results": out, "samples": len(q["samples"])}
+        row = {"ok": ok, "kind": kind, "ms": r["ms"], "sample": i < ns}
+        if i < ns:
+            row.update(out=preview(r["out"]), err=preview(r["err"]), **{"in": preview(t["in"]), "expected": preview(t["out"])})
+        elif not ok and not shown:
+            # Hidden tests stay hidden, like on OA platforms, except the first one that fails: sent in full so the
+            # page can show it, run it as custom input or download it.
+            shown = True
+            row.update(out=preview(r["out"]), err=preview(r["err"]), **{"in": t["in"], "expected": t["out"], "shown": True})
+        out.append(row)
+    return {"results": out, "samples": ns}

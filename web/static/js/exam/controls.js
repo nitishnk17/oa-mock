@@ -96,22 +96,27 @@ async function doRun(full){
     const ns = q.samples.length;
     const verdict = passed === tests.length ? ["ok", full ? "All test cases passed" : "Sample cases passed"] : passed ? ["warn", `${passed}/${tests.length} test cases passed`] : ["bad", res[0].kind === "Time limit exceeded" ? "Time limit exceeded" : res[0].kind === "Compilation error" ? "Compilation error" : res.some(r => r.err) ? "Runtime error" : "Wrong answer"];
     let html = `<div class="verdict ${verdict[0]}">${verdict[1]}${full ? `<span class="status">Score ${score}/100 · best ${e.best[id].score}/100</span>` : ""}</div>`;
-    if (full) html += `<div class="grid-tests" aria-label="Test results">${res.map((r, i) => `<span class="res ${r.ok ? "ok" : r.kind.startsWith("Time") ? "warn" : "bad"}" title="Click to view case ${i < ns ? "S" + i : "T" + (i - ns + 1)}" data-tc="${i}" tabindex="0" role="button">${i < ns ? "S" + i : "T" + (i - ns + 1)} ${r.ok ? "✓" : "✗"}</span>`).join("")}</div><p class="status" style="margin-top:8px">S = sample, T = extra. Click a case above to jump to it.</p>`;
+    // Hidden cases stay hidden: pass/fail only, plus the first one that fails (to inspect, rerun or download).
+    const firstBad = full ? res.findIndex((r, i) => i >= ns && !r.ok) : -1;
+    const shown = i => i < ns || i === firstBad;
+    const name = i => i < ns ? "S" + i : "T" + (i - ns + 1);
+    if (full) html += `<div class="grid-tests" aria-label="Test results">${res.map((r, i) => `<span class="res ${r.ok ? "ok" : r.kind.startsWith("Time") ? "warn" : "bad"}"${shown(i) ? ` title="Show case ${name(i)}" data-tc="${i}" tabindex="0" role="button"` : ` title="Hidden case ${name(i)}"`}>${name(i)} ${r.ok ? "✓" : "✗"}</span>`).join("")}</div><p class="status" style="margin-top:8px">S = sample, T = hidden. Hidden cases only show pass/fail${firstBad >= 0 ? `; the first one that failed (${name(firstBad)}) is shown below` : ""}.</p>`;
     if (res[0].kind === "Compilation error") html += `<pre class="err" style="white-space:pre-wrap">${esc(res[0].err)}</pre>`;
-    else html += res.map((r, i) => tcHTML(q, tests[i], r, i, i < ns ? "Sample" : "Hidden")).join("");
+    else html += res.map((r, i) => shown(i) ? tcHTML(q, tests[i], r, i, i < ns ? "Sample case " + i : "Hidden case " + name(i), i === firstBad) : "").join("");
     out.innerHTML = html;
     out.querySelectorAll("[data-tc]").forEach(el => {
       const jump = () => { const d = $("#tc-" + el.dataset.tc); if (!d) return; d.open = true; d.scrollIntoView({behavior:"smooth", block:"center"}); };
       el.addEventListener("click", jump);
       el.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " "){ ev.preventDefault(); jump(); } });
     });
+    if (firstBad >= 0) wireHiddenCase(tests[firstBad], name(firstBad));
     setStat(full ? `${passed}/${tests.length} passed · ${score}/100` : `${passed}/${tests.length} samples passed`, verdict[0]);
   } catch (err){
     setStat("Error", "bad");
     out.innerHTML = `<div class="verdict bad">Could not run the code</div><p>${esc(err.message)}. ${lang === "py" ? "Python loads from the internet the first time; check your connection and press Run again." : ""}</p>`;
   } finally { busy = false; runB.disabled = subB.disabled = false; }
 }
-function tcHTML(q, t, r, i, label){
+function tcHTML(q, t, r, i, label, tools){
   const cls = r.ok ? "ok" : r.kind.startsWith("Time") ? "warn" : "bad";
   let body;
   if (q.type === "sql"){
@@ -119,7 +124,28 @@ function tcHTML(q, t, r, i, label){
   } else {
     body = `<div><div class="lbl">Input</div><pre>${esc(trunc(t.in))}</pre></div><div><div class="lbl">Expected</div><pre>${esc(trunc(t.out))}</pre></div><div><div class="lbl">Your output</div><pre>${esc(trunc(r.out || "(nothing printed)"))}</pre></div>${r.err ? `<div style="grid-column:1/-1"><div class="lbl">Error</div><pre class="err">${esc(trunc(r.err))}</pre></div>` : ""}`;
   }
-  return `<details class="tc" id="tc-${i}" ${r.ok ? "" : "open"}><summary><span class="res ${cls}">${r.kind}</span>${label} case ${i}<span class="ms">${Math.round(r.ms || 0)} ms</span></summary><div class="body">${body}</div></details>`;
+  const extra = tools && q.type !== "sql" ? `<div class="tc-tools">${$("#usecustom") ? `<button class="btn" data-hc="custom">Use as custom input</button>` : ""}<button class="btn" data-hc="in">Download input (.txt)</button><button class="btn" data-hc="out">Download expected output (.txt)</button><span class="status">input: ${t.in.length < 1024 ? t.in.length + " characters" : (t.in.length / 1024).toFixed(t.in.length < 10240 ? 1 : 0) + " KB"}</span></div>` : "";
+  return `<details class="tc" id="tc-${i}" ${r.ok ? "" : "open"}><summary><span class="res ${cls}">${r.kind}</span>${label}<span class="ms">${Math.round(r.ms || 0)} ms</span></summary><div class="body">${body}</div>${extra}</details>`;
+}
+// Buttons on the first failing hidden case
+function wireHiddenCase(t, name){
+  const qid = S.exam.ids[S.exam.cur];
+  const save = (text, file) => {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([text], {type:"text/plain"}));
+    a.download = file; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  };
+  document.querySelectorAll("[data-hc]").forEach(b => b.addEventListener("click", ev => {
+    ev.preventDefault();
+    const k = b.dataset.hc;
+    if (k === "in") return save(t.in, `${qid}-${name}-input.txt`);
+    if (k === "out") return save(t.out, `${qid}-${name}-expected.txt`);
+    const uc = $("#usecustom"), box = $("#custom");
+    uc.checked = true; box.hidden = false; box.value = t.in;
+    box.scrollIntoView({behavior:"smooth", block:"center"});
+    toast(`Case ${name} is in the custom input. Press Run to try it.`);
+  }));
 }
 
 function confirmEnd(){

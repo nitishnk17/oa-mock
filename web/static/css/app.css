@@ -139,6 +139,8 @@ body.dragging{user-select:none;cursor:grabbing}
 .res.ok{background:var(--ok-soft);color:var(--ok)} .res.bad{background:var(--bad-soft);color:var(--bad)} .res.warn{background:var(--warn-soft);color:var(--warn)}
 .tc .ms{margin-left:auto;font:12px var(--f-mono);color:var(--muted)}
 .tc .body{padding:0 10px 10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
+.tc-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:0 10px 10px}
+.tc-tools .btn{padding:4px 10px;font-size:13px}
 .tc pre{margin:2px 0 0;background:var(--code-bg);border:1px solid var(--line);border-radius:4px;padding:6px 8px;font-size:12.5px;max-height:180px;overflow:auto;white-space:pre-wrap;word-break:break-all}
 .tc pre.err{color:var(--bad)}
 .grid-tests{display:flex;flex-wrap:wrap;gap:6px}

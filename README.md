@@ -7,7 +7,7 @@
 - **Real formats:** each company's test layout is reproduced (for example, Amazon's 3-section SDE Intern OA), or you can build a custom set. The question bank is grouped by year, with filters for role, college and difficulty.
 - **LeetCode or HackerRank style:** by default you complete a function and the input/output is handled for you. Switch to HackerRank style (on the home page or under ⚙ in the editor) to get the whole program, input reading included.
 - **Your languages:** C++17, Java, Python 3 and JavaScript compile and run natively on your machine.
-- **Graded like the real thing:** Run checks the samples, and Submit runs every hidden test. Score = tests passed / total × 100, and your best submission counts.
+- **Graded like the real thing:** Run checks the samples, and Submit runs every hidden test. Score = tests passed / total × 100, and your best submission counts. Hidden tests only show pass/fail, except the first one that fails: you can see it, load it as custom input, or download its input and expected output as text.
 - **Timed or not:** a countdown that auto-submits, or **No timer** with a count-up clock.
 - **Learn afterwards:** the report shows your code, reference solutions (Python + C++) and a LeetCode question with the same pattern.
 - **Every submission kept:** each Submit is saved on your computer in `.oa-cache/` (git-ignored). Browse them per question or from the home page, and reopen any of them in the editor.
@@ -237,7 +237,7 @@ setup.sh, setup.ps1/.bat   install Python / C++ / Java if missing; start.sh / st
 .github/                   PR checks and catalog workflows, CODEOWNERS
 ```
 
-**Request flow.** `GET /amazon` renders `web/app.html`, which loads the vendored editor, then `/api/companies/amazon/data.js` (that company's config and questions, without hidden tests), then the app scripts. C++, Java and Python answers go to `POST /api/grade`: the server runs them on the samples or on all tests and returns a verdict per test. JavaScript answers and the debugging repo run in a Web Worker in the page, which fetches that one question's hidden tests when you submit. The server only listens on `127.0.0.1`, checks the `Host` header, and requires a per-run token on `/run`, `/api/grade`, `/api/library` and `/api/submissions`.
+**Request flow.** `GET /amazon` renders `web/app.html`, which loads the vendored editor, then `/api/companies/amazon/data.js` (that company's config and questions, without hidden tests), then the app scripts. C++, Java and Python answers go to `POST /api/grade`: the server runs them on the samples or on all tests and returns a verdict per test, with the data of only the first failing hidden test. JavaScript answers and the debugging repo run in a Web Worker in the page, which fetches that one question's hidden tests when you submit. The server only listens on `127.0.0.1`, checks the `Host` header, and requires a per-run token on `/run`, `/api/grade`, `/api/library` and `/api/submissions`.
 
 ### Adding or editing questions
 

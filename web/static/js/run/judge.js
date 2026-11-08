@@ -27,7 +27,7 @@ async function gradeOnServer(q, lang, code, full){
     while (res.length < n) res.push({ok:false, kind:"Compilation error", err:"", out:"", ms:0});
     return {res, tests: res.map((_, i) => i < q.samples.length ? q.samples[i] : {in:"", out:""})};
   }
-  const tests = j.results.map((x, i) => x.sample ? q.samples[i] : {in:x.in, out:x.expected});
+  const tests = j.results.map((x, i) => x.sample ? q.samples[i] : x.shown ? {in:x.in, out:x.expected} : {in:"", out:""});
   return {res: j.results, tests};
 }
 // Hidden tests for questions graded in the browser (JavaScript, SQL, the debugging repo), fetched once on Submit
