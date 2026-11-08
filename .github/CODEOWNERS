@@ -1,0 +1,5 @@
+# Changes to the app, tools and setup scripts need a review from the maintainer.
+*        @rgabhi
+# New and edited questions don't: the "PR checks" workflow tests them (tools/add_question.py).
+/data/
+/sources/
