@@ -10,4 +10,4 @@ They're copied here so the app works offline and needs no npm install.
 ## Fonts (SIL Open Font License 1.1)
 
 - `fonts/jetbrains-mono.woff2`: JetBrains Mono, variable weight, Latin subset (from @fontsource-variable/jetbrains-mono 5.3.0). License: `fonts/OFL-jetbrains-mono.txt`.
-- `fonts/inter.woff2`: Inter, variable weight, Latin subset (from @fontsource-variable/inter 5.3.0). License: `fonts/OFL-inter.txt`.
+- `fonts/geist.woff2`: Geist Sans, variable weight, Latin subset (from @fontsource-variable/geist 5.3.0). License: `fonts/OFL-geist.txt`.

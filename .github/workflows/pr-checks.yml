@@ -19,6 +19,8 @@ jobs:
         with: { distribution: temurin, java-version: "21" }
       - uses: actions/setup-node@v5
         with: { node-version: "22" }
+      - name: Colour contrast of the design tokens
+        run: python3 tools/check_contrast.py
       - name: App starts and grades
         run: python3 tools/smoke.py
       - name: Changed questions (format, references, 4 language drivers, known-wrong solutions, duplicates)
