@@ -3,7 +3,7 @@
  "title": "Identical Bags",
  "diff": "Medium",
  "src": "Flipkart Data Engineer OA",
- "body": "<p>You have <code>n</code> distinct objects and <code>k</code> identical bags. Count the ways to put every object into a bag so that <strong>no bag is empty</strong>. The bags cannot be told apart, so only which objects end up together matters.</p><p>Print the answer modulo 10<sup>9</sup> + 7.</p>",
+ "body": "<p>You have <code>n</code> distinct objects and <code>k</code> identical bags. Count the ways to put every object into a bag so that <strong>no bag is empty</strong>. The bags cannot be told apart, so only which objects end up together matters.</p><p>Print the answer modulo 10<sup>9</sup> + 7.</p><h3>Function to complete</h3><p>Complete <code>countWays(n, k)</code>. It returns the number of ways modulo 10<sup>9</sup> + 7.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "One line with <code>n</code> and <code>k</code>.",
  "out": "The number of ways modulo 10<sup>9</sup> + 7.",
  "cons": [
@@ -56,8 +56,33 @@
   }
  ],
  "type": "code",
- "ref": "import sys, heapq\nfrom collections import defaultdict\n\ndef bags(s):\n    n,k=map(int,s.split()); M=10**9+7\n    dp=[1]+[0]*k\n    for i in range(1,n+1):\n        for j in range(min(i,k),0,-1): dp[j]=(j*dp[j]+dp[j-1])%M\n        dp[0]=0\n    return str(dp[k])\n\nprint(bags(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def countWays(self, n: int, k: int) -> int:\n        M = 10**9 + 7\n        dp = [1] + [0] * k\n        for i in range(1, n + 1):\n            for j in range(min(i, k), 0, -1): dp[j] = (j * dp[j] + dp[j - 1]) % M\n            dp[0] = 0\n        return dp[k]\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nconst long long M=1e9+7;\nlong long pw(long long b,long long e){long long r=1;b%=M;while(e){if(e&1)r=r*b%M;b=b*b%M;e>>=1;}return r;}\nint main(){ int n,k; cin>>n>>k; // inclusion-exclusion: S(n,k) = 1/k! * sum (-1)^j C(k,j) (k-j)^n\n  vector<long long> f(k+1,1); for(int i=1;i<=k;i++) f[i]=f[i-1]*i%M;\n  long long s=0; for(int j=0;j<=k;j++){ long long c=f[k]*pw(f[j],M-2)%M*pw(f[k-j],M-2)%M; long long t=c*pw(k-j,n)%M; s=(j&1)?(s-t+M)%M:(s+t)%M; }\n  cout<<s*pw(f[k],M-2)%M<<\"\\n\"; }\n",
  "lc": "1692 Count Ways to Distribute Candies (premium)",
- "lcurl": "https://leetcode.com/problems/count-ways-to-distribute-candies/"
+ "lcurl": "https://leetcode.com/problems/count-ways-to-distribute-candies/",
+ "stub": {
+  "py": "class Solution:\n    def countWays(self, n: int, k: int) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    int countWays(int n, int k) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public int countWays(int n, int k) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {number} n\n * @param {number} k\n * @return {number}\n */\nvar countWays = function(n, k) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    n = int(_t[_p]); _p += 1\n    k = int(_t[_p]); _p += 1\n    _r = Solution().countWays(n, k)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int n; cin >> n;\n    int k; cin >> k;\n    auto _r = Solution().countWays(n, k);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int n = Integer.parseInt(_t[_p++]);\n        int k = Integer.parseInt(_t[_p++]);\n        int _r = new Solution().countWays(n, k);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const n = Number(_t[_p++]);\n    const k = Number(_t[_p++]);\n    const _r = countWays(n, k);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

@@ -3,7 +3,7 @@
  "title": "Minimise the Busiest Worker",
  "diff": "Hard",
  "src": "Juspay elimination interview (Mar 2025)",
- "body": "<p>Assign each of <code>n</code> jobs to one of <code>k</code> workers. A worker's load is the sum of their jobs' times. Jobs need not be contiguous. Print the smallest possible load of the busiest worker.</p>",
+ "body": "<p>Assign each of <code>n</code> jobs to one of <code>k</code> workers. A worker's load is the sum of their jobs' times. Jobs need not be contiguous. Print the smallest possible load of the busiest worker.</p><h3>Function to complete</h3><p>Complete <code>minMaxLoad(k, jobs)</code>. It returns the smallest possible load of the busiest worker.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "Line 1: <code>n k</code>. Line 2: the <code>n</code> job times.",
  "out": "One integer.",
  "cons": [
@@ -62,7 +62,32 @@
    "out": "37407635"
   }
  ],
- "ref": "import sys, heapq\nfrom collections import defaultdict, deque\nsys.setrecursionlimit(1 << 20)\n\ndef workers(s):\n    t = list(map(int, s.split())); n, k = t[0], t[1]; jobs = sorted(t[2:2+n], reverse=True)\n    best = [sum(jobs)]; load = [0]*k\n    def go(i, cur):\n        if cur >= best[0]: return\n        if i == n: best[0] = cur; return\n        seen = set()\n        for w in range(k):\n            if load[w] in seen: continue\n            seen.add(load[w]); load[w] += jobs[i]\n            go(i + 1, max(cur, load[w])); load[w] -= jobs[i]\n    go(0, 0)\n    return str(best[0])\n\nprint(workers(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def minMaxLoad(self, k: int, jobs: List[int]) -> int:\n        n = len(jobs); jobs = sorted(jobs, reverse=True)\n        best = [sum(jobs)]; load = [0] * k\n        def go(i, cur):\n            if cur >= best[0]: return\n            if i == n: best[0] = cur; return\n            seen = set()\n            for w in range(k):\n                if load[w] in seen: continue\n                seen.add(load[w]); load[w] += jobs[i]\n                go(i + 1, max(cur, load[w])); load[w] -= jobs[i]\n        go(0, 0)\n        return best[0]\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\n// subset DP: dp[k][mask] = min possible max load splitting mask among k workers\nint main(){ int n,k; cin>>n>>k; vector<long long> j(n); for(auto&x:j)cin>>x; int F=1<<n; vector<long long> sum(F,0);\n  for(int s=1;s<F;s++){ int b=__builtin_ctz(s); sum[s]=sum[s&(s-1)]+j[b]; }\n  vector<long long> dp(sum); for(int w=2;w<=k;w++){ vector<long long> nd(F); for(int s=0;s<F;s++){ long long best=dp[s]; for(int t=s;t;t=(t-1)&s) best=min(best,max(dp[s^t],sum[t])); nd[s]=best; } dp=nd; }\n  cout<<dp[F-1]<<\"\\n\"; }\n",
- "lcurl": "https://leetcode.com/problems/find-minimum-time-to-finish-all-jobs/"
+ "lcurl": "https://leetcode.com/problems/find-minimum-time-to-finish-all-jobs/",
+ "stub": {
+  "py": "class Solution:\n    def minMaxLoad(self, k: int, jobs: List[int]) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    long long minMaxLoad(int k, vector<int>& jobs) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public long minMaxLoad(int k, int[] jobs) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {number} k\n * @param {number[]} jobs\n * @return {number}\n */\nvar minMaxLoad = function(k, jobs) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _n = int(_t[_p]); _p += 1\n    k = int(_t[_p]); _p += 1\n    jobs = list(map(int, _t[_p:_p + (_n)])); _p += (_n)\n    _r = Solution().minMaxLoad(k, jobs)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _n; cin >> _n;\n    int k; cin >> k;\n    vector<int> jobs((_n)); for (auto& _x : jobs) cin >> _x;\n    auto _r = Solution().minMaxLoad(k, jobs);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _n = Integer.parseInt(_t[_p++]);\n        int k = Integer.parseInt(_t[_p++]);\n        int[] jobs = new int[(_n)]; for (int _i = 0; _i < jobs.length; _i++) jobs[_i] = Integer.parseInt(_t[_p++]);\n        long _r = new Solution().minMaxLoad(k, jobs);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _n = Number(_t[_p++]);\n    const k = Number(_t[_p++]);\n    const jobs = _t.slice(_p, _p + (_n)).map(Number); _p += (_n);\n    const _r = minMaxLoad(k, jobs);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

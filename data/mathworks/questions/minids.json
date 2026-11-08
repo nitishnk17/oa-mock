@@ -4,7 +4,7 @@
  "title": "Fewest IDs After Removals",
  "diff": "Easy",
  "src": "MathWorks OA, IIT Bombay, 2026 (Embedded Systems role, HackerRank). Coding question 1 of 2.",
- "body": "<p>You are given a list of IDs <code>arr</code> and an integer <code>m</code>. Remove <b>exactly</b> <code>m</code> elements from the list (any elements you like).</p><p>Return the <b>minimum number of distinct IDs</b> that can remain.</p>",
+ "body": "<p>You are given a list of IDs <code>arr</code> and an integer <code>m</code>. Remove <b>exactly</b> <code>m</code> elements from the list (any elements you like).</p><p>Return the <b>minimum number of distinct IDs</b> that can remain.</p><h3>Function to complete</h3><p>Complete <code>minIds(arr, m)</code>. It returns the fewest distinct IDs left.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "The first line contains <code>n</code> and <code>m</code>. The second line contains the <code>n</code> IDs.",
  "out": "One integer: the fewest distinct IDs left.",
  "cons": [
@@ -74,14 +74,33 @@
    "out": "1"
   }
  ],
- "ref": "import sys\nfrom collections import Counter\n\ndef main():\n    t = sys.stdin.read().split()\n    n, m = int(t[0]), int(t[1])\n    freq = sorted(Counter(t[2:2 + n]).values())\n    left = len(freq)\n    for f in freq:\n        if m < f:\n            break\n        m -= f\n        left -= 1\n    print(left)\n\nmain()\n",
+ "ref": "class Solution:\n    def minIds(self, arr: List[int], m: int) -> int:\n        freq = sorted(Counter(arr).values()); left = len(freq)\n        for f in freq:\n            if m < f: break\n            m -= f; left -= 1\n        return left\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; long long m; cin >> n >> m;\n    unordered_map<long long,int> cnt; cnt.reserve(n * 2 + 1);\n    for (int i = 0; i < n; i++){ long long x; cin >> x; cnt[x]++; }\n    vector<int> f; for (auto &p : cnt) f.push_back(p.second);\n    sort(f.begin(), f.end());\n    int left = f.size();\n    for (int x : f){ if (m < x) break; m -= x; left--; }\n    cout << left << \"\\n\";\n}\n",
  "lc": "1481 Least Number of Unique Integers after K Removals",
  "lcurl": "https://leetcode.com/problems/least-number-of-unique-integers-after-k-removals/",
  "stub": {
-  "py": "import sys\n\ndef min_distinct_ids(arr, m):\n    # write your solution here\n    return 0\n\ndef main():\n    data = sys.stdin.read().split()\n    n, m = int(data[0]), int(data[1])\n    arr = list(map(int, data[2:2 + n]))\n    print(min_distinct_ids(arr, m))\n\nmain()\n",
-  "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint minDistinctIds(vector<int> &arr, int m) {\n    // write your solution here\n    return 0;\n}\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int n, m;\n    cin >> n >> m;\n    vector<int> arr(n);\n    for (int i = 0; i < n; i++) cin >> arr[i];\n    cout << minDistinctIds(arr, m) << \"\\n\";\n    return 0;\n}\n",
-  "java": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    static int minDistinctIds(int[] arr, int m) {\n        // write your solution here\n        return 0;\n    }\n\n    public static void main(String[] args) throws IOException {\n        StreamTokenizer in = new StreamTokenizer(new BufferedInputStream(System.in));\n        in.nextToken(); int n = (int) in.nval;\n        in.nextToken(); int m = (int) in.nval;\n        int[] arr = new int[n];\n        for (int i = 0; i < n; i++) { in.nextToken(); arr[i] = (int) in.nval; }\n        System.out.println(minDistinctIds(arr, m));\n    }\n}\n",
-  "js": "function minDistinctIds(arr, m) {\n  // write your solution here\n  return 0;\n}\n\nconst data = require(\"fs\").readFileSync(0, \"utf8\").split(/\\s+/).filter(Boolean);\nconst n = +data[0], m = +data[1];\nconst arr = data.slice(2, 2 + n).map(Number);\nconsole.log(minDistinctIds(arr, m));\n"
- }
+  "py": "class Solution:\n    def minIds(self, arr: List[int], m: int) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    int minIds(vector<int>& arr, int m) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public int minIds(int[] arr, int m) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {number[]} arr\n * @param {number} m\n * @return {number}\n */\nvar minIds = function(arr, m) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _n = int(_t[_p]); _p += 1\n    m = int(_t[_p]); _p += 1\n    arr = list(map(int, _t[_p:_p + (_n)])); _p += (_n)\n    _r = Solution().minIds(arr, m)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _n; cin >> _n;\n    int m; cin >> m;\n    vector<int> arr((_n)); for (auto& _x : arr) cin >> _x;\n    auto _r = Solution().minIds(arr, m);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _n = Integer.parseInt(_t[_p++]);\n        int m = Integer.parseInt(_t[_p++]);\n        int[] arr = new int[(_n)]; for (int _i = 0; _i < arr.length; _i++) arr[_i] = Integer.parseInt(_t[_p++]);\n        int _r = new Solution().minIds(arr, m);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _n = Number(_t[_p++]);\n    const m = Number(_t[_p++]);\n    const arr = _t.slice(_p, _p + (_n)).map(Number); _p += (_n);\n    const _r = minIds(arr, m);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

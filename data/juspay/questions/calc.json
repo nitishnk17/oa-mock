@@ -3,7 +3,7 @@
  "title": "Basic Calculator",
  "diff": "Hard",
  "src": "Juspay elimination interview (SDE intern, Feb 2026)",
- "body": "<p>Evaluate an expression containing non-negative integers, <code>+</code>, <code>-</code>, parentheses and spaces. A <code>-</code> can also be a unary minus, as in <code>-(2+3)</code> or <code>-5</code>. Do not use eval.</p>",
+ "body": "<p>Evaluate an expression containing non-negative integers, <code>+</code>, <code>-</code>, parentheses and spaces. A <code>-</code> can also be a unary minus, as in <code>-(2+3)</code> or <code>-5</code>. Do not use eval.</p><h3>Function to complete</h3><p>Complete <code>calculate(s)</code>. It returns the value of the expression.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "One line: the expression.",
  "out": "One integer.",
  "cons": [
@@ -62,7 +62,32 @@
    "out": "3998438466175"
   }
  ],
- "ref": "import sys, heapq\nfrom collections import defaultdict, deque\nsys.setrecursionlimit(1 << 20)\n\ndef calc(s):\n    e = s.strip(\"\\n\"); res = 0; num = 0; sign = 1; st = []\n    for ch in e:\n        if ch.isdigit(): num = num*10 + int(ch)\n        elif ch in \"+-\":\n            res += sign*num; num = 0; sign = 1 if ch == \"+\" else -1\n        elif ch == \"(\":\n            st.append((res, sign)); res = 0; sign = 1\n        elif ch == \")\":\n            res += sign*num; num = 0; pr, ps = st.pop(); res = pr + ps*res\n    return str(res + sign*num)\n\nprint(calc(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def calculate(self, s: str) -> int:\n        res = 0; num = 0; sign = 1; st = []\n        for ch in s:\n            if ch.isdigit(): num = num * 10 + int(ch)\n            elif ch in \"+-\":\n                res += sign * num; num = 0; sign = 1 if ch == \"+\" else -1\n            elif ch == \"(\":\n                st.append((res, sign)); res = 0; sign = 1\n            elif ch == \")\":\n                res += sign * num; num = 0; pr, ps = st.pop(); res = pr + ps * res\n        return res + sign * num\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\n// recursive descent: expr := term (('+'|'-') term)*, term := '-' term | number | '(' expr ')'\nstring s; size_t p=0;\nvoid ws(){ while(p<s.size()&&s[p]==' ') p++; }\nlong long expr();\nlong long term(){ ws(); if(s[p]=='-'){p++; return -term();} if(s[p]=='+'){p++; return term();} if(s[p]=='('){ p++; long long v=expr(); ws(); p++; return v; } long long v=0; while(p<s.size()&&isdigit(s[p])) v=v*10+(s[p++]-'0'); return v; }\nlong long expr(){ long long v=term(); while(true){ ws(); if(p<s.size()&&(s[p]=='+'||s[p]=='-')){ char op=s[p++]; long long r=term(); v= op=='+'? v+r : v-r; } else break; } return v; }\nint main(){ getline(cin,s); cout<<expr()<<\"\\n\"; }\n",
- "lcurl": "https://leetcode.com/problems/basic-calculator/"
+ "lcurl": "https://leetcode.com/problems/basic-calculator/",
+ "stub": {
+  "py": "class Solution:\n    def calculate(self, s: str) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    long long calculate(string s) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public long calculate(String s) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {string} s\n * @return {number}\n */\nvar calculate = function(s) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    s = _raw.rstrip(\"\\r\\n\")\n    _r = Solution().calculate(s)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    string s((istreambuf_iterator<char>(cin)), istreambuf_iterator<char>());\n    while (!s.empty() && (s.back() == '\\n' || s.back() == '\\r')) s.pop_back();\n    auto _r = Solution().calculate(s);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        String s = _raw.replaceAll(\"[\\\\r\\\\n]+$\", \"\");\n        long _r = new Solution().calculate(s);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const s = _raw.replace(/[\\r\\n]+$/, \"\");\n    const _r = calculate(s);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

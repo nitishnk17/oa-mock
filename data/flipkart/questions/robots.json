@@ -3,7 +3,7 @@
  "title": "Two Collector Robots",
  "diff": "Hard",
  "src": "Flipkart SDE OA",
- "body": "<p>A grid has <code>R</code> rows and <code>C</code> columns, and each cell holds some goods. Robot 1 starts at the top-left cell and robot 2 at the top-right cell.</p><p>Every step, both robots move down one row at the same time. Each moves to the cell below-left, directly below or below-right, and must stay inside the grid. A robot collects the goods of every cell it visits. If both robots are on the same cell, its goods are counted once.</p><p>Print the maximum total the two robots can collect after reaching the bottom row.</p>",
+ "body": "<p>A grid has <code>R</code> rows and <code>C</code> columns, and each cell holds some goods. Robot 1 starts at the top-left cell and robot 2 at the top-right cell.</p><p>Every step, both robots move down one row at the same time. Each moves to the cell below-left, directly below or below-right, and must stay inside the grid. A robot collects the goods of every cell it visits. If both robots are on the same cell, its goods are counted once.</p><p>Print the maximum total the two robots can collect after reaching the bottom row.</p><h3>Function to complete</h3><p>Complete <code>maxGoods(grid)</code>. It returns the maximum goods collected.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "The first line contains <code>R</code> and <code>C</code>. Each of the next <code>R</code> lines contains <code>C</code> integers.",
  "out": "One integer: the maximum goods collected.",
  "cons": [
@@ -57,8 +57,33 @@
   }
  ],
  "type": "code",
- "ref": "import sys, heapq\nfrom collections import defaultdict\n\ndef robots(s):\n    t=list(map(int,s.split())); R,C=t[0],t[1]; g=[t[2+r*C:2+(r+1)*C] for r in range(R)]\n    NEG=-1; dp=[[NEG]*C for _ in range(C)]; dp[0][C-1]=g[0][0]+(g[0][C-1] if C>1 else 0)\n    for r in range(1,R):\n        nd=[[NEG]*C for _ in range(C)]\n        for a in range(C):\n            for b in range(C):\n                if dp[a][b]<0: continue\n                for na in (a-1,a,a+1):\n                    if not 0<=na<C: continue\n                    for nb in (b-1,b,b+1):\n                        if not 0<=nb<C: continue\n                        v=dp[a][b]+g[r][na]+(g[r][nb] if na!=nb else 0)\n                        if v>nd[na][nb]: nd[na][nb]=v\n        dp=nd\n    return str(max(max(x) for x in dp))\n\nprint(robots(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def maxGoods(self, grid: List[List[int]]) -> int:\n        R, C = len(grid), len(grid[0]); g = grid\n        NEG = -1; dp = [[NEG] * C for _ in range(C)]; dp[0][C - 1] = g[0][0] + (g[0][C - 1] if C > 1 else 0)\n        for r in range(1, R):\n            nd = [[NEG] * C for _ in range(C)]\n            for a in range(C):\n                for b in range(C):\n                    if dp[a][b] < 0: continue\n                    for na in (a - 1, a, a + 1):\n                        if not 0 <= na < C: continue\n                        for nb in (b - 1, b, b + 1):\n                            if not 0 <= nb < C: continue\n                            v = dp[a][b] + g[r][na] + (g[r][nb] if na != nb else 0)\n                            if v > nd[na][nb]: nd[na][nb] = v\n            dp = nd\n        return max(max(x) for x in dp)\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint R,C,g[50][50],memo[50][50][50];\nint go(int r,int a,int b){ if(a<0||b<0||a>=C||b>=C) return INT_MIN/2; int v=g[r][a]+(a!=b?g[r][b]:0); if(r==R-1) return v;\n  int &m=memo[r][a][b]; if(m>=0) return m; int best=INT_MIN/2; for(int i=-1;i<=1;i++) for(int j=-1;j<=1;j++) best=max(best,go(r+1,a+i,b+j)); return m=v+best; }\nint main(){ cin>>R>>C; for(int i=0;i<R;i++) for(int j=0;j<C;j++) cin>>g[i][j]; memset(memo,-1,sizeof memo); cout<<go(0,0,C-1)<<\"\\n\"; }\n",
  "lc": "1463 Cherry Pickup II",
- "lcurl": "https://leetcode.com/problems/cherry-pickup-ii/"
+ "lcurl": "https://leetcode.com/problems/cherry-pickup-ii/",
+ "stub": {
+  "py": "class Solution:\n    def maxGoods(self, grid: List[List[int]]) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    int maxGoods(vector<vector<int>>& grid) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public int maxGoods(int[][] grid) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {number[][]} grid\n * @return {number}\n */\nvar maxGoods = function(grid) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _R = int(_t[_p]); _p += 1\n    _C = int(_t[_p]); _p += 1\n    grid = [list(map(int, _t[_p + _i * (_C):_p + (_i + 1) * (_C)])) for _i in range((_R))]; _p += (_R) * (_C)\n    _r = Solution().maxGoods(grid)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _R; cin >> _R;\n    int _C; cin >> _C;\n    vector<vector<int>> grid((_R), vector<int>((_C))); for (auto& _row : grid) for (auto& _x : _row) cin >> _x;\n    auto _r = Solution().maxGoods(grid);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _R = Integer.parseInt(_t[_p++]);\n        int _C = Integer.parseInt(_t[_p++]);\n        int[][] grid = new int[(_R)][(_C)]; for (int[] _row : grid) for (int _j = 0; _j < _row.length; _j++) _row[_j] = Integer.parseInt(_t[_p++]);\n        int _r = new Solution().maxGoods(grid);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _R = Number(_t[_p++]);\n    const _C = Number(_t[_p++]);\n    const grid = []; for (let _i = 0; _i < (_R); _i++) { grid.push(_t.slice(_p, _p + (_C)).map(Number)); _p += (_C); }\n    const _r = maxGoods(grid);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

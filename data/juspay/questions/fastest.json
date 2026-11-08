@@ -3,7 +3,7 @@
  "title": "Learn JS: Shortest Time",
  "diff": "Medium",
  "src": "Juspay OA (HackerEarth, Q2)",
- "body": "<p>Same network, but now every follow edge <code>u v t</code> takes <code>t</code> units of time to pass an introduction from u to v.</p><p>A newbie <code>A</code> wants to be introduced to <code>B</code> as fast as possible. Print the shortest total time from A to B along follow edges, or <code>-1</code> if B cannot be reached.</p>",
+ "body": "<p>Same network, but now every follow edge <code>u v t</code> takes <code>t</code> units of time to pass an introduction from u to v.</p><p>A newbie <code>A</code> wants to be introduced to <code>B</code> as fast as possible. Print the shortest total time from A to B along follow edges, or <code>-1</code> if B cannot be reached.</p><h3>Function to complete</h3><p>Complete <code>shortestTime(members, follower, following, time, a, b)</code>. It returns the shortest time from A to B, or -1.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "Line 1: <code>N</code>. Line 2: the <code>N</code> member IDs. Line 3: <code>E</code>. Next <code>E</code> lines: an edge. Last line: <code>A B</code>. Each edge is <code>follower following time</code>.",
  "out": "One integer: the shortest time, or <code>-1</code>.",
  "cons": [
@@ -58,7 +58,32 @@
    "out": "-1"
   }
  ],
- "ref": "import sys, heapq\nfrom collections import defaultdict, deque\nsys.setrecursionlimit(1 << 20)\n\ndef _graph(s, weighted):\n    t = s.split(); p = 0\n    n = int(t[p]); p += 1 + n\n    e = int(t[p]); p += 1\n    g = defaultdict(list)\n    for _ in range(e):\n        if weighted: g[t[p]].append((t[p+1], int(t[p+2]))); p += 3\n        else: g[t[p]].append(t[p+1]); p += 2\n    return g, t[p], t[p+1]\n\ndef fastest(s):\n    g, a, b = _graph(s, True)\n    dist = {a: 0}; pq = [(0, a)]\n    while pq:\n        d, u = heapq.heappop(pq)\n        if d > dist[u]: continue\n        if u == b: return str(d)\n        for v, w in g[u]:\n            if d + w < dist.get(v, 1 << 62): dist[v] = d + w; heapq.heappush(pq, (d + w, v))\n    return \"-1\"\n\nprint(fastest(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def shortestTime(self, members: List[int], follower: List[int], following: List[int], time: List[int], a: int, b: int) -> int:\n        g = defaultdict(list)\n        for u, v, w in zip(follower, following, time): g[u].append((v, w))\n        dist = {a: 0}; pq = [(0, a)]\n        while pq:\n            d, u = heapq.heappop(pq)\n            if d > dist[u]: continue\n            if u == b: return d\n            for v, w in g[u]:\n                if d + w < dist.get(v, 1 << 62): dist[v] = d + w; heapq.heappush(pq, (d + w, v))\n        return -1\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\n// Dijkstra on the directed follow graph; member IDs are mapped to 0..N-1.\nint main(){ ios::sync_with_stdio(false); cin.tie(nullptr);\n  int n; cin >> n; unordered_map<string,int> id; for(int i = 0; i < n; i++){ string s; cin >> s; id[s] = i; }\n  int e; cin >> e; vector<vector<pair<int,long long>>> g(n);\n  for(int i = 0; i < e; i++){ string u, v; long long w; cin >> u >> v >> w; g[id[u]].push_back({id[v], w}); }\n  string A, B; cin >> A >> B; int a = id[A], b = id[B];\n  vector<long long> d(n, LLONG_MAX); priority_queue<pair<long long,int>, vector<pair<long long,int>>, greater<>> pq; d[a] = 0; pq.push({0, a});\n  while(!pq.empty()){ auto [du, u] = pq.top(); pq.pop(); if(du > d[u]) continue; for(auto [v, w] : g[u]) if(du + w < d[v]){ d[v] = du + w; pq.push({d[v], v}); } }\n  cout << (d[b] == LLONG_MAX ? -1 : d[b]) << \"\\n\"; }\n",
- "lcurl": "https://leetcode.com/problems/network-delay-time/"
+ "lcurl": "https://leetcode.com/problems/network-delay-time/",
+ "stub": {
+  "py": "class Solution:\n    def shortestTime(self, members: List[int], follower: List[int], following: List[int], time: List[int], a: int, b: int) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    long long shortestTime(vector<int>& members, vector<int>& follower, vector<int>& following, vector<int>& time, int a, int b) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public long shortestTime(int[] members, int[] follower, int[] following, int[] time, int a, int b) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {number[]} members\n * @param {number[]} follower\n * @param {number[]} following\n * @param {number[]} time\n * @param {number} a\n * @param {number} b\n * @return {number}\n */\nvar shortestTime = function(members, follower, following, time, a, b) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _n = int(_t[_p]); _p += 1\n    members = list(map(int, _t[_p:_p + (_n)])); _p += (_n)\n    _e = int(_t[_p]); _p += 1\n    follower = []; following = []; time = []\n    for _ in range((_e)):\n        follower.append(int(_t[_p + 0]))\n        following.append(int(_t[_p + 1]))\n        time.append(int(_t[_p + 2]))\n        _p += 3\n    a = int(_t[_p]); _p += 1\n    b = int(_t[_p]); _p += 1\n    _r = Solution().shortestTime(members, follower, following, time, a, b)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _n; cin >> _n;\n    vector<int> members((_n)); for (auto& _x : members) cin >> _x;\n    int _e; cin >> _e;\n    vector<int> follower((_e));\n    vector<int> following((_e));\n    vector<int> time((_e));\n    for (int _i = 0; _i < (_e); _i++) cin >> follower[_i] >> following[_i] >> time[_i];\n    int a; cin >> a;\n    int b; cin >> b;\n    auto _r = Solution().shortestTime(members, follower, following, time, a, b);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _n = Integer.parseInt(_t[_p++]);\n        int[] members = new int[(_n)]; for (int _i = 0; _i < members.length; _i++) members[_i] = Integer.parseInt(_t[_p++]);\n        int _e = Integer.parseInt(_t[_p++]);\n        int[] follower = new int[(_e)];\n        int[] following = new int[(_e)];\n        int[] time = new int[(_e)];\n        for (int _i = 0; _i < (_e); _i++) { follower[_i] = Integer.parseInt(_t[_p++]); following[_i] = Integer.parseInt(_t[_p++]); time[_i] = Integer.parseInt(_t[_p++]); }\n        int a = Integer.parseInt(_t[_p++]);\n        int b = Integer.parseInt(_t[_p++]);\n        long _r = new Solution().shortestTime(members, follower, following, time, a, b);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _n = Number(_t[_p++]);\n    const members = _t.slice(_p, _p + (_n)).map(Number); _p += (_n);\n    const _e = Number(_t[_p++]);\n    const follower = [], following = [], time = [];\n    for (let _i = 0; _i < (_e); _i++) { follower.push(Number(_t[_p++])); following.push(Number(_t[_p++])); time.push(Number(_t[_p++])); }\n    const a = Number(_t[_p++]);\n    const b = Number(_t[_p++]);\n    const _r = shortestTime(members, follower, following, time, a, b);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

@@ -3,7 +3,7 @@
  "title": "Parking Lot Arrangement",
  "diff": "Hard",
  "src": "Juspay hiring challenge (Unstop Part C)",
- "body": "<p><code>n</code> cars are parked at distinct positions on a long street. In one move you pick up a car and park it at any empty position. Find the minimum number of moves so the cars occupy <code>n</code> consecutive positions.</p><p class='muted'>Also seen as \"Data Server Storage Consolidation\" with servers instead of cars.</p>",
+ "body": "<p><code>n</code> cars are parked at distinct positions on a long street. In one move you pick up a car and park it at any empty position. Find the minimum number of moves so the cars occupy <code>n</code> consecutive positions.</p><p class='muted'>Also seen as \"Data Server Storage Consolidation\" with servers instead of cars.</p><h3>Function to complete</h3><p>Complete <code>minMoves(positions)</code>. It returns the minimum number of cars to move.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "Line 1: <code>n</code>. Line 2: the <code>n</code> positions.",
  "out": "One integer.",
  "cons": [
@@ -58,7 +58,32 @@
    "out": "19995"
   }
  ],
- "ref": "import sys, heapq\nfrom collections import defaultdict, deque\nsys.setrecursionlimit(1 << 20)\n\ndef parking(s):\n    t = list(map(int, s.split())); n = t[0]; a = sorted(t[1:1+n]); best = 0; j = 0\n    for i in range(n):\n        while a[i] - a[j] > n - 1: j += 1\n        best = max(best, i - j + 1)\n    return str(n - best)\n\nprint(parking(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def minMoves(self, positions: List[int]) -> int:\n        n = len(positions); a = sorted(positions); best = 0; j = 0\n        for i in range(n):\n            while a[i] - a[j] > n - 1: j += 1\n            best = max(best, i - j + 1)\n        return n - best\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){ int n; cin>>n; vector<long long> a(n); for(auto&x:a)cin>>x; sort(a.begin(),a.end()); int best=0;\n  for(int i=0;i<n;i++){ int j=upper_bound(a.begin(),a.end(),a[i]+n-1)-a.begin(); best=max(best,j-i); }   // window starting at a[i]\n  cout<<n-best<<\"\\n\"; }\n",
- "lcurl": "https://leetcode.com/problems/minimum-number-of-operations-to-make-array-continuous/"
+ "lcurl": "https://leetcode.com/problems/minimum-number-of-operations-to-make-array-continuous/",
+ "stub": {
+  "py": "class Solution:\n    def minMoves(self, positions: List[int]) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    int minMoves(vector<int>& positions) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public int minMoves(int[] positions) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {number[]} positions\n * @return {number}\n */\nvar minMoves = function(positions) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _n = int(_t[_p]); _p += 1\n    positions = list(map(int, _t[_p:_p + (_n)])); _p += (_n)\n    _r = Solution().minMoves(positions)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _n; cin >> _n;\n    vector<int> positions((_n)); for (auto& _x : positions) cin >> _x;\n    auto _r = Solution().minMoves(positions);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _n = Integer.parseInt(_t[_p++]);\n        int[] positions = new int[(_n)]; for (int _i = 0; _i < positions.length; _i++) positions[_i] = Integer.parseInt(_t[_p++]);\n        int _r = new Solution().minMoves(positions);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _n = Number(_t[_p++]);\n    const positions = _t.slice(_p, _p + (_n)).map(Number); _p += (_n);\n    const _r = minMoves(positions);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

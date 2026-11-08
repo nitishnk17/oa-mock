@@ -3,7 +3,7 @@
  "title": "Priority Colouring",
  "diff": "Easy",
  "src": "Flipkart UI Engineer OA (IIT Bombay)",
- "body": "<p>An undirected graph has <code>n</code> vertices numbered 1 to n. There are 10 colours, numbered 1 (highest priority) to 10 (lowest).</p><p>Colour the vertices in order 1, 2, …, n. Each vertex gets the highest-priority colour (the smallest number) that is not already used by one of its <em>already coloured</em> neighbours.</p><p>Print the colour of every vertex.</p>",
+ "body": "<p>An undirected graph has <code>n</code> vertices numbered 1 to n. There are 10 colours, numbered 1 (highest priority) to 10 (lowest).</p><p>Colour the vertices in order 1, 2, …, n. Each vertex gets the highest-priority colour (the smallest number) that is not already used by one of its <em>already coloured</em> neighbours.</p><p>Print the colour of every vertex.</p><h3>Function to complete</h3><p>Complete <code>colourVertices(n, edges)</code>. It returns the colour of vertices 1 to n.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "The first line contains <code>n</code> and <code>m</code>. Each of the next <code>m</code> lines contains an edge <code>u v</code>.",
  "out": "<code>n</code> integers separated by spaces: the colour of vertices 1 to n.",
  "cons": [
@@ -58,8 +58,33 @@
   }
  ],
  "type": "code",
- "ref": "import sys, heapq\nfrom collections import defaultdict\n\ndef colour(s):\n    t=list(map(int,s.split())); n,m=t[0],t[1]; adj=[[] for _ in range(n+1)]\n    for i in range(m):\n        u,v=t[2+2*i],t[3+2*i]; adj[u].append(v); adj[v].append(u)\n    col=[0]*(n+1)\n    for v in range(1,n+1):\n        used={col[u] for u in adj[v]}\n        c=1\n        while c in used: c+=1\n        col[v]=c\n    return \" \".join(map(str,col[1:]))\n\nprint(colour(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def colourVertices(self, n: int, edges: List[List[int]]) -> List[int]:\n        adj = [[] for _ in range(n + 1)]\n        for u, v in edges:\n            adj[u].append(v); adj[v].append(u)\n        col = [0] * (n + 1)\n        for v in range(1, n + 1):\n            used = {col[u] for u in adj[v]}\n            c = 1\n            while c in used: c += 1\n            col[v] = c\n        return col[1:]\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){ int n,m; cin>>n>>m; vector<vector<int>> g(n+1); for(int i=0;i<m;i++){int u,v;cin>>u>>v; g[u].push_back(v); g[v].push_back(u);}\n  vector<int> c(n+1,0); for(int v=1;v<=n;v++){ bool used[12]={}; for(int u:g[v]) if(c[u]) used[c[u]]=1; int k=1; while(used[k]) k++; c[v]=k; }\n  for(int v=1;v<=n;v++) cout<<c[v]<<(v<n?\" \":\"\\n\"); }\n",
  "lc": "1042 Flower Planting With No Adjacent",
- "lcurl": "https://leetcode.com/problems/flower-planting-with-no-adjacent/"
+ "lcurl": "https://leetcode.com/problems/flower-planting-with-no-adjacent/",
+ "stub": {
+  "py": "class Solution:\n    def colourVertices(self, n: int, edges: List[List[int]]) -> List[int]:\n        return []\n",
+  "cpp": "class Solution {\npublic:\n    vector<int> colourVertices(int n, vector<vector<int>>& edges) {\n        \n        return {};\n    }\n};\n",
+  "java": "class Solution {\n    public int[] colourVertices(int n, int[][] edges) {\n        \n        return new int[0];\n    }\n}\n",
+  "js": "/**\n * @param {number} n\n * @param {number[][]} edges\n * @return {number[]}\n */\nvar colourVertices = function(n, edges) {\n    \n    return [];\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    n = int(_t[_p]); _p += 1\n    _m = int(_t[_p]); _p += 1\n    edges = [list(map(int, _t[_p + _i * 2:_p + (_i + 1) * 2])) for _i in range((_m))]; _p += (_m) * 2\n    _r = Solution().colourVertices(n, edges)\n    print(\" \".join(map(str, _r)))\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int n; cin >> n;\n    int _m; cin >> _m;\n    vector<vector<int>> edges((_m), vector<int>(2)); for (auto& _row : edges) for (auto& _x : _row) cin >> _x;\n    auto _r = Solution().colourVertices(n, edges);\n    for (size_t _i = 0; _i < _r.size(); _i++) { if (_i) cout << ' '; cout << _r[_i]; }\n    cout << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int n = Integer.parseInt(_t[_p++]);\n        int _m = Integer.parseInt(_t[_p++]);\n        int[][] edges = new int[(_m)][2]; for (int[] _row : edges) for (int _j = 0; _j < _row.length; _j++) _row[_j] = Integer.parseInt(_t[_p++]);\n        int[] _r = new Solution().colourVertices(n, edges);\n        StringBuilder _sb = new StringBuilder();\n        for (int _i = 0; _i < _r.length; _i++) { if (_i > 0) _sb.append(' '); _sb.append(_r[_i]); }\n        _sb.append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const n = Number(_t[_p++]);\n    const _m = Number(_t[_p++]);\n    const edges = []; for (let _i = 0; _i < (_m); _i++) { edges.push(_t.slice(_p, _p + 2).map(Number)); _p += 2; }\n    const _r = colourVertices(n, edges);\n    console.log(_r.join(\" \"));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

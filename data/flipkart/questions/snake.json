@@ -3,7 +3,7 @@
  "title": "Poison Trail Snake",
  "diff": "Medium",
  "src": "Generic coding round (hirepro)",
- "body": "<p>A snake moves on a grid that covers every point <code>(x, y)</code> with <code>0 ≤ x ≤ W</code> and <code>0 ≤ y ≤ D</code>. <code>x</code> grows to the right and <code>y</code> grows upwards. The snake starts at <code>(x, y)</code> facing east (towards +x).</p><p>Each move is a turn <code>T</code> followed by a length <code>k</code>. <code>T</code> is <code>S</code> (straight), <code>L</code> (turn left) or <code>R</code> (turn right), relative to the current direction. After turning, the snake moves <code>k</code> units, one point at a time.</p><p>The snake leaves poison on every point it visits, including its start. The game ends immediately when the snake steps on a point it has already visited (it dies) or steps off the grid (it dies). The step that kills it still counts towards the distance, and its final position is the point it stepped onto.</p><p>Print the total distance travelled, then the final position and <code>A</code> (alive) or <code>D</code> (dead).</p>",
+ "body": "<p>A snake moves on a grid that covers every point <code>(x, y)</code> with <code>0 ≤ x ≤ W</code> and <code>0 ≤ y ≤ D</code>. <code>x</code> grows to the right and <code>y</code> grows upwards. The snake starts at <code>(x, y)</code> facing east (towards +x).</p><p>Each move is a turn <code>T</code> followed by a length <code>k</code>. <code>T</code> is <code>S</code> (straight), <code>L</code> (turn left) or <code>R</code> (turn right), relative to the current direction. After turning, the snake moves <code>k</code> units, one point at a time.</p><p>The snake leaves poison on every point it visits, including its start. The game ends immediately when the snake steps on a point it has already visited (it dies) or steps off the grid (it dies). The step that kills it still counts towards the distance, and its final position is the point it stepped onto.</p><p>Print the total distance travelled, then the final position and <code>A</code> (alive) or <code>D</code> (dead).</p><h3>Function to complete</h3><p>Complete <code>snakeTrail(W, D, x, y, turns, steps)</code>. It returns two strings: the distance, then <code>\"(x,y) S\"</code> where S is A or D.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "Line 1: <code>W D</code>. Line 2: <code>x y</code>. Line 3: <code>n T<sub>1</sub> k<sub>1</sub> T<sub>2</sub> k<sub>2</sub> …</code>",
  "out": "Line 1: the distance. Line 2: <code>(x,y) S</code> where S is A or D.",
  "cons": [
@@ -62,8 +62,33 @@
   }
  ],
  "type": "code",
- "ref": "import sys, heapq\nfrom collections import defaultdict\n\ndef snake(s):\n    L=s.split(\"\\n\"); W,D=map(int,L[0].split()); x,y=map(int,L[1].split()); t=L[2].split(); n=int(t[0])\n    dirs=[(1,0),(0,1),(-1,0),(0,-1)]; d=0; seen={(x,y)}; dist=0\n    for i in range(n):\n        T,k=t[1+2*i],int(t[2+2*i]); d=(d+{'S':0,'L':1,'R':3}[T])%4\n        for _ in range(k):\n            x+=dirs[d][0]; y+=dirs[d][1]; dist+=1\n            if not(0<=x<=W and 0<=y<=D) or (x,y) in seen: return f\"{dist}\\n({x},{y}) D\"\n            seen.add((x,y))\n    return f\"{dist}\\n({x},{y}) A\"\n\nprint(snake(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def snakeTrail(self, W: int, D: int, x: int, y: int, turns: List[str], steps: List[int]) -> List[str]:\n        dirs = [(1, 0), (0, 1), (-1, 0), (0, -1)]; d = 0; seen = {(x, y)}; dist = 0\n        for T, k in zip(turns, steps):\n            d = (d + {'S': 0, 'L': 1, 'R': 3}[T]) % 4\n            for _ in range(k):\n                x += dirs[d][0]; y += dirs[d][1]; dist += 1\n                if not (0 <= x <= W and 0 <= y <= D) or (x, y) in seen:\n                    return [str(dist), f\"({x},{y}) D\"]\n                seen.add((x, y))\n        return [str(dist), f\"({x},{y}) A\"]\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){ int W,D,x,y,n; cin>>W>>D>>x>>y>>n; int dx[4]={1,0,-1,0}, dy[4]={0,1,0,-1}, d=0, dist=0;\n  set<pair<int,int>> seen{{x,y}};\n  for(int i=0;i<n;i++){ char T; int k; cin>>T>>k; if(T=='L') d=(d+1)%4; else if(T=='R') d=(d+3)%4;\n    for(int s=0;s<k;s++){ x+=dx[d]; y+=dy[d]; dist++;\n      if(x<0||x>W||y<0||y>D||seen.count({x,y})){ printf(\"%d\\n(%d,%d) D\\n\",dist,x,y); return 0; } seen.insert({x,y}); } }\n  printf(\"%d\\n(%d,%d) A\\n\",dist,x,y); }\n",
  "lc": "874 Walking Robot Simulation",
- "lcurl": "https://leetcode.com/problems/walking-robot-simulation/"
+ "lcurl": "https://leetcode.com/problems/walking-robot-simulation/",
+ "stub": {
+  "py": "class Solution:\n    def snakeTrail(self, W: int, D: int, x: int, y: int, turns: List[str], steps: List[int]) -> List[str]:\n        return []\n",
+  "cpp": "class Solution {\npublic:\n    vector<string> snakeTrail(int W, int D, int x, int y, vector<string>& turns, vector<int>& steps) {\n        \n        return {};\n    }\n};\n",
+  "java": "class Solution {\n    public String[] snakeTrail(int W, int D, int x, int y, String[] turns, int[] steps) {\n        \n        return new String[0];\n    }\n}\n",
+  "js": "/**\n * @param {number} W\n * @param {number} D\n * @param {number} x\n * @param {number} y\n * @param {string[]} turns\n * @param {number[]} steps\n * @return {string[]}\n */\nvar snakeTrail = function(W, D, x, y, turns, steps) {\n    \n    return [];\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    W = int(_t[_p]); _p += 1\n    D = int(_t[_p]); _p += 1\n    x = int(_t[_p]); _p += 1\n    y = int(_t[_p]); _p += 1\n    _n = int(_t[_p]); _p += 1\n    turns = []; steps = []\n    for _ in range((_n)):\n        turns.append(_t[_p + 0])\n        steps.append(int(_t[_p + 1]))\n        _p += 2\n    _r = Solution().snakeTrail(W, D, x, y, turns, steps)\n    print(\"\\n\".join(map(str, _r)))\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int W; cin >> W;\n    int D; cin >> D;\n    int x; cin >> x;\n    int y; cin >> y;\n    int _n; cin >> _n;\n    vector<string> turns((_n));\n    vector<int> steps((_n));\n    for (int _i = 0; _i < (_n); _i++) cin >> turns[_i] >> steps[_i];\n    auto _r = Solution().snakeTrail(W, D, x, y, turns, steps);\n    for (auto& _x : _r) cout << _x << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int W = Integer.parseInt(_t[_p++]);\n        int D = Integer.parseInt(_t[_p++]);\n        int x = Integer.parseInt(_t[_p++]);\n        int y = Integer.parseInt(_t[_p++]);\n        int _n = Integer.parseInt(_t[_p++]);\n        String[] turns = new String[(_n)];\n        int[] steps = new int[(_n)];\n        for (int _i = 0; _i < (_n); _i++) { turns[_i] = _t[_p++]; steps[_i] = Integer.parseInt(_t[_p++]); }\n        String[] _r = new Solution().snakeTrail(W, D, x, y, turns, steps);\n        StringBuilder _sb = new StringBuilder();\n        for (int _i = 0; _i < _r.length; _i++) _sb.append(_r[_i]).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const W = Number(_t[_p++]);\n    const D = Number(_t[_p++]);\n    const x = Number(_t[_p++]);\n    const y = Number(_t[_p++]);\n    const _n = Number(_t[_p++]);\n    const turns = [], steps = [];\n    for (let _i = 0; _i < (_n); _i++) { turns.push(_t[_p++]); steps.push(Number(_t[_p++])); }\n    const _r = snakeTrail(W, D, x, y, turns, steps);\n    console.log(_r.join(\"\\n\"));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

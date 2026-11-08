@@ -3,7 +3,7 @@
  "title": "Largest Merged Code",
  "diff": "Hard",
  "src": "Flipkart SDE OA",
- "body": "<p>You have two lists of digits. Build the largest possible number of exactly <code>k</code> digits by choosing digits from both lists. Digits taken from the same list must keep their original relative order, but you can interleave the two lists however you like.</p><p>Print the digits of the largest number.</p>",
+ "body": "<p>You have two lists of digits. Build the largest possible number of exactly <code>k</code> digits by choosing digits from both lists. Digits taken from the same list must keep their original relative order, but you can interleave the two lists however you like.</p><p>Print the digits of the largest number.</p><h3>Function to complete</h3><p>Complete <code>largestMerged(a, b, k)</code>. It returns the k digits of the largest code.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "Line 1: <code>m</code>. Line 2: <code>m</code> digits. Line 3: <code>n</code>. Line 4: <code>n</code> digits. Line 5: <code>k</code>.",
  "out": "<code>k</code> digits separated by spaces.",
  "cons": [
@@ -57,8 +57,33 @@
   }
  ],
  "type": "code",
- "ref": "import sys, heapq\nfrom collections import defaultdict\n\ndef bignum(s):\n    t=list(map(int,s.split())); m=t[0]; A=t[1:1+m]; n=t[1+m]; B=t[2+m:2+m+n]; k=t[2+m+n]\n    def pick(a,c):\n        drop=len(a)-c; st=[]\n        for x in a:\n            while drop and st and st[-1]<x: st.pop(); drop-=1\n            st.append(x)\n        return st[:c]\n    def merge(a,b):\n        r=[]\n        while a or b:\n            if a>b: r.append(a.pop(0))\n            else: r.append(b.pop(0))\n        return r\n    best=[]\n    for i in range(max(0,k-n),min(k,m)+1):\n        best=max(best,merge(pick(A,i),pick(B,k-i)))\n    return \" \".join(map(str,best))\n\nprint(bignum(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def largestMerged(self, a: List[int], b: List[int], k: int) -> List[int]:\n        m, n = len(a), len(b)\n        def pick(x, c):\n            drop = len(x) - c; st = []\n            for d in x:\n                while drop and st and st[-1] < d: st.pop(); drop -= 1\n                st.append(d)\n            return st[:c]\n        def merge(x, y):\n            r = []\n            while x or y:\n                if x > y: r.append(x.pop(0))\n                else: r.append(y.pop(0))\n            return r\n        best = []\n        for i in range(max(0, k - n), min(k, m) + 1):\n            best = max(best, merge(pick(a, i), pick(b, k - i)))\n        return best\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nvector<int> best(const vector<int>& a,int c){ vector<int> st; int drop=a.size()-c; for(int x:a){ while(drop&&!st.empty()&&st.back()<x){st.pop_back();drop--;} st.push_back(x);} st.resize(c); return st; }\nvector<int> mergeV(vector<int> a, vector<int> b){ vector<int> r; size_t i=0,j=0; while(i<a.size()||j<b.size()){\n  if(lexicographical_compare(b.begin()+j,b.end(),a.begin()+i,a.end())) r.push_back(a[i++]); else r.push_back(b[j++]); } return r; }\nint main(){ int m; cin>>m; vector<int> A(m); for(auto&x:A)cin>>x; int n; cin>>n; vector<int> B(n); for(auto&x:B)cin>>x; int k; cin>>k;\n  vector<int> ans; for(int i=max(0,k-n);i<=min(k,m);i++){ auto c=mergeV(best(A,i),best(B,k-i)); if(c>ans) ans=c; }\n  for(int i=0;i<k;i++) cout<<ans[i]<<(i+1<k?\" \":\"\\n\"); }\n",
  "lc": "321 Create Maximum Number",
- "lcurl": "https://leetcode.com/problems/create-maximum-number/"
+ "lcurl": "https://leetcode.com/problems/create-maximum-number/",
+ "stub": {
+  "py": "class Solution:\n    def largestMerged(self, a: List[int], b: List[int], k: int) -> List[int]:\n        return []\n",
+  "cpp": "class Solution {\npublic:\n    vector<int> largestMerged(vector<int>& a, vector<int>& b, int k) {\n        \n        return {};\n    }\n};\n",
+  "java": "class Solution {\n    public int[] largestMerged(int[] a, int[] b, int k) {\n        \n        return new int[0];\n    }\n}\n",
+  "js": "/**\n * @param {number[]} a\n * @param {number[]} b\n * @param {number} k\n * @return {number[]}\n */\nvar largestMerged = function(a, b, k) {\n    \n    return [];\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _m = int(_t[_p]); _p += 1\n    a = list(map(int, _t[_p:_p + (_m)])); _p += (_m)\n    _n = int(_t[_p]); _p += 1\n    b = list(map(int, _t[_p:_p + (_n)])); _p += (_n)\n    k = int(_t[_p]); _p += 1\n    _r = Solution().largestMerged(a, b, k)\n    print(\" \".join(map(str, _r)))\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _m; cin >> _m;\n    vector<int> a((_m)); for (auto& _x : a) cin >> _x;\n    int _n; cin >> _n;\n    vector<int> b((_n)); for (auto& _x : b) cin >> _x;\n    int k; cin >> k;\n    auto _r = Solution().largestMerged(a, b, k);\n    for (size_t _i = 0; _i < _r.size(); _i++) { if (_i) cout << ' '; cout << _r[_i]; }\n    cout << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _m = Integer.parseInt(_t[_p++]);\n        int[] a = new int[(_m)]; for (int _i = 0; _i < a.length; _i++) a[_i] = Integer.parseInt(_t[_p++]);\n        int _n = Integer.parseInt(_t[_p++]);\n        int[] b = new int[(_n)]; for (int _i = 0; _i < b.length; _i++) b[_i] = Integer.parseInt(_t[_p++]);\n        int k = Integer.parseInt(_t[_p++]);\n        int[] _r = new Solution().largestMerged(a, b, k);\n        StringBuilder _sb = new StringBuilder();\n        for (int _i = 0; _i < _r.length; _i++) { if (_i > 0) _sb.append(' '); _sb.append(_r[_i]); }\n        _sb.append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _m = Number(_t[_p++]);\n    const a = _t.slice(_p, _p + (_m)).map(Number); _p += (_m);\n    const _n = Number(_t[_p++]);\n    const b = _t.slice(_p, _p + (_n)).map(Number); _p += (_n);\n    const k = Number(_t[_p++]);\n    const _r = largestMerged(a, b, k);\n    console.log(_r.join(\" \"));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

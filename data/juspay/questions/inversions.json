@@ -3,7 +3,7 @@
  "title": "Count Inversion Pairs",
  "diff": "Medium",
  "src": "Juspay technical interview (SDE-1, Aug 2025)",
- "body": "<p>Count the pairs <code>i &lt; j</code> with <code>a_i &gt; a_j</code>. The interviewer asked for brute force first and then the O(n log n) divide-and-conquer version, so the large tests need the fast one.</p>",
+ "body": "<p>Count the pairs <code>i &lt; j</code> with <code>a_i &gt; a_j</code>. The interviewer asked for brute force first and then the O(n log n) divide-and-conquer version, so the large tests need the fast one.</p><h3>Function to complete</h3><p>Complete <code>countInversions(a)</code>. It returns the number of inversion pairs.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "Line 1: <code>n</code>. Line 2: the array.",
  "out": "One integer.",
  "cons": [
@@ -58,7 +58,32 @@
    "out": "49995000"
   }
  ],
- "ref": "import sys, heapq\nfrom collections import defaultdict, deque\nsys.setrecursionlimit(1 << 20)\n\ndef inversions(s):\n    t = list(map(int, s.split())); a = t[1:1+t[0]]\n    def sort(x):\n        if len(x) < 2: return x, 0\n        m = len(x)//2; l, c1 = sort(x[:m]); r, c2 = sort(x[m:]); out = []; i = j = 0; c = c1 + c2\n        while i < len(l) and j < len(r):\n            if r[j] < l[i]: out.append(r[j]); j += 1; c += len(l) - i\n            else: out.append(l[i]); i += 1\n        out += l[i:]; out += r[j:]\n        return out, c\n    return str(sort(a)[1])\n\nprint(inversions(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def countInversions(self, a: List[int]) -> int:\n        def sort(x):\n            if len(x) < 2: return x, 0\n            m = len(x) // 2; l, c1 = sort(x[:m]); r, c2 = sort(x[m:]); out = []; i = j = 0; c = c1 + c2\n            while i < len(l) and j < len(r):\n                if r[j] < l[i]: out.append(r[j]); j += 1; c += len(l) - i\n                else: out.append(l[i]); i += 1\n            out += l[i:]; out += r[j:]\n            return out, c\n        return sort(a)[1]\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\n// Fenwick tree over compressed values (the reference uses merge sort)\nint main(){ int n; cin>>n; vector<long long> a(n); for(auto&x:a)cin>>x; vector<long long> v(a); sort(v.begin(),v.end()); v.erase(unique(v.begin(),v.end()),v.end());\n  vector<long long> bit(v.size()+1,0); long long inv=0;\n  for(int i=n-1;i>=0;i--){ int r=lower_bound(v.begin(),v.end(),a[i])-v.begin(); for(int x=r;x>0;x-=x&-x) inv+=bit[x]; for(int x=r+1;x<=(int)v.size();x+=x&-x) bit[x]++; }\n  cout<<inv<<\"\\n\"; }\n",
- "lcurl": "https://leetcode.com/problems/reverse-pairs/"
+ "lcurl": "https://leetcode.com/problems/reverse-pairs/",
+ "stub": {
+  "py": "class Solution:\n    def countInversions(self, a: List[int]) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    long long countInversions(vector<int>& a) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public long countInversions(int[] a) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {number[]} a\n * @return {number}\n */\nvar countInversions = function(a) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _n = int(_t[_p]); _p += 1\n    a = list(map(int, _t[_p:_p + (_n)])); _p += (_n)\n    _r = Solution().countInversions(a)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _n; cin >> _n;\n    vector<int> a((_n)); for (auto& _x : a) cin >> _x;\n    auto _r = Solution().countInversions(a);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _n = Integer.parseInt(_t[_p++]);\n        int[] a = new int[(_n)]; for (int _i = 0; _i < a.length; _i++) a[_i] = Integer.parseInt(_t[_p++]);\n        long _r = new Solution().countInversions(a);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _n = Number(_t[_p++]);\n    const a = _t.slice(_p, _p + (_n)).map(Number); _p += (_n);\n    const _r = countInversions(a);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

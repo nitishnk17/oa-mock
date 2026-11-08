@@ -3,7 +3,7 @@
  "title": "Sorted Position Code",
  "diff": "Easy",
  "src": "Flipkart Data Engineer OA (IIT BHU)",
- "body": "<p>You are given a word. Sort its letters alphabetically to get the <em>sorted word</em>.</p><p>Match each letter of the original word to the same letter in the sorted word. Repeated letters are matched in order of appearance: the first <code>a</code> of the word goes with the first <code>a</code> of the sorted word, and so on. Positions are 0-indexed.</p><p>For every letter of the original word, compute <code>v = |original position − sorted position| + ASCII(last letter of the sorted word)</code> and take the digit sum of <code>v</code>. Add these digit sums together to get <code>X</code>.</p><p>Finally take the digit sum of <code>X</code> once (do not repeat) and turn it into a letter: 1 → A, 2 → B, …, 26 → Z, 27 → A again, and so on.</p><p>Print <code>X</code> and the letter.</p>",
+ "body": "<p>You are given a word. Sort its letters alphabetically to get the <em>sorted word</em>.</p><p>Match each letter of the original word to the same letter in the sorted word. Repeated letters are matched in order of appearance: the first <code>a</code> of the word goes with the first <code>a</code> of the sorted word, and so on. Positions are 0-indexed.</p><p>For every letter of the original word, compute <code>v = |original position − sorted position| + ASCII(last letter of the sorted word)</code> and take the digit sum of <code>v</code>. Add these digit sums together to get <code>X</code>.</p><p>Finally take the digit sum of <code>X</code> once (do not repeat) and turn it into a letter: 1 → A, 2 → B, …, 26 → Z, 27 → A again, and so on.</p><p>Print <code>X</code> and the letter.</p><h3>Function to complete</h3><p>Complete <code>positionCode(word)</code>. It returns X and the letter separated by one space, e.g. <code>\"55 J\"</code>.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "One line with the word.",
  "out": "<code>X</code> and the letter, separated by a space.",
  "cons": [
@@ -57,8 +57,33 @@
   }
  ],
  "type": "code",
- "ref": "import sys, heapq\nfrom collections import defaultdict\n\ndef poscode(s):\n    w=s.split()[0]; srt=sorted(w)\n    q=defaultdict(list)\n    for i,c in enumerate(srt): q[c].append(i)\n    ptr=defaultdict(int); base=ord(srt[-1]); X=0\n    for i,c in enumerate(w):\n        j=q[c][ptr[c]]; ptr[c]+=1\n        X+=sum(map(int,str(abs(i-j)+base)))\n    d=sum(map(int,str(X)))\n    return f\"{X} {chr((d-1)%26+65)}\"\n\nprint(poscode(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def positionCode(self, word: str) -> str:\n        srt = sorted(word)\n        where = defaultdict(list)\n        for i, c in enumerate(srt):\n            where[c].append(i)\n        used = defaultdict(int); base = ord(srt[-1]); X = 0\n        for i, c in enumerate(word):\n            j = where[c][used[c]]; used[c] += 1\n            X += sum(map(int, str(abs(i - j) + base)))\n        d = sum(map(int, str(X)))\n        return f\"{X} {chr((d - 1) % 26 + 65)}\"\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint ds(long long v){int s=0; while(v){s+=v%10; v/=10;} return s;}\nint main(){ string w; cin>>w; int n=w.size(); vector<int> idx(n); iota(idx.begin(),idx.end(),0);\n  stable_sort(idx.begin(),idx.end(),[&](int a,int b){return w[a]<w[b];});   // idx[j] = original position of sorted letter j\n  int base=w[idx[n-1]]; long long X=0;\n  for(int j=0;j<n;j++) X+=ds(llabs((long long)idx[j]-j)+base);\n  int d=ds(X); cout<<X<<\" \"<<char('A'+(d-1)%26)<<\"\\n\"; }\n",
  "lc": "1945 Sum of Digits of String After Convert",
- "lcurl": "https://leetcode.com/problems/sum-of-digits-of-string-after-convert/"
+ "lcurl": "https://leetcode.com/problems/sum-of-digits-of-string-after-convert/",
+ "stub": {
+  "py": "class Solution:\n    def positionCode(self, word: str) -> str:\n        return \"\"\n",
+  "cpp": "class Solution {\npublic:\n    string positionCode(string word) {\n        \n        return \"\";\n    }\n};\n",
+  "java": "class Solution {\n    public String positionCode(String word) {\n        \n        return \"\";\n    }\n}\n",
+  "js": "/**\n * @param {string} word\n * @return {string}\n */\nvar positionCode = function(word) {\n    \n    return \"\";\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    word = _t[_p]; _p += 1\n    _r = Solution().positionCode(word)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    string word; cin >> word;\n    auto _r = Solution().positionCode(word);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        String word = _t[_p++];\n        String _r = new Solution().positionCode(word);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const word = _t[_p++];\n    const _r = positionCode(word);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

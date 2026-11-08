@@ -3,7 +3,7 @@
  "title": "Nearest Meeting Cell",
  "diff": "Medium",
  "src": "Juspay OA (Rookies World, Converging Maze)",
- "body": "<p>A maze has <code>N</code> cells numbered 0 to N − 1. Each cell has at most one exit: <code>edge[i]</code> is the cell you reach by leaving cell i, or <code>-1</code> if cell i has no exit.</p><p>Two people start at cells <code>C1</code> and <code>C2</code> and keep following exits. A cell is a meeting cell if both can reach it. Print the meeting cell with the smallest <code>dist(C1, X) + dist(C2, X)</code>, where dist counts exits followed. Break ties by the smaller cell number. Print <code>-1</code> if no cell is reachable from both.</p><p class='muted'>The report did not say whether \"nearest\" means the sum or the maximum of the two distances; this mock uses the sum.</p>",
+ "body": "<p>A maze has <code>N</code> cells numbered 0 to N − 1. Each cell has at most one exit: <code>edge[i]</code> is the cell you reach by leaving cell i, or <code>-1</code> if cell i has no exit.</p><p>Two people start at cells <code>C1</code> and <code>C2</code> and keep following exits. A cell is a meeting cell if both can reach it. Print the meeting cell with the smallest <code>dist(C1, X) + dist(C2, X)</code>, where dist counts exits followed. Break ties by the smaller cell number. Print <code>-1</code> if no cell is reachable from both.</p><p class='muted'>The report did not say whether \"nearest\" means the sum or the maximum of the two distances; this mock uses the sum.</p><h3>Function to complete</h3><p>Complete <code>nearestMeetingCell(edge, c1, c2)</code>. It returns the nearest meeting cell, or -1.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "Line 1: <code>N</code>. Line 2: <code>edge[0] … edge[N−1]</code>. Line 3: <code>C1 C2</code>.",
  "out": "One integer: the cell, or <code>-1</code>.",
  "cons": [
@@ -58,7 +58,32 @@
    "out": "-1"
   }
  ],
- "ref": "import sys, heapq\nfrom collections import defaultdict, deque\nsys.setrecursionlimit(1 << 20)\n\ndef meeting(s):\n    t = list(map(int, s.split())); n = t[0]; e = t[1:1+n]; c1, c2 = t[1+n], t[2+n]\n    def dist(src):\n        d = [-1]*n; k = 0; u = src\n        while u != -1 and d[u] == -1: d[u] = k; k += 1; u = e[u]\n        return d\n    d1, d2 = dist(c1), dist(c2); best = -1; bv = None\n    for i in range(n):\n        if d1[i] >= 0 and d2[i] >= 0 and (bv is None or d1[i] + d2[i] < bv): bv = d1[i] + d2[i]; best = i\n    return str(best)\n\nprint(meeting(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def nearestMeetingCell(self, edge: List[int], c1: int, c2: int) -> int:\n        n = len(edge)\n        def dist(src):\n            d = [-1] * n; k = 0; u = src\n            while u != -1 and d[u] == -1: d[u] = k; k += 1; u = edge[u]\n            return d\n        d1, d2 = dist(c1), dist(c2); best = -1; bv = None\n        for i in range(n):\n            if d1[i] >= 0 and d2[i] >= 0 and (bv is None or d1[i] + d2[i] < bv): bv = d1[i] + d2[i]; best = i\n        return best\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){ int n; cin>>n; vector<int> e(n); for(auto&x:e)cin>>x; int a,b; cin>>a>>b;\n  auto bfs=[&](int s){ vector<long long> d(n,LLONG_MAX); d[s]=0; queue<int> q; q.push(s); while(!q.empty()){int u=q.front();q.pop(); int v=e[u]; if(v>=0&&d[v]==LLONG_MAX){d[v]=d[u]+1;q.push(v);}} return d; };\n  auto d1=bfs(a), d2=bfs(b); long long bv=LLONG_MAX; int ans=-1;\n  for(int i=0;i<n;i++) if(d1[i]!=LLONG_MAX&&d2[i]!=LLONG_MAX&&d1[i]+d2[i]<bv){bv=d1[i]+d2[i];ans=i;}\n  cout<<ans<<\"\\n\"; }\n",
- "lcurl": "https://leetcode.com/problems/find-closest-node-to-given-two-nodes/"
+ "lcurl": "https://leetcode.com/problems/find-closest-node-to-given-two-nodes/",
+ "stub": {
+  "py": "class Solution:\n    def nearestMeetingCell(self, edge: List[int], c1: int, c2: int) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    int nearestMeetingCell(vector<int>& edge, int c1, int c2) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public int nearestMeetingCell(int[] edge, int c1, int c2) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {number[]} edge\n * @param {number} c1\n * @param {number} c2\n * @return {number}\n */\nvar nearestMeetingCell = function(edge, c1, c2) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _n = int(_t[_p]); _p += 1\n    edge = list(map(int, _t[_p:_p + (_n)])); _p += (_n)\n    c1 = int(_t[_p]); _p += 1\n    c2 = int(_t[_p]); _p += 1\n    _r = Solution().nearestMeetingCell(edge, c1, c2)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _n; cin >> _n;\n    vector<int> edge((_n)); for (auto& _x : edge) cin >> _x;\n    int c1; cin >> c1;\n    int c2; cin >> c2;\n    auto _r = Solution().nearestMeetingCell(edge, c1, c2);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _n = Integer.parseInt(_t[_p++]);\n        int[] edge = new int[(_n)]; for (int _i = 0; _i < edge.length; _i++) edge[_i] = Integer.parseInt(_t[_p++]);\n        int c1 = Integer.parseInt(_t[_p++]);\n        int c2 = Integer.parseInt(_t[_p++]);\n        int _r = new Solution().nearestMeetingCell(edge, c1, c2);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _n = Number(_t[_p++]);\n    const edge = _t.slice(_p, _p + (_n)).map(Number); _p += (_n);\n    const c1 = Number(_t[_p++]);\n    const c2 = Number(_t[_p++]);\n    const _r = nearestMeetingCell(edge, c1, c2);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

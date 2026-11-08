@@ -3,7 +3,7 @@
  "title": "Failure Cascade",
  "diff": "Medium",
  "src": "Flipkart UI Engineer OA (IIT Bombay)",
- "body": "<p>Machines depend on each other. A dependency <code>A B T</code> means machine A depends on machine B: <code>T</code> seconds after B fails, A fails too (unless it has already failed).</p><p>Machine <code>X</code> fails at time 0. Find how many machines fail in total (count X itself) and the time at which the last one fails.</p>",
+ "body": "<p>Machines depend on each other. A dependency <code>A B T</code> means machine A depends on machine B: <code>T</code> seconds after B fails, A fails too (unless it has already failed).</p><p>Machine <code>X</code> fails at time 0. Find how many machines fail in total (count X itself) and the time at which the last one fails.</p><h3>Function to complete</h3><p>Complete <code>failureCascade(start, machine, dependsOn, time)</code>. It returns two numbers: how many machines fail and the time of the last failure.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "The first line contains <code>M</code> (the number of dependencies) and the name <code>X</code>. Each of the next <code>M</code> lines contains <code>A B T</code>.",
  "out": "Two integers: the number of failed machines and the time of the last failure.",
  "cons": [
@@ -58,8 +58,33 @@
   }
  ],
  "type": "code",
- "ref": "import sys, heapq\nfrom collections import defaultdict\n\ndef cascade(s):\n    t=s.split(); m,X=int(t[0]),t[1]; g=defaultdict(list)\n    for i in range(m):\n        a,b,T=t[2+3*i],t[3+3*i],int(t[4+3*i]); g[b].append((a,T))\n    dist={X:0}; pq=[(0,X)]\n    while pq:\n        d,u=heapq.heappop(pq)\n        if d>dist[u]: continue\n        for v,w in g[u]:\n            if d+w<dist.get(v,1<<62): dist[v]=d+w; heapq.heappush(pq,(d+w,v))\n    return f\"{len(dist)} {max(dist.values())}\"\n\nprint(cascade(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def failureCascade(self, start: str, machine: List[str], dependsOn: List[str], time: List[int]) -> List[int]:\n        g = defaultdict(list)\n        for a, b, t in zip(machine, dependsOn, time): g[b].append((a, t))\n        dist = {start: 0}; pq = [(0, start)]\n        while pq:\n            d, u = heapq.heappop(pq)\n            if d > dist[u]: continue\n            for v, w in g[u]:\n                if d + w < dist.get(v, 1 << 62): dist[v] = d + w; heapq.heappush(pq, (d + w, v))\n        return [len(dist), max(dist.values())]\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){ int m; string X; cin>>m>>X; vector<tuple<string,string,long long>> e(m); for(auto&[a,b,t]:e) cin>>a>>b>>t;\n  // Bellman-Ford relaxation (independent of the Dijkstra reference)\n  map<string,long long> d; d[X]=0; bool ch=true; for(int it=0; ch && it<=m+1; it++){ ch=false;\n    for(auto&[a,b,t]:e){ auto f=d.find(b); if(f==d.end()) continue; long long nd=f->second+t; auto g=d.find(a); if(g==d.end()||nd<g->second){ d[a]=nd; ch=true; } } }\n  long long mx=0; for(auto&p:d) mx=max(mx,p.second); cout<<d.size()<<\" \"<<mx<<\"\\n\"; }\n",
  "lc": "743 Network Delay Time",
- "lcurl": "https://leetcode.com/problems/network-delay-time/"
+ "lcurl": "https://leetcode.com/problems/network-delay-time/",
+ "stub": {
+  "py": "class Solution:\n    def failureCascade(self, start: str, machine: List[str], dependsOn: List[str], time: List[int]) -> List[int]:\n        return []\n",
+  "cpp": "class Solution {\npublic:\n    vector<long long> failureCascade(string start, vector<string>& machine, vector<string>& dependsOn, vector<int>& time) {\n        \n        return {};\n    }\n};\n",
+  "java": "class Solution {\n    public long[] failureCascade(String start, String[] machine, String[] dependsOn, int[] time) {\n        \n        return new long[0];\n    }\n}\n",
+  "js": "/**\n * @param {string} start\n * @param {string[]} machine\n * @param {string[]} dependsOn\n * @param {number[]} time\n * @return {number[]}\n */\nvar failureCascade = function(start, machine, dependsOn, time) {\n    \n    return [];\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _m = int(_t[_p]); _p += 1\n    start = _t[_p]; _p += 1\n    machine = []; dependsOn = []; time = []\n    for _ in range((_m)):\n        machine.append(_t[_p + 0])\n        dependsOn.append(_t[_p + 1])\n        time.append(int(_t[_p + 2]))\n        _p += 3\n    _r = Solution().failureCascade(start, machine, dependsOn, time)\n    print(\" \".join(map(str, _r)))\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _m; cin >> _m;\n    string start; cin >> start;\n    vector<string> machine((_m));\n    vector<string> dependsOn((_m));\n    vector<int> time((_m));\n    for (int _i = 0; _i < (_m); _i++) cin >> machine[_i] >> dependsOn[_i] >> time[_i];\n    auto _r = Solution().failureCascade(start, machine, dependsOn, time);\n    for (size_t _i = 0; _i < _r.size(); _i++) { if (_i) cout << ' '; cout << _r[_i]; }\n    cout << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _m = Integer.parseInt(_t[_p++]);\n        String start = _t[_p++];\n        String[] machine = new String[(_m)];\n        String[] dependsOn = new String[(_m)];\n        int[] time = new int[(_m)];\n        for (int _i = 0; _i < (_m); _i++) { machine[_i] = _t[_p++]; dependsOn[_i] = _t[_p++]; time[_i] = Integer.parseInt(_t[_p++]); }\n        long[] _r = new Solution().failureCascade(start, machine, dependsOn, time);\n        StringBuilder _sb = new StringBuilder();\n        for (int _i = 0; _i < _r.length; _i++) { if (_i > 0) _sb.append(' '); _sb.append(_r[_i]); }\n        _sb.append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _m = Number(_t[_p++]);\n    const start = _t[_p++];\n    const machine = [], dependsOn = [], time = [];\n    for (let _i = 0; _i < (_m); _i++) { machine.push(_t[_p++]); dependsOn.push(_t[_p++]); time.push(Number(_t[_p++])); }\n    const _r = failureCascade(start, machine, dependsOn, time);\n    console.log(_r.join(\" \"));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

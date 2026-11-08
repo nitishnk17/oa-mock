@@ -3,7 +3,7 @@
  "title": "Weight Lifting Challenge",
  "diff": "Medium",
  "src": "Juspay hiring challenge (Unstop)",
- "body": "<p>There are <code>n</code> lifters with strengths <code>a_1 … a_n</code>. You add a permutation of 1 … n to them: lifter i gets an extra <code>p_i</code>, and every p_i is different.</p><p>Choose the permutation to maximise the number of lifters with the same final strength, and print that number.</p>",
+ "body": "<p>There are <code>n</code> lifters with strengths <code>a_1 … a_n</code>. You add a permutation of 1 … n to them: lifter i gets an extra <code>p_i</code>, and every p_i is different.</p><p>Choose the permutation to maximise the number of lifters with the same final strength, and print that number.</p><h3>Function to complete</h3><p>Complete <code>maxEqual(a)</code>. It returns the answer described above.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "Line 1: <code>n</code>. Line 2: <code>a_1 … a_n</code>.",
  "out": "One integer.",
  "cons": [
@@ -54,7 +54,32 @@
    "out": "5"
   }
  ],
- "ref": "import sys, heapq\nfrom collections import defaultdict, deque\nsys.setrecursionlimit(1 << 20)\n\ndef equalize(s):\n    t = list(map(int, s.split())); n = t[0]; a = sorted(set(t[1:1+n])); best = 0; j = 0\n    for i in range(len(a)):\n        while a[i] - a[j] > n - 1: j += 1\n        best = max(best, i - j + 1)\n    return str(best)\n\nprint(equalize(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def maxEqual(self, a: List[int]) -> int:\n        n = len(a); v = sorted(set(a)); best = 0; j = 0\n        for i in range(len(v)):\n            while v[i] - v[j] > n - 1: j += 1\n            best = max(best, i - j + 1)\n        return best\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){ int n; cin>>n; vector<long long> a(n); for(auto&x:a)cin>>x; sort(a.begin(),a.end()); a.erase(unique(a.begin(),a.end()),a.end());\n  int best=0; for(size_t i=0;i<a.size();i++){ int j=upper_bound(a.begin(),a.end(),a[i]+n-1)-a.begin(); best=max(best,(int)(j-i)); } cout<<best<<\"\\n\"; }\n",
- "lcurl": "https://codeforces.com/problemset/problem/1928/B"
+ "lcurl": "https://codeforces.com/problemset/problem/1928/B",
+ "stub": {
+  "py": "class Solution:\n    def maxEqual(self, a: List[int]) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    int maxEqual(vector<int>& a) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public int maxEqual(int[] a) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {number[]} a\n * @return {number}\n */\nvar maxEqual = function(a) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _n = int(_t[_p]); _p += 1\n    a = list(map(int, _t[_p:_p + (_n)])); _p += (_n)\n    _r = Solution().maxEqual(a)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _n; cin >> _n;\n    vector<int> a((_n)); for (auto& _x : a) cin >> _x;\n    auto _r = Solution().maxEqual(a);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _n = Integer.parseInt(_t[_p++]);\n        int[] a = new int[(_n)]; for (int _i = 0; _i < a.length; _i++) a[_i] = Integer.parseInt(_t[_p++]);\n        int _r = new Solution().maxEqual(a);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _n = Number(_t[_p++]);\n    const a = _t.slice(_p, _p + (_n)).map(Number); _p += (_n);\n    const _r = maxEqual(a);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

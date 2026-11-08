@@ -3,7 +3,7 @@
  "title": "Most Pointed-To Vertex",
  "diff": "Easy",
  "src": "Generic coding round (hirepro)",
- "body": "<p>A directed graph is given as a list of edges. Each edge <code>u v</code> goes from vertex <code>u</code> to vertex <code>v</code>. Vertex names are strings, and only the vertices that appear in the edges exist. Self-loops <code>u u</code> are allowed and count as an incoming edge.</p><p>Find the vertex with the highest in-degree (number of incoming edges). If several vertices tie, choose the one that comes first in alphabetical (ASCII) order.</p>",
+ "body": "<p>A directed graph is given as a list of edges. Each edge <code>u v</code> goes from vertex <code>u</code> to vertex <code>v</code>. Vertex names are strings, and only the vertices that appear in the edges exist. Self-loops <code>u u</code> are allowed and count as an incoming edge.</p><p>Find the vertex with the highest in-degree (number of incoming edges). If several vertices tie, choose the one that comes first in alphabetical (ASCII) order.</p><h3>Function to complete</h3><p>Complete <code>mostPointedTo(u, v)</code>. It returns the vertex name and its in-degree separated by one space, e.g. <code>\"C 2\"</code>.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "The first line contains <code>N</code>, the number of edges. Each of the next <code>N</code> lines contains two vertex names <code>u v</code>.",
  "out": "The vertex name and its in-degree, separated by a space.",
  "cons": [
@@ -57,8 +57,33 @@
   }
  ],
  "type": "code",
- "ref": "import sys, heapq\nfrom collections import defaultdict\n\ndef indeg(s):\n    t=s.split(); n=int(t[0]); deg={}\n    for i in range(n):\n        u,v=t[1+2*i],t[2+2*i]; deg.setdefault(u,0); deg[v]=deg.get(v,0)+1\n    m=max(deg.values()); v=min(x for x in deg if deg[x]==m)\n    return f\"{v} {m}\"\n\nprint(indeg(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def mostPointedTo(self, u: List[str], v: List[str]) -> str:\n        deg = {}\n        for a, b in zip(u, v):\n            deg.setdefault(a, 0); deg[b] = deg.get(b, 0) + 1\n        m = max(deg.values())\n        return f\"{min(x for x in deg if deg[x] == m)} {m}\"\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){ int n; cin>>n; map<string,int> d; for(int i=0;i<n;i++){string u,v; cin>>u>>v; d[u]; d[v]++;}\n  string bv; int bd=-1; for(auto&[k,c]:d) if(c>bd){bd=c; bv=k;} cout<<bv<<\" \"<<bd<<\"\\n\"; }\n",
  "lc": "997 Find the Town Judge",
- "lcurl": "https://leetcode.com/problems/find-the-town-judge/"
+ "lcurl": "https://leetcode.com/problems/find-the-town-judge/",
+ "stub": {
+  "py": "class Solution:\n    def mostPointedTo(self, u: List[str], v: List[str]) -> str:\n        return \"\"\n",
+  "cpp": "class Solution {\npublic:\n    string mostPointedTo(vector<string>& u, vector<string>& v) {\n        \n        return \"\";\n    }\n};\n",
+  "java": "class Solution {\n    public String mostPointedTo(String[] u, String[] v) {\n        \n        return \"\";\n    }\n}\n",
+  "js": "/**\n * @param {string[]} u\n * @param {string[]} v\n * @return {string}\n */\nvar mostPointedTo = function(u, v) {\n    \n    return \"\";\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _n = int(_t[_p]); _p += 1\n    u = []; v = []\n    for _ in range((_n)):\n        u.append(_t[_p + 0])\n        v.append(_t[_p + 1])\n        _p += 2\n    _r = Solution().mostPointedTo(u, v)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _n; cin >> _n;\n    vector<string> u((_n));\n    vector<string> v((_n));\n    for (int _i = 0; _i < (_n); _i++) cin >> u[_i] >> v[_i];\n    auto _r = Solution().mostPointedTo(u, v);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _n = Integer.parseInt(_t[_p++]);\n        String[] u = new String[(_n)];\n        String[] v = new String[(_n)];\n        for (int _i = 0; _i < (_n); _i++) { u[_i] = _t[_p++]; v[_i] = _t[_p++]; }\n        String _r = new Solution().mostPointedTo(u, v);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _n = Number(_t[_p++]);\n    const u = [], v = [];\n    for (let _i = 0; _i < (_n); _i++) { u.push(_t[_p++]); v.push(_t[_p++]); }\n    const _r = mostPointedTo(u, v);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

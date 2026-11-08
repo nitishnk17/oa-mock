@@ -4,7 +4,7 @@
  "title": "Fewest Subsequences With a Majority",
  "diff": "Medium",
  "src": "MathWorks OA, IIT Bombay, 2026 (Software Engineer role). Coding question 1 of 3.",
- "body": "<p>You are given an integer array <code>arr</code> of length <code>n</code>. Split it into subsequences so that every element belongs to exactly one subsequence, and every subsequence has a <b>majority element</b>: a value that occurs strictly more than half the subsequence's length.</p><p>Return the minimum number of subsequences needed.</p>",
+ "body": "<p>You are given an integer array <code>arr</code> of length <code>n</code>. Split it into subsequences so that every element belongs to exactly one subsequence, and every subsequence has a <b>majority element</b>: a value that occurs strictly more than half the subsequence's length.</p><p>Return the minimum number of subsequences needed.</p><h3>Function to complete</h3><p>Complete <code>minSubsequences(arr)</code>. It returns the minimum number of subsequences.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "The first line contains <code>n</code>. The second line contains the <code>n</code> elements.",
  "out": "One integer: the minimum number of subsequences.",
  "cons": [
@@ -77,14 +77,33 @@
    "out": "4"
   }
  ],
- "ref": "import sys\nfrom collections import Counter\n\ndef main():\n    t = sys.stdin.read().split()\n    n = int(t[0])\n    freq = sorted(Counter(t[1:1 + n]).values(), reverse=True)\n    covered = 0\n    for groups, f in enumerate(freq, 1):\n        covered += 2 * f - 1         # f copies + up to f - 1 other elements\n        if covered >= n:\n            print(groups)\n            return\n\nmain()\n",
+ "ref": "class Solution:\n    def minSubsequences(self, arr: List[int]) -> int:\n        n = len(arr); covered = 0\n        for groups, f in enumerate(sorted(Counter(arr).values(), reverse=True), 1):\n            covered += 2 * f - 1         # f copies + up to f - 1 other elements\n            if covered >= n: return groups\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    unordered_map<long long,int> cnt; cnt.reserve(n * 2 + 1);\n    for (int i = 0; i < n; i++){ long long x; cin >> x; cnt[x]++; }\n    vector<int> f; for (auto &p : cnt) f.push_back(p.second);\n    sort(f.rbegin(), f.rend());\n    long long covered = 0;\n    for (size_t g = 0; g < f.size(); g++){\n        covered += 2LL * f[g] - 1;\n        if (covered >= n){ cout << g + 1 << \"\\n\"; return 0; }\n    }\n}\n",
  "lc": "169 Majority Element (related)",
  "lcurl": "https://leetcode.com/problems/majority-element/",
  "stub": {
-  "py": "import sys\n\ndef min_subsequences(arr):\n    # write your solution here\n    return 0\n\ndef main():\n    data = sys.stdin.read().split()\n    n = int(data[0])\n    arr = list(map(int, data[1:1 + n]))\n    print(min_subsequences(arr))\n\nmain()\n",
-  "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint minSubsequences(vector<int> &arr) {\n    // write your solution here\n    return 0;\n}\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int n;\n    cin >> n;\n    vector<int> arr(n);\n    for (int i = 0; i < n; i++) cin >> arr[i];\n    cout << minSubsequences(arr) << \"\\n\";\n    return 0;\n}\n",
-  "java": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    static int minSubsequences(int[] arr) {\n        // write your solution here\n        return 0;\n    }\n\n    public static void main(String[] args) throws IOException {\n        StreamTokenizer in = new StreamTokenizer(new BufferedInputStream(System.in));\n        in.nextToken(); int n = (int) in.nval;\n        int[] arr = new int[n];\n        for (int i = 0; i < n; i++) { in.nextToken(); arr[i] = (int) in.nval; }\n        System.out.println(minSubsequences(arr));\n    }\n}\n",
-  "js": "function minSubsequences(arr) {\n  // write your solution here\n  return 0;\n}\n\nconst data = require(\"fs\").readFileSync(0, \"utf8\").split(/\\s+/).filter(Boolean);\nconst n = +data[0];\nconst arr = data.slice(1, 1 + n).map(Number);\nconsole.log(minSubsequences(arr));\n"
- }
+  "py": "class Solution:\n    def minSubsequences(self, arr: List[int]) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    int minSubsequences(vector<int>& arr) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public int minSubsequences(int[] arr) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {number[]} arr\n * @return {number}\n */\nvar minSubsequences = function(arr) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _n = int(_t[_p]); _p += 1\n    arr = list(map(int, _t[_p:_p + (_n)])); _p += (_n)\n    _r = Solution().minSubsequences(arr)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _n; cin >> _n;\n    vector<int> arr((_n)); for (auto& _x : arr) cin >> _x;\n    auto _r = Solution().minSubsequences(arr);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _n = Integer.parseInt(_t[_p++]);\n        int[] arr = new int[(_n)]; for (int _i = 0; _i < arr.length; _i++) arr[_i] = Integer.parseInt(_t[_p++]);\n        int _r = new Solution().minSubsequences(arr);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _n = Number(_t[_p++]);\n    const arr = _t.slice(_p, _p + (_n)).map(Number); _p += (_n);\n    const _r = minSubsequences(arr);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

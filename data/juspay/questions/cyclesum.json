@@ -3,7 +3,7 @@
  "title": "Largest Sum Cycle",
  "diff": "Medium",
  "src": "Juspay OA (Rookies World, Converging Maze)",
- "body": "<p>A maze has <code>N</code> cells numbered 0 to N − 1. Each cell has at most one exit: <code>edge[i]</code> is the cell you reach by leaving cell i, or <code>-1</code> if cell i has no exit.</p><p>Find the cycle whose cell numbers add up to the largest sum and print that sum. Print <code>-1</code> if the maze has no cycle.</p>",
+ "body": "<p>A maze has <code>N</code> cells numbered 0 to N − 1. Each cell has at most one exit: <code>edge[i]</code> is the cell you reach by leaving cell i, or <code>-1</code> if cell i has no exit.</p><p>Find the cycle whose cell numbers add up to the largest sum and print that sum. Print <code>-1</code> if the maze has no cycle.</p><h3>Function to complete</h3><p>Complete <code>largestCycleSum(edge)</code>. It returns the largest sum of cell indices on any cycle, or -1.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "Line 1: <code>N</code>. Line 2: <code>edge[0] … edge[N−1]</code>.",
  "out": "One integer.",
  "cons": [
@@ -58,7 +58,32 @@
    "out": "89233"
   }
  ],
- "ref": "import sys, heapq\nfrom collections import defaultdict, deque\nsys.setrecursionlimit(1 << 20)\n\ndef cyclesum(s):\n    t = list(map(int, s.split())); n = t[0]; e = t[1:1+n]\n    state = [0]*n; best = -1\n    for i in range(n):\n        if state[i]: continue\n        path = {}; u = i; order = []\n        while u != -1 and state[u] == 0:\n            state[u] = 1; path[u] = len(order); order.append(u); u = e[u]\n        if u != -1 and u in path:\n            best = max(best, sum(order[path[u]:]))\n        for x in order: state[x] = 2\n    return str(best)\n\nprint(cyclesum(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def largestCycleSum(self, edge: List[int]) -> int:\n        n = len(edge); state = [0] * n; best = -1\n        for i in range(n):\n            if state[i]: continue\n            pos = {}; u = i; order = []\n            while u != -1 and state[u] == 0:\n                state[u] = 1; pos[u] = len(order); order.append(u); u = edge[u]\n            if u != -1 and u in pos: best = max(best, sum(order[pos[u]:]))\n            for x in order: state[x] = 2\n        return best\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){ int n; cin>>n; vector<int> e(n); for(auto&x:e)cin>>x; vector<int> indeg(n,0); for(int x:e) if(x>=0) indeg[x]++;\n  // Kahn: peel off nodes not on cycles; what remains are disjoint cycles\n  queue<int> q; vector<bool> gone(n,false); for(int i=0;i<n;i++) if(!indeg[i]) q.push(i);\n  while(!q.empty()){ int u=q.front(); q.pop(); gone[u]=true; if(e[u]>=0 && --indeg[e[u]]==0) q.push(e[u]); }\n  long long best=-1; vector<bool> vis(n,false);\n  for(int i=0;i<n;i++) if(!gone[i] && !vis[i]){ long long s=0; int u=i; while(!vis[u]){ vis[u]=true; s+=u; u=e[u]; } best=max(best,s); }\n  cout<<best<<\"\\n\"; }\n",
- "lcurl": "https://leetcode.com/problems/longest-cycle-in-a-graph/"
+ "lcurl": "https://leetcode.com/problems/longest-cycle-in-a-graph/",
+ "stub": {
+  "py": "class Solution:\n    def largestCycleSum(self, edge: List[int]) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    long long largestCycleSum(vector<int>& edge) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public long largestCycleSum(int[] edge) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {number[]} edge\n * @return {number}\n */\nvar largestCycleSum = function(edge) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _n = int(_t[_p]); _p += 1\n    edge = list(map(int, _t[_p:_p + (_n)])); _p += (_n)\n    _r = Solution().largestCycleSum(edge)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _n; cin >> _n;\n    vector<int> edge((_n)); for (auto& _x : edge) cin >> _x;\n    auto _r = Solution().largestCycleSum(edge);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _n = Integer.parseInt(_t[_p++]);\n        int[] edge = new int[(_n)]; for (int _i = 0; _i < edge.length; _i++) edge[_i] = Integer.parseInt(_t[_p++]);\n        long _r = new Solution().largestCycleSum(edge);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _n = Number(_t[_p++]);\n    const edge = _t.slice(_p, _p + (_n)).map(Number); _p += (_n);\n    const _r = largestCycleSum(edge);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

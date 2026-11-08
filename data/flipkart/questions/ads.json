@@ -3,7 +3,7 @@
  "title": "Advertisement Sequence",
  "diff": "Hard",
  "src": "Flipkart SDE OA",
- "body": "<p>An advertiser has <code>N</code> pairs of events. Each pair <code>u v</code> must be used <strong>exactly once</strong>, meaning v is advertised directly after u. Build one sequence that starts with the event <code>ABC</code> and uses every pair exactly once.</p><p>If several sequences work, print the one that is smallest when compared token by token in alphabetical (ASCII) order. A valid sequence is guaranteed to exist.</p>",
+ "body": "<p>An advertiser has <code>N</code> pairs of events. Each pair <code>u v</code> must be used <strong>exactly once</strong>, meaning v is advertised directly after u. Build one sequence that starts with the event <code>ABC</code> and uses every pair exactly once.</p><p>If several sequences work, print the one that is smallest when compared token by token in alphabetical (ASCII) order. A valid sequence is guaranteed to exist.</p><h3>Function to complete</h3><p>Complete <code>adSequence(u, v)</code>. It returns the sequence of n + 1 event names.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "The first line contains <code>N</code>. Each of the next <code>N</code> lines contains a pair <code>u v</code>.",
  "out": "The sequence of <code>N + 1</code> event names, separated by spaces.",
  "cons": [
@@ -57,8 +57,33 @@
   }
  ],
  "type": "code",
- "ref": "import sys, heapq\nfrom collections import defaultdict\n\ndef ads(s):\n    t=s.split(); n=int(t[0]); g=defaultdict(list)\n    for i in range(n): g[t[1+2*i]].append(t[2+2*i])\n    for k in g: g[k].sort(reverse=True)\n    out=[]; st=[\"ABC\"]\n    while st:\n        while g[st[-1]]: st.append(g[st[-1]].pop())\n        out.append(st.pop())\n    return \" \".join(reversed(out))\n\nprint(ads(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def adSequence(self, u: List[str], v: List[str]) -> List[str]:\n        g = defaultdict(list)\n        for a, b in zip(u, v): g[a].append(b)\n        for k in g: g[k].sort(reverse=True)\n        out = []; st = [\"ABC\"]\n        while st:\n            while g[st[-1]]: st.append(g[st[-1]].pop())\n            out.append(st.pop())\n        return out[::-1]\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){ int n; cin>>n; map<string,multiset<string>> g; for(int i=0;i<n;i++){string u,v;cin>>u>>v;g[u].insert(v);}\n  vector<string> path; function<void(const string&)> dfs=[&](const string& u){ auto &s=g[u]; while(!s.empty()){ string v=*s.begin(); s.erase(s.begin()); dfs(v);} path.push_back(u); };\n  dfs(\"ABC\"); reverse(path.begin(),path.end()); for(size_t i=0;i<path.size();i++) cout<<path[i]<<(i+1<path.size()?\" \":\"\\n\"); }\n",
  "lc": "332 Reconstruct Itinerary",
- "lcurl": "https://leetcode.com/problems/reconstruct-itinerary/"
+ "lcurl": "https://leetcode.com/problems/reconstruct-itinerary/",
+ "stub": {
+  "py": "class Solution:\n    def adSequence(self, u: List[str], v: List[str]) -> List[str]:\n        return []\n",
+  "cpp": "class Solution {\npublic:\n    vector<string> adSequence(vector<string>& u, vector<string>& v) {\n        \n        return {};\n    }\n};\n",
+  "java": "class Solution {\n    public String[] adSequence(String[] u, String[] v) {\n        \n        return new String[0];\n    }\n}\n",
+  "js": "/**\n * @param {string[]} u\n * @param {string[]} v\n * @return {string[]}\n */\nvar adSequence = function(u, v) {\n    \n    return [];\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _n = int(_t[_p]); _p += 1\n    u = []; v = []\n    for _ in range((_n)):\n        u.append(_t[_p + 0])\n        v.append(_t[_p + 1])\n        _p += 2\n    _r = Solution().adSequence(u, v)\n    print(\" \".join(map(str, _r)))\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _n; cin >> _n;\n    vector<string> u((_n));\n    vector<string> v((_n));\n    for (int _i = 0; _i < (_n); _i++) cin >> u[_i] >> v[_i];\n    auto _r = Solution().adSequence(u, v);\n    for (size_t _i = 0; _i < _r.size(); _i++) { if (_i) cout << ' '; cout << _r[_i]; }\n    cout << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _n = Integer.parseInt(_t[_p++]);\n        String[] u = new String[(_n)];\n        String[] v = new String[(_n)];\n        for (int _i = 0; _i < (_n); _i++) { u[_i] = _t[_p++]; v[_i] = _t[_p++]; }\n        String[] _r = new Solution().adSequence(u, v);\n        StringBuilder _sb = new StringBuilder();\n        for (int _i = 0; _i < _r.length; _i++) { if (_i > 0) _sb.append(' '); _sb.append(_r[_i]); }\n        _sb.append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _n = Number(_t[_p++]);\n    const u = [], v = [];\n    for (let _i = 0; _i < (_n); _i++) { u.push(_t[_p++]); v.push(_t[_p++]); }\n    const _r = adSequence(u, v);\n    console.log(_r.join(\" \"));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

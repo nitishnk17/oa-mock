@@ -3,7 +3,7 @@
  "title": "Open the Lock",
  "diff": "Medium",
  "src": "Juspay elimination interview (SDE-1, Mar 2026)",
- "body": "<p>A lock has 4 wheels with digits 0–9, starting at <code>0000</code>. One move turns one wheel by one step, and 9 and 0 wrap around. Some combinations are dead ends: if the lock shows one, it jams. Print the minimum number of moves to reach the target, or <code>-1</code> if it is impossible.</p>",
+ "body": "<p>A lock has 4 wheels with digits 0–9, starting at <code>0000</code>. One move turns one wheel by one step, and 9 and 0 wrap around. Some combinations are dead ends: if the lock shows one, it jams. Print the minimum number of moves to reach the target, or <code>-1</code> if it is impossible.</p><h3>Function to complete</h3><p>Complete <code>openLock(deadends, target)</code>. It returns the minimum number of turns, or -1.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "Line 1: <code>d</code>, the number of dead ends. Line 2: the dead ends (empty if d = 0). Line 3: the target.",
  "out": "One integer.",
  "cons": [
@@ -58,7 +58,32 @@
    "out": "12"
   }
  ],
- "ref": "import sys, heapq\nfrom collections import defaultdict, deque\nsys.setrecursionlimit(1 << 20)\n\ndef openlock(s):\n    t = s.split(); d = int(t[0]); dead = set(t[1:1+d]); target = t[1+d]\n    if \"0000\" in dead: return \"-1\"\n    if target == \"0000\": return \"0\"\n    seen = {\"0000\"} | dead; q = deque([(\"0000\", 0)])\n    while q:\n        u, k = q.popleft()\n        for i in range(4):\n            for dd in (1, -1):\n                v = u[:i] + str((int(u[i]) + dd) % 10) + u[i+1:]\n                if v == target: return str(k + 1)\n                if v not in seen: seen.add(v); q.append((v, k + 1))\n    return \"-1\"\n\nprint(openlock(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def openLock(self, deadends: List[str], target: str) -> int:\n        dead = set(deadends)\n        if \"0000\" in dead: return -1\n        if target == \"0000\": return 0\n        seen = {\"0000\"} | dead; q = deque([(\"0000\", 0)])\n        while q:\n            u, k = q.popleft()\n            for i in range(4):\n                for dd in (1, -1):\n                    v = u[:i] + str((int(u[i]) + dd) % 10) + u[i + 1:]\n                    if v == target: return k + 1\n                    if v not in seen: seen.add(v); q.append((v, k + 1))\n        return -1\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){ int d; cin>>d; vector<bool> bad(10000,false); for(int i=0;i<d;i++){string s;cin>>s;bad[stoi(s)]=true;} string t; cin>>t; int T=stoi(t);\n  vector<int> dist(10000,-1); if(!bad[0]){ dist[0]=0; queue<int> q; q.push(0); while(!q.empty()){ int u=q.front(); q.pop(); int p=1; for(int i=0;i<4;i++,p*=10){ int dg=u/p%10; for(int dd:{1,9}){ int v=u-dg*p+((dg+dd)%10)*p; if(!bad[v]&&dist[v]<0){dist[v]=dist[u]+1;q.push(v);} } } } }\n  cout<<dist[T]<<\"\\n\"; }\n",
- "lcurl": "https://leetcode.com/problems/open-the-lock/"
+ "lcurl": "https://leetcode.com/problems/open-the-lock/",
+ "stub": {
+  "py": "class Solution:\n    def openLock(self, deadends: List[str], target: str) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    int openLock(vector<string>& deadends, string target) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public int openLock(String[] deadends, String target) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {string[]} deadends\n * @param {string} target\n * @return {number}\n */\nvar openLock = function(deadends, target) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _d = int(_t[_p]); _p += 1\n    deadends = _t[_p:_p + (_d)]; _p += (_d)\n    target = _t[_p]; _p += 1\n    _r = Solution().openLock(deadends, target)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _d; cin >> _d;\n    vector<string> deadends((_d)); for (auto& _x : deadends) cin >> _x;\n    string target; cin >> target;\n    auto _r = Solution().openLock(deadends, target);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _d = Integer.parseInt(_t[_p++]);\n        String[] deadends = new String[(_d)]; for (int _i = 0; _i < deadends.length; _i++) deadends[_i] = _t[_p++];\n        String target = _t[_p++];\n        int _r = new Solution().openLock(deadends, target);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _d = Number(_t[_p++]);\n    const deadends = _t.slice(_p, _p + (_d)); _p += (_d);\n    const target = _t[_p++];\n    const _r = openLock(deadends, target);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

@@ -3,7 +3,7 @@
  "title": "Three-Terrain Tournament",
  "diff": "Medium",
  "src": "Generic coding round (hirepro)",
- "body": "<p><code>N</code> racers each race every other racer exactly once. There are three terrains: Hilly, City and Off-road. Each terrain has its own rank list; on a terrain the better-ranked racer (smaller rank) always wins.</p><p>For each race the organisers choose the terrain like this:</p><ol><li>Choose the terrain where the <strong>winner's rank is best</strong> (smallest).</li><li>If tied, choose the terrain where the <strong>loser's rank is best</strong>.</li><li>If still tied, prefer Hilly, then City, then Off-road.</li></ol><p>Print how many races happen on each terrain, then how many races each racer wins.</p>",
+ "body": "<p><code>N</code> racers each race every other racer exactly once. There are three terrains: Hilly, City and Off-road. Each terrain has its own rank list; on a terrain the better-ranked racer (smaller rank) always wins.</p><p>For each race the organisers choose the terrain like this:</p><ol><li>Choose the terrain where the <strong>winner's rank is best</strong> (smallest).</li><li>If tied, choose the terrain where the <strong>loser's rank is best</strong>.</li><li>If still tied, prefer Hilly, then City, then Off-road.</li></ol><p>Print how many races happen on each terrain, then how many races each racer wins.</p><h3>Function to complete</h3><p>Complete <code>tournament(n, ranks)</code>. It returns two rows: the race count for Hilly, City and Off-road, then the wins of racers 1 to n.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "Line 1: <code>N</code>. Lines 2–4: the rank lists for Hilly, City and Off-road. Each lists racer numbers from rank 1 (strongest) to rank N.",
  "out": "Line 1: three integers, the race count for Hilly, City and Off-road. Line 2: <code>N</code> integers, the wins of racers 1 to N.",
  "cons": [
@@ -56,7 +56,32 @@
   }
  ],
  "type": "code",
- "ref": "import sys, heapq\nfrom collections import defaultdict\n\ndef racing(s):\n    t=list(map(int,s.split())); n=t[0]; T=[t[1+i*n:1+(i+1)*n] for i in range(3)]\n    rk=[[0]*(n+1) for _ in range(3)]\n    for k in range(3):\n        for i,p in enumerate(T[k]): rk[k][p]=i+1\n    cnt=[0]*3; w=[0]*(n+1)\n    for a in range(1,n+1):\n        for b in range(a+1,n+1):\n            best=None\n            for k in range(3):\n                win,lose=(a,b) if rk[k][a]<rk[k][b] else (b,a)\n                key=(rk[k][win],rk[k][lose],k)\n                if best is None or key<best[0]: best=(key,win)\n            cnt[best[0][2]]+=1; w[best[1]]+=1\n    return \" \".join(map(str,cnt))+\"\\n\"+\" \".join(map(str,w[1:]))\n\nprint(racing(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def tournament(self, n: int, ranks: List[List[int]]) -> List[List[int]]:\n        rk = [[0] * (n + 1) for _ in range(3)]\n        for k in range(3):\n            for i, p in enumerate(ranks[k]): rk[k][p] = i + 1\n        cnt = [0] * 3; w = [0] * (n + 1)\n        for a in range(1, n + 1):\n            for b in range(a + 1, n + 1):\n                best = None\n                for k in range(3):\n                    win, lose = (a, b) if rk[k][a] < rk[k][b] else (b, a)\n                    key = (rk[k][win], rk[k][lose], k)\n                    if best is None or key < best[0]: best = (key, win)\n                cnt[best[0][2]] += 1; w[best[1]] += 1\n        return [cnt, w[1:]]\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){ int n; cin>>n; vector<vector<int>> rk(3,vector<int>(n+1)); for(int t=0;t<3;t++) for(int r=1;r<=n;r++){int p;cin>>p; rk[t][p]=r;}\n  long long cnt[3]={}; vector<int> w(n+1,0);\n  for(int a=1;a<=n;a++) for(int b=a+1;b<=n;b++){ int bt=-1,bw=0,bl=0,win=0;\n    for(int t=0;t<3;t++){ int W=rk[t][a]<rk[t][b]?a:b, L=W==a?b:a, wr=rk[t][W], lr=rk[t][L];\n      if(bt<0 || wr<bw || (wr==bw && lr<bl)){bt=t;bw=wr;bl=lr;win=W;} }\n    cnt[bt]++; w[win]++; }\n  cout<<cnt[0]<<\" \"<<cnt[1]<<\" \"<<cnt[2]<<\"\\n\"; for(int i=1;i<=n;i++) cout<<w[i]<<(i<n?\" \":\"\\n\"); }\n",
- "lcurl": null
+ "lcurl": null,
+ "stub": {
+  "py": "class Solution:\n    def tournament(self, n: int, ranks: List[List[int]]) -> List[List[int]]:\n        return []\n",
+  "cpp": "class Solution {\npublic:\n    vector<vector<int>> tournament(int n, vector<vector<int>>& ranks) {\n        \n        return {};\n    }\n};\n",
+  "java": "class Solution {\n    public int[][] tournament(int n, int[][] ranks) {\n        \n        return new int[0][];\n    }\n}\n",
+  "js": "/**\n * @param {number} n\n * @param {number[][]} ranks\n * @return {number[][]}\n */\nvar tournament = function(n, ranks) {\n    \n    return [];\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    n = int(_t[_p]); _p += 1\n    ranks = [list(map(int, _t[_p + _i * (n):_p + (_i + 1) * (n)])) for _i in range(3)]; _p += 3 * (n)\n    _r = Solution().tournament(n, ranks)\n    print(\"\\n\".join(\" \".join(map(str, _row)) for _row in _r))\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int n; cin >> n;\n    vector<vector<int>> ranks(3, vector<int>((n))); for (auto& _row : ranks) for (auto& _x : _row) cin >> _x;\n    auto _r = Solution().tournament(n, ranks);\n    for (auto& _row : _r) { for (size_t _i = 0; _i < _row.size(); _i++) { if (_i) cout << ' '; cout << _row[_i]; } cout << \"\\n\"; }\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int n = Integer.parseInt(_t[_p++]);\n        int[][] ranks = new int[3][(n)]; for (int[] _row : ranks) for (int _j = 0; _j < _row.length; _j++) _row[_j] = Integer.parseInt(_t[_p++]);\n        int[][] _r = new Solution().tournament(n, ranks);\n        StringBuilder _sb = new StringBuilder();\n        for (int[] _row : _r) { for (int _i = 0; _i < _row.length; _i++) { if (_i > 0) _sb.append(' '); _sb.append(_row[_i]); } _sb.append('\\n'); }\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const n = Number(_t[_p++]);\n    const ranks = []; for (let _i = 0; _i < 3; _i++) { ranks.push(_t.slice(_p, _p + (n)).map(Number)); _p += (n); }\n    const _r = tournament(n, ranks);\n    console.log(_r.map(_row => _row.join(\" \")).join(\"\\n\"));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

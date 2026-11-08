@@ -3,7 +3,7 @@
  "title": "Factory Maintenance Scheduling",
  "diff": "Medium",
  "src": "Juspay hiring challenge (Unstop Part B)",
- "body": "<p>A factory has <code>n</code> machines. Machine i produces <code>o_i</code> units on day 1 and then again every <code>c_i</code> days (on days 1, 1 + c_i, 1 + 2c_i, …), because it needs maintenance in between. So within the first D days it produces <code>o_i · ceil(D / c_i)</code> units.</p><p>Find the smallest number of days D after which the total production is at least <code>P</code>.</p><p class='muted'>The report's sample only fits this reading (the literal \"produce, then c_i days off\" cycle gives 23, not 21).</p>",
+ "body": "<p>A factory has <code>n</code> machines. Machine i produces <code>o_i</code> units on day 1 and then again every <code>c_i</code> days (on days 1, 1 + c_i, 1 + 2c_i, …), because it needs maintenance in between. So within the first D days it produces <code>o_i · ceil(D / c_i)</code> units.</p><p>Find the smallest number of days D after which the total production is at least <code>P</code>.</p><p class='muted'>The report's sample only fits this reading (the literal \"produce, then c_i days off\" cycle gives 23, not 21).</p><h3>Function to complete</h3><p>Complete <code>minDays(P, output, cooldown)</code>. It returns the minimum number of days.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "Line 1: <code>P n</code>. Line 2: <code>o_1 … o_n</code>. Line 3: <code>c_1 … c_n</code>.",
  "out": "One integer: the minimum number of days.",
  "cons": [
@@ -53,7 +53,32 @@
    "out": "333332"
   }
  ],
- "ref": "import sys, heapq\nfrom collections import defaultdict, deque\nsys.setrecursionlimit(1 << 20)\n\ndef factory(s):\n    t = list(map(int, s.split())); P, n = t[0], t[1]; o = t[2:2+n]; c = t[2+n:2+2*n]\n    lo, hi = 1, 1\n    def ok(D): return sum(o[i] * (-(-D // c[i])) for i in range(n)) >= P\n    while not ok(hi): hi *= 2\n    while lo < hi:\n        mid = (lo + hi)//2\n        if ok(mid): hi = mid\n        else: lo = mid + 1\n    return str(lo)\n\nprint(factory(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def minDays(self, P: int, output: List[int], cooldown: List[int]) -> int:\n        o, c, n = output, cooldown, len(output)\n        def ok(D): return sum(o[i] * (-(-D // c[i])) for i in range(n)) >= P\n        lo = hi = 1\n        while not ok(hi): hi *= 2\n        while lo < hi:\n            mid = (lo + hi) // 2\n            if ok(mid): hi = mid\n            else: lo = mid + 1\n        return lo\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){ long long P; int n; cin>>P>>n; vector<long long> o(n),c(n); for(auto&x:o)cin>>x; for(auto&x:c)cin>>x;\n  auto prod=[&](long long D){ __int128 s=0; for(int i=0;i<n;i++) s+=(__int128)o[i]*((D+c[i]-1)/c[i]); return s; };\n  long long lo=1, hi=1; while(prod(hi)<P) hi*=2; while(lo<hi){ long long mid=lo+(hi-lo)/2; if(prod(mid)>=P) hi=mid; else lo=mid+1; } cout<<lo<<\"\\n\"; }\n",
- "lcurl": "https://leetcode.com/problems/minimum-time-to-complete-trips/"
+ "lcurl": "https://leetcode.com/problems/minimum-time-to-complete-trips/",
+ "stub": {
+  "py": "class Solution:\n    def minDays(self, P: int, output: List[int], cooldown: List[int]) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    long long minDays(long long P, vector<int>& output, vector<int>& cooldown) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public long minDays(long P, int[] output, int[] cooldown) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {number} P\n * @param {number[]} output\n * @param {number[]} cooldown\n * @return {number}\n */\nvar minDays = function(P, output, cooldown) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    P = int(_t[_p]); _p += 1\n    _n = int(_t[_p]); _p += 1\n    output = list(map(int, _t[_p:_p + (_n)])); _p += (_n)\n    cooldown = list(map(int, _t[_p:_p + (_n)])); _p += (_n)\n    _r = Solution().minDays(P, output, cooldown)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    long long P; cin >> P;\n    int _n; cin >> _n;\n    vector<int> output((_n)); for (auto& _x : output) cin >> _x;\n    vector<int> cooldown((_n)); for (auto& _x : cooldown) cin >> _x;\n    auto _r = Solution().minDays(P, output, cooldown);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        long P = Long.parseLong(_t[_p++]);\n        int _n = Integer.parseInt(_t[_p++]);\n        int[] output = new int[(_n)]; for (int _i = 0; _i < output.length; _i++) output[_i] = Integer.parseInt(_t[_p++]);\n        int[] cooldown = new int[(_n)]; for (int _i = 0; _i < cooldown.length; _i++) cooldown[_i] = Integer.parseInt(_t[_p++]);\n        long _r = new Solution().minDays(P, output, cooldown);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const P = Number(_t[_p++]);\n    const _n = Number(_t[_p++]);\n    const output = _t.slice(_p, _p + (_n)).map(Number); _p += (_n);\n    const cooldown = _t.slice(_p, _p + (_n)).map(Number); _p += (_n);\n    const _r = minDays(P, output, cooldown);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

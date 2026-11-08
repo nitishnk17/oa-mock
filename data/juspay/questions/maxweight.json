@@ -3,7 +3,7 @@
  "title": "Maximum Weight Node",
  "diff": "Easy",
  "src": "Juspay OA (Rookies World, Converging Maze)",
- "body": "<p>A maze has <code>N</code> cells numbered 0 to N − 1. Each cell has at most one exit: <code>edge[i]</code> is the cell you reach by leaving cell i, or <code>-1</code> if cell i has no exit.</p><p>The <em>weight</em> of a cell is the sum of the numbers of all cells whose exit points to it. Print the cell with the largest weight. If several cells tie, print the one with the <strong>largest</strong> number.</p><p class='muted'>The report did not capture the tie rule; the largest-number rule is the one used in the commonly shared version of this question.</p>",
+ "body": "<p>A maze has <code>N</code> cells numbered 0 to N − 1. Each cell has at most one exit: <code>edge[i]</code> is the cell you reach by leaving cell i, or <code>-1</code> if cell i has no exit.</p><p>The <em>weight</em> of a cell is the sum of the numbers of all cells whose exit points to it. Print the cell with the largest weight. If several cells tie, print the one with the <strong>largest</strong> number.</p><p class='muted'>The report did not capture the tie rule; the largest-number rule is the one used in the commonly shared version of this question.</p><h3>Function to complete</h3><p>Complete <code>maxWeightNode(edge)</code>. It returns the cell with the largest weight (the larger index on a tie).</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "Line 1: <code>N</code>. Line 2: <code>edge[0] … edge[N−1]</code>.",
  "out": "One integer: the cell.",
  "cons": [
@@ -58,7 +58,32 @@
    "out": "5674"
   }
  ],
- "ref": "import sys, heapq\nfrom collections import defaultdict, deque\nsys.setrecursionlimit(1 << 20)\n\ndef maxweight(s):\n    t = list(map(int, s.split())); n = t[0]; e = t[1:1+n]\n    w = [0]*n\n    for i, x in enumerate(e):\n        if x != -1: w[x] += i\n    m = max(w)\n    return str(max(i for i in range(n) if w[i] == m))\n\nprint(maxweight(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def maxWeightNode(self, edge: List[int]) -> int:\n        n = len(edge); w = [0] * n\n        for i, x in enumerate(edge):\n            if x != -1: w[x] += i\n        m = max(w)\n        return max(i for i in range(n) if w[i] == m)\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){ int n; cin>>n; vector<long long> w(n,0); for(int i=0;i<n;i++){int x;cin>>x; if(x>=0) w[x]+=i;}\n  int best=0; for(int i=0;i<n;i++) if(w[i]>=w[best]) best=i; cout<<best<<\"\\n\"; }\n",
- "lcurl": "https://leetcode.com/problems/node-with-highest-edge-score/"
+ "lcurl": "https://leetcode.com/problems/node-with-highest-edge-score/",
+ "stub": {
+  "py": "class Solution:\n    def maxWeightNode(self, edge: List[int]) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    int maxWeightNode(vector<int>& edge) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public int maxWeightNode(int[] edge) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {number[]} edge\n * @return {number}\n */\nvar maxWeightNode = function(edge) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _n = int(_t[_p]); _p += 1\n    edge = list(map(int, _t[_p:_p + (_n)])); _p += (_n)\n    _r = Solution().maxWeightNode(edge)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _n; cin >> _n;\n    vector<int> edge((_n)); for (auto& _x : edge) cin >> _x;\n    auto _r = Solution().maxWeightNode(edge);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _n = Integer.parseInt(_t[_p++]);\n        int[] edge = new int[(_n)]; for (int _i = 0; _i < edge.length; _i++) edge[_i] = Integer.parseInt(_t[_p++]);\n        int _r = new Solution().maxWeightNode(edge);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _n = Number(_t[_p++]);\n    const edge = _t.slice(_p, _p + (_n)).map(Number); _p += (_n);\n    const _r = maxWeightNode(edge);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

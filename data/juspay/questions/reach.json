@@ -3,7 +3,7 @@
  "title": "Find Reachability",
  "diff": "Easy",
  "src": "Juspay OA (HackerEarth, Q3)",
- "body": "<p>Members of a developer network follow each other. An edge <code>u v</code> means u follows v, and information flows from u to v along that direction.</p><p>A JS newbie <code>A</code> wants to know whether he can reach the React expert <code>B</code> through the network. Print <code>1</code> if there is a directed path from A to B, otherwise <code>0</code>. A member always reaches themself.</p>",
+ "body": "<p>Members of a developer network follow each other. An edge <code>u v</code> means u follows v, and information flows from u to v along that direction.</p><p>A JS newbie <code>A</code> wants to know whether he can reach the React expert <code>B</code> through the network. Print <code>1</code> if there is a directed path from A to B, otherwise <code>0</code>. A member always reaches themself.</p><h3>Function to complete</h3><p>Complete <code>canReach(members, follower, following, a, b)</code>. It returns 1 if A can reach B, otherwise 0.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "Line 1: <code>N</code>. Line 2: the <code>N</code> member IDs. Line 3: <code>E</code>. Next <code>E</code> lines: an edge. Last line: <code>A B</code>. Each edge is <code>follower following</code>.",
  "out": "<code>1</code> or <code>0</code>.",
  "cons": [
@@ -58,7 +58,32 @@
    "out": "0"
   }
  ],
- "ref": "import sys, heapq\nfrom collections import defaultdict, deque\nsys.setrecursionlimit(1 << 20)\n\ndef _graph(s, weighted):\n    t = s.split(); p = 0\n    n = int(t[p]); p += 1 + n\n    e = int(t[p]); p += 1\n    g = defaultdict(list)\n    for _ in range(e):\n        if weighted: g[t[p]].append((t[p+1], int(t[p+2]))); p += 3\n        else: g[t[p]].append(t[p+1]); p += 2\n    return g, t[p], t[p+1]\n\ndef reach(s):\n    g, a, b = _graph(s, False)\n    seen = {a}; q = deque([a])\n    while q:\n        u = q.popleft()\n        if u == b: return \"1\"\n        for v in g[u]:\n            if v not in seen: seen.add(v); q.append(v)\n    return \"0\"\n\nprint(reach(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def canReach(self, members: List[int], follower: List[int], following: List[int], a: int, b: int) -> int:\n        g = defaultdict(list)\n        for u, v in zip(follower, following): g[u].append(v)\n        seen = {a}; q = deque([a])\n        while q:\n            u = q.popleft()\n            if u == b: return 1\n            for v in g[u]:\n                if v not in seen: seen.add(v); q.append(v)\n        return 0\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){ int n; cin>>n; vector<string> ids(n); for(auto&x:ids)cin>>x; int e; cin>>e; map<string,vector<string>> g;\n  for(int i=0;i<e;i++){string u,v;cin>>u>>v;g[u].push_back(v);} string a,b; cin>>a>>b;\n  set<string> seen; function<void(const string&)> dfs=[&](const string& u){ if(seen.count(u)) return; seen.insert(u); for(auto&v:g[u]) dfs(v); };\n  dfs(a); cout<<(seen.count(b)?1:0)<<\"\\n\"; }\n",
- "lcurl": "https://leetcode.com/problems/find-if-path-exists-in-graph/"
+ "lcurl": "https://leetcode.com/problems/find-if-path-exists-in-graph/",
+ "stub": {
+  "py": "class Solution:\n    def canReach(self, members: List[int], follower: List[int], following: List[int], a: int, b: int) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    int canReach(vector<int>& members, vector<int>& follower, vector<int>& following, int a, int b) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public int canReach(int[] members, int[] follower, int[] following, int a, int b) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {number[]} members\n * @param {number[]} follower\n * @param {number[]} following\n * @param {number} a\n * @param {number} b\n * @return {number}\n */\nvar canReach = function(members, follower, following, a, b) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _n = int(_t[_p]); _p += 1\n    members = list(map(int, _t[_p:_p + (_n)])); _p += (_n)\n    _e = int(_t[_p]); _p += 1\n    follower = []; following = []\n    for _ in range((_e)):\n        follower.append(int(_t[_p + 0]))\n        following.append(int(_t[_p + 1]))\n        _p += 2\n    a = int(_t[_p]); _p += 1\n    b = int(_t[_p]); _p += 1\n    _r = Solution().canReach(members, follower, following, a, b)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _n; cin >> _n;\n    vector<int> members((_n)); for (auto& _x : members) cin >> _x;\n    int _e; cin >> _e;\n    vector<int> follower((_e));\n    vector<int> following((_e));\n    for (int _i = 0; _i < (_e); _i++) cin >> follower[_i] >> following[_i];\n    int a; cin >> a;\n    int b; cin >> b;\n    auto _r = Solution().canReach(members, follower, following, a, b);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _n = Integer.parseInt(_t[_p++]);\n        int[] members = new int[(_n)]; for (int _i = 0; _i < members.length; _i++) members[_i] = Integer.parseInt(_t[_p++]);\n        int _e = Integer.parseInt(_t[_p++]);\n        int[] follower = new int[(_e)];\n        int[] following = new int[(_e)];\n        for (int _i = 0; _i < (_e); _i++) { follower[_i] = Integer.parseInt(_t[_p++]); following[_i] = Integer.parseInt(_t[_p++]); }\n        int a = Integer.parseInt(_t[_p++]);\n        int b = Integer.parseInt(_t[_p++]);\n        int _r = new Solution().canReach(members, follower, following, a, b);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _n = Number(_t[_p++]);\n    const members = _t.slice(_p, _p + (_n)).map(Number); _p += (_n);\n    const _e = Number(_t[_p++]);\n    const follower = [], following = [];\n    for (let _i = 0; _i < (_e); _i++) { follower.push(Number(_t[_p++])); following.push(Number(_t[_p++])); }\n    const a = Number(_t[_p++]);\n    const b = Number(_t[_p++]);\n    const _r = canReach(members, follower, following, a, b);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

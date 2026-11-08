@@ -3,7 +3,7 @@
  "title": "National Cycling League",
  "diff": "Medium",
  "src": "Juspay hiring challenge (Unstop Part C)",
- "body": "<p>A rider's speeds over <code>n</code> checkpoints are given. For a window length <code>d</code>, look at every block of <code>d</code> consecutive checkpoints, take the maximum speed in each block, and report the <strong>smallest</strong> of those maxima. Answer <code>q</code> such queries.</p><p class='muted'>Also seen as \"Customer Satisfaction Analysis\".</p>",
+ "body": "<p>A rider's speeds over <code>n</code> checkpoints are given. For a window length <code>d</code>, look at every block of <code>d</code> consecutive checkpoints, take the maximum speed in each block, and report the <strong>smallest</strong> of those maxima. Answer <code>q</code> such queries.</p><p class='muted'>Also seen as \"Customer Satisfaction Analysis\".</p><h3>Function to complete</h3><p>Complete <code>answerQueries(speeds, queries)</code>. It returns one answer per query.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "Line 1: <code>n q</code>. Line 2: the <code>n</code> speeds. Next <code>q</code> lines: <code>d</code>.",
  "out": "<code>q</code> lines, one answer each.",
  "cons": [
@@ -49,7 +49,32 @@
    "out": "995093\n985988\n998021\n997649\n998021\n998612\n999834\n999834\n999834\n999916"
   }
  ],
- "ref": "import sys, heapq\nfrom collections import defaultdict, deque\nsys.setrecursionlimit(1 << 20)\n\ndef cycling(s):\n    t = list(map(int, s.split())); n, q = t[0], t[1]; a = t[2:2+n]; out = []\n    for d in t[2+n:2+n+q]:\n        dq = deque(); best = None\n        for i, x in enumerate(a):\n            while dq and a[dq[-1]] <= x: dq.pop()\n            dq.append(i)\n            if dq[0] <= i - d: dq.popleft()\n            if i >= d - 1: best = a[dq[0]] if best is None else min(best, a[dq[0]])\n        out.append(str(best))\n    return \"\\n\".join(out)\n\nprint(cycling(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def answerQueries(self, speeds: List[int], queries: List[int]) -> List[int]:\n        a = speeds; out = []\n        for d in queries:\n            dq = deque(); best = None\n            for i, x in enumerate(a):\n                while dq and a[dq[-1]] <= x: dq.pop()\n                dq.append(i)\n                if dq[0] <= i - d: dq.popleft()\n                if i >= d - 1: best = a[dq[0]] if best is None else min(best, a[dq[0]])\n            out.append(best)\n        return out\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){ int n,q; cin>>n>>q; vector<long long> a(n); for(auto&x:a)cin>>x; int LOG=1; while((1<<LOG)<=n) LOG++;\n  vector<vector<long long>> sp(LOG, vector<long long>(n)); sp[0]=a; for(int k=1;k<LOG;k++) for(int i=0;i+(1<<k)<=n;i++) sp[k][i]=max(sp[k-1][i],sp[k-1][i+(1<<(k-1))]);\n  while(q--){ int d; cin>>d; int k=31-__builtin_clz(d); long long best=LLONG_MAX; for(int i=0;i+d<=n;i++) best=min(best,max(sp[k][i],sp[k][i+d-(1<<k)])); cout<<best<<\"\\n\"; } }\n",
- "lcurl": "https://leetcode.com/problems/sliding-window-maximum/"
+ "lcurl": "https://leetcode.com/problems/sliding-window-maximum/",
+ "stub": {
+  "py": "class Solution:\n    def answerQueries(self, speeds: List[int], queries: List[int]) -> List[int]:\n        return []\n",
+  "cpp": "class Solution {\npublic:\n    vector<int> answerQueries(vector<int>& speeds, vector<int>& queries) {\n        \n        return {};\n    }\n};\n",
+  "java": "class Solution {\n    public int[] answerQueries(int[] speeds, int[] queries) {\n        \n        return new int[0];\n    }\n}\n",
+  "js": "/**\n * @param {number[]} speeds\n * @param {number[]} queries\n * @return {number[]}\n */\nvar answerQueries = function(speeds, queries) {\n    \n    return [];\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _n = int(_t[_p]); _p += 1\n    _q = int(_t[_p]); _p += 1\n    speeds = list(map(int, _t[_p:_p + (_n)])); _p += (_n)\n    queries = list(map(int, _t[_p:_p + (_q)])); _p += (_q)\n    _r = Solution().answerQueries(speeds, queries)\n    print(\"\\n\".join(map(str, _r)))\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _n; cin >> _n;\n    int _q; cin >> _q;\n    vector<int> speeds((_n)); for (auto& _x : speeds) cin >> _x;\n    vector<int> queries((_q)); for (auto& _x : queries) cin >> _x;\n    auto _r = Solution().answerQueries(speeds, queries);\n    for (auto& _x : _r) cout << _x << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _n = Integer.parseInt(_t[_p++]);\n        int _q = Integer.parseInt(_t[_p++]);\n        int[] speeds = new int[(_n)]; for (int _i = 0; _i < speeds.length; _i++) speeds[_i] = Integer.parseInt(_t[_p++]);\n        int[] queries = new int[(_q)]; for (int _i = 0; _i < queries.length; _i++) queries[_i] = Integer.parseInt(_t[_p++]);\n        int[] _r = new Solution().answerQueries(speeds, queries);\n        StringBuilder _sb = new StringBuilder();\n        for (int _i = 0; _i < _r.length; _i++) _sb.append(_r[_i]).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _n = Number(_t[_p++]);\n    const _q = Number(_t[_p++]);\n    const speeds = _t.slice(_p, _p + (_n)).map(Number); _p += (_n);\n    const queries = _t.slice(_p, _p + (_q)).map(Number); _p += (_q);\n    const _r = answerQueries(speeds, queries);\n    console.log(_r.join(\"\\n\"));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

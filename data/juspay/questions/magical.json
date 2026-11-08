@@ -3,7 +3,7 @@
  "title": "Magical Sequence Transformation",
  "diff": "Medium",
  "src": "Juspay hiring challenge (Unstop Part B)",
- "body": "<p>A string has only the letters <code>X</code> and <code>Y</code>. You may repeatedly apply either operation, earning one coin each time:</p><ul><li>replace a substring <code>XY</code> with <code>YZ</code>;</li><li>replace a substring <code>YX</code> with <code>ZY</code>.</li></ul><p>Print the maximum number of coins.</p><p class='muted'>Also seen as \"Robot Battery Conversion\" with other letters.</p>",
+ "body": "<p>A string has only the letters <code>X</code> and <code>Y</code>. You may repeatedly apply either operation, earning one coin each time:</p><ul><li>replace a substring <code>XY</code> with <code>YZ</code>;</li><li>replace a substring <code>YX</code> with <code>ZY</code>.</li></ul><p>Print the maximum number of coins.</p><p class='muted'>Also seen as \"Robot Battery Conversion\" with other letters.</p><h3>Function to complete</h3><p>Complete <code>minOperations(s)</code>. It returns the answer described above.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "One line: the string.",
  "out": "One integer.",
  "cons": [
@@ -61,7 +61,32 @@
    "out": "39999"
   }
  ],
- "ref": "import sys, heapq\nfrom collections import defaultdict, deque\nsys.setrecursionlimit(1 << 20)\n\ndef magical(s):\n    w = s.split()[0]; xs = w.count(\"X\")\n    if xs == 0: return \"0\"\n    if w[0] == \"Y\" or w[-1] == \"Y\" or \"YY\" in w: return str(xs)\n    runs = [len(r) for r in w.split(\"Y\") if r]\n    return str(xs - min(runs)) if \"Y\" in w else \"0\"\n\nprint(magical(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def minOperations(self, s: str) -> int:\n        xs = s.count(\"X\")\n        if xs == 0: return 0\n        if s[0] == \"Y\" or s[-1] == \"Y\" or \"YY\" in s: return xs\n        runs = [len(r) for r in s.split(\"Y\") if r]\n        return xs - min(runs) if \"Y\" in s else 0\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\n// DP over X-runs: each Y can eat one whole adjacent X-run; there are (#Y) eaters and (#runs) runs\nint main(){ string s; cin>>s; vector<long long> runs; long long cur=0; int ys=0;\n  for(char ch:s){ if(ch=='X') cur++; else { runs.push_back(cur); cur=0; ys++; } } runs.push_back(cur);\n  long long total=0; for(auto r:runs) total+=r;\n  if(ys==0){ cout<<0<<\"\\n\"; return 0; }\n  // runs.size() == ys+1; Ys can cover any ys of the ys+1 runs, so we drop the smallest one\n  long long mn=*min_element(runs.begin(),runs.end()); cout<<total-mn<<\"\\n\"; }\n",
- "lcurl": "https://codeforces.com/problemset/problem/1873/G"
+ "lcurl": "https://codeforces.com/problemset/problem/1873/G",
+ "stub": {
+  "py": "class Solution:\n    def minOperations(self, s: str) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    int minOperations(string s) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public int minOperations(String s) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {string} s\n * @return {number}\n */\nvar minOperations = function(s) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    s = _t[_p]; _p += 1\n    _r = Solution().minOperations(s)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    string s; cin >> s;\n    auto _r = Solution().minOperations(s);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        String s = _t[_p++];\n        int _r = new Solution().minOperations(s);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const s = _t[_p++];\n    const _r = minOperations(s);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }

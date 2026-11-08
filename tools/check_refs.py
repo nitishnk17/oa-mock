@@ -19,6 +19,9 @@ def norm(s):
 
 
 def wrap(q, lang, code):
+    """Function-style references run inside the question's driver; full-program ones run as they are."""
+    if lang == "cpp" and q.get("refcppProgram"):
+        return code
     d = (q.get("driver") or {}).get(lang)
     return d["pre"] + code + d["post"] if d else code
 

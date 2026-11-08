@@ -3,7 +3,7 @@
  "title": "Highest Cumulative Score",
  "diff": "Easy",
  "src": "Juspay elimination interview (Mar 2025)",
- "body": "<p>Score entries <code>name score</code> arrive one at a time and add up per person. At the end, find the person with the highest total. If several people share the highest total, the winner is the one who first reached at least that total while the entries were arriving.</p>",
+ "body": "<p>Score entries <code>name score</code> arrive one at a time and add up per person. At the end, find the person with the highest total. If several people share the highest total, the winner is the one who first reached at least that total while the entries were arriving.</p><h3>Function to complete</h3><p>Complete <code>winner(names, scores)</code>. It returns the winner's name.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "Line 1: <code>q</code>. Next <code>q</code> lines: <code>name score</code>.",
  "out": "The winner's name.",
  "cons": [
@@ -54,7 +54,32 @@
    "out": "e"
   }
  ],
- "ref": "import sys, heapq\nfrom collections import defaultdict, deque\nsys.setrecursionlimit(1 << 20)\n\ndef leader(s):\n    t = s.split(); q = int(t[0]); ev = [(t[1+2*i], int(t[2+2*i])) for i in range(q)]\n    tot = defaultdict(int)\n    for nm, sc in ev: tot[nm] += sc\n    m = max(tot.values()); run = defaultdict(int)\n    for nm, sc in ev:\n        run[nm] += sc\n        if tot[nm] == m and run[nm] >= m: return nm\n\nprint(leader(sys.stdin.read()))\n",
+ "ref": "class Solution:\n    def winner(self, names: List[str], scores: List[int]) -> str:\n        tot = defaultdict(int)\n        for nm, sc in zip(names, scores): tot[nm] += sc\n        m = max(tot.values()); run = defaultdict(int)\n        for nm, sc in zip(names, scores):\n            run[nm] += sc\n            if tot[nm] == m and run[nm] >= m: return nm\n",
  "refcpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){ int q; cin>>q; vector<pair<string,long long>> ev(q); map<string,long long> tot; for(auto&[n,s]:ev){cin>>n>>s; tot[n]+=s;}\n  long long m=LLONG_MIN; for(auto&p:tot) m=max(m,p.second); map<string,long long> run; string ans; long long when=LLONG_MAX;\n  for(auto&p:tot) if(p.second==m){ long long r=0; for(int i=0;i<q;i++) if(ev[i].first==p.first){ r+=ev[i].second; if(r>=m){ if(i<when){when=i;ans=p.first;} break; } } }\n  cout<<ans<<\"\\n\"; }\n",
- "lcurl": null
+ "lcurl": null,
+ "stub": {
+  "py": "class Solution:\n    def winner(self, names: List[str], scores: List[int]) -> str:\n        return \"\"\n",
+  "cpp": "class Solution {\npublic:\n    string winner(vector<string>& names, vector<int>& scores) {\n        \n        return \"\";\n    }\n};\n",
+  "java": "class Solution {\n    public String winner(String[] names, int[] scores) {\n        \n        return \"\";\n    }\n}\n",
+  "js": "/**\n * @param {string[]} names\n * @param {number[]} scores\n * @return {string}\n */\nvar winner = function(names, scores) {\n    \n    return \"\";\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    _q = int(_t[_p]); _p += 1\n    names = []; scores = []\n    for _ in range((_q)):\n        names.append(_t[_p + 0])\n        scores.append(int(_t[_p + 1]))\n        _p += 2\n    _r = Solution().winner(names, scores)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int _q; cin >> _q;\n    vector<string> names((_q));\n    vector<int> scores((_q));\n    for (int _i = 0; _i < (_q); _i++) cin >> names[_i] >> scores[_i];\n    auto _r = Solution().winner(names, scores);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int _q = Integer.parseInt(_t[_p++]);\n        String[] names = new String[(_q)];\n        int[] scores = new int[(_q)];\n        for (int _i = 0; _i < (_q); _i++) { names[_i] = _t[_p++]; scores[_i] = Integer.parseInt(_t[_p++]); }\n        String _r = new Solution().winner(names, scores);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const _q = Number(_t[_p++]);\n    const names = [], scores = [];\n    for (let _i = 0; _i < (_q); _i++) { names.push(_t[_p++]); scores.push(Number(_t[_p++])); }\n    const _r = winner(names, scores);\n    console.log(String(_r));\n})();\n"
+  }
+ },
+ "refcppProgram": true
 }
