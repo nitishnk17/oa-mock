@@ -1,7 +1,7 @@
 # One-line install for Windows 10/11 (PowerShell):
-#   irm https://raw.githubusercontent.com/rgabhi/oa-mock/main/install.ps1 | iex
+#   irm https://raw.githubusercontent.com/rgabhi/oa-mock/main/scripts/install.ps1 | iex
 # Makes a slim clone in .\oa-mock (the app + Flipkart's questions, ~4 MB; download more companies on the
-# home page), then runs setup.ps1. $env:OA_DIR changes the folder; $env:OA_FULL = "1" clones every company.
+# home page), then runs scripts\setup.ps1. $env:OA_DIR changes the folder; $env:OA_FULL = "1" clones every company.
 $ErrorActionPreference = "Stop"
 $Repo = if ($env:OA_REPO) { $env:OA_REPO } else { "https://github.com/rgabhi/oa-mock.git" }
 $Dir = if ($env:OA_DIR) { $env:OA_DIR } else { "oa-mock" }
@@ -38,4 +38,4 @@ if (Test-Path (Join-Path $Dir ".git")) {
 
 Set-Location $Dir
 Write-Host "Setting up in $(Get-Location)" -ForegroundColor White
-powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path (Get-Location) "setup.ps1")
+powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path (Get-Location) "scripts\setup.ps1")

@@ -7,7 +7,7 @@ Files are re-read when they change, so edits show up on the next page load.
 """
 import json, os, re
 
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))   # the repository: app/server/ -> ..
 DATA_DIR = os.path.join(ROOT, "data")
 KEY_RE = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 

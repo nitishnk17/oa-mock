@@ -16,8 +16,8 @@ the known-wrong solutions in "wrong"; not already in the bank. Exit code 1 if an
 import json, os, subprocess, sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.insert(0, ROOT)
-from oa_mock import contribute  # noqa: E402
+sys.path.insert(0, os.path.join(ROOT, "app"))
+from server import contribute  # noqa: E402
 
 MARK = {"ok": "\033[32m ok \033[0m", "warn": "\033[33mwarn\033[0m", "fail": "\033[31mFAIL\033[0m", "skip": "skip"}
 

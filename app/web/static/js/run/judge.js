@@ -4,7 +4,7 @@
 /* ---------- local runner (C++ / Java / CPython) ---------- */
 async function serverRun(lang, code, inputs){
   const r = await fetch("/run", {method:"POST", headers:{"Content-Type":"application/json", "X-Token":window.LOCAL_TOKEN || ""}, body:JSON.stringify({lang, code, inputs, limit:LIMIT[lang]})});
-  if (!r.ok) throw new Error("The local runner answered " + r.status + ". Restart oa_mock_local.py");
+  if (!r.ok) throw new Error("The local runner answered " + r.status + ". Restart the app (./start.sh, or start.bat on Windows)");
   return r.json();
 }
 async function runOne(lang, code, inp){
@@ -50,7 +50,7 @@ async function judge(q, lang, code, tests, onEach){
       catch (e){ r = {ok:false, err:String(e && e.message || e), ms:performance.now() - t0}; }
       r.kind = r.err ? "Runtime error" : r.ok ? "Passed" : "Wrong answer";
     } else if (NEEDS_LOCAL(lang)) {
-      throw new Error(LANGS[lang].label + " needs the local runner. Open this test through oa_mock_local.py on your laptop, or switch to Python");
+      throw new Error(LANGS[lang].label + " needs the local runner. Open this test through the app on your computer (./start.sh), or switch to Python");
     } else if (LOCAL && lang !== "js") {
       if (!judge.batch || judge.batch.code !== code || judge.batch.lang !== lang || judge.batch.tests !== tests){
         const resp = await serverRun(lang, code, tests.map(z => z.in));

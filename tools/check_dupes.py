@@ -60,8 +60,8 @@ def compare(a, b):
 def same_behaviour(a, b):
     """Does a's Python reference reproduce b's tests (samples + up to 8 small hidden)? Runs a's reference.
     Returns "duplicate", "similar" (only one case to compare) or False."""
-    sys.path.insert(0, ROOT)
-    from oa_mock import judge
+    sys.path.insert(0, os.path.join(ROOT, "app"))
+    from server import judge
     if not a.get("ref") or a.get("type", "code") != "code" or not b["_samples"]:
         return False
     d = (a.get("driver") or {}).get("py")

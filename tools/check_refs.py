@@ -4,14 +4,14 @@
     python3 tools/check_refs.py              # all companies
     python3 tools/check_refs.py amazon       # one company
 
-Uses the same judge as the server (oa_mock/judge.py). Python and C++ references are
+Uses the same judge as the server (app/server/judge.py). Python and C++ references are
 checked; SQL, debugging and SJT questions are skipped (the debugging tests are
 generated from the fixed repo by tools/amazon/watchlist/gen_tests.js).
 """
 import os, sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from oa_mock import data, judge  # noqa: E402
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "app")))
+from server import data, judge  # noqa: E402
 
 
 def norm(s):

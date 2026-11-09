@@ -1,4 +1,4 @@
-// "Add a question": paste an LLM's JSON, run the checks (oa_mock/contribute.py), save it, open a pull request.
+// "Add a question": paste an LLM's JSON, run the checks (app/server/contribute.py), save it, open a pull request.
 (function () {
   "use strict";
   const $ = (id) => document.getElementById(id);

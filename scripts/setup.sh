@@ -1,23 +1,25 @@
 #!/usr/bin/env bash
-# OA Mock setup for macOS and Linux.
-#   ./setup.sh               install what's missing (Python 3, C++ compiler, Java JDK), then start the mock
-#   ./setup.sh --no-java     skip the JDK
-#   ./setup.sh --no-start    set up only, don't start the runner
-#   ./setup.sh --only cpp    set up just one language (python, cpp or java); implies --no-start
-#   ./setup.sh --gui-auth    ask for the password in the system's own dialog instead of the terminal
-#                            (the app uses this when you install a language from the language menu)
+# OA Mock setup for macOS and Linux (run it from the app's folder):
+#   ./scripts/setup.sh               install what's missing (Python 3, C++, Java), add the oa-mock command, start the mock
+#   ./scripts/setup.sh --no-java     skip the JDK
+#   ./scripts/setup.sh --no-start    set up only, don't start the runner
+#   ./scripts/setup.sh --no-command  don't add the oa-mock command
+#   ./scripts/setup.sh --only cpp    set up just one language (python, cpp or java); implies --no-start
+#   ./scripts/setup.sh --gui-auth    ask for the password in the system's own dialog instead of the terminal
+#                                    (the app uses this when you install a language from the language menu)
 set -u
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."   # the app's folder
 
-WANT_JAVA=1; START=1; ONLY=""; GUI_AUTH=0
+WANT_JAVA=1; START=1; ONLY=""; GUI_AUTH=0; MAKE_CMD=1
 while [ $# -gt 0 ]; do
   case "$1" in
     --no-java) WANT_JAVA=0 ;;
     --no-start) START=0 ;;
+    --no-command) MAKE_CMD=0 ;;
     --only) shift; ONLY="${1:-}"; START=0
             case "$ONLY" in python|cpp|java) ;; *) echo "--only needs python, cpp or java"; exit 2 ;; esac ;;
     --gui-auth) GUI_AUTH=1 ;;
-    -h|--help) sed -n '2,8p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,9p' "$0"; exit 0 ;;
     *) echo "Unknown option: $1"; exit 2 ;;
   esac
   shift
@@ -82,7 +84,7 @@ as_root() {
     warn "This step needs root and sudo isn't installed. Run it as root."; return 1
   fi
   if [ -z "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]; then
-    warn "There's no desktop session to show a password dialog in. Run this in a terminal instead: ./setup.sh --only ${ONLY:-cpp}"
+    warn "There's no desktop session to show a password dialog in. Run this in a terminal instead: ./scripts/setup.sh --only ${ONLY:-cpp}"
     return 1
   fi
   if have pkexec; then
@@ -103,7 +105,7 @@ as_root() {
       SUDO_ASKPASS="$ap" sudo -A sh -c "$1"; return
     fi
   fi
-  warn "No password dialog is available (install pkexec, zenity or kdialog). Run this in a terminal instead: ./setup.sh --only ${ONLY:-cpp}"
+  warn "No password dialog is available (install pkexec, zenity or kdialog). Run this in a terminal instead: ./scripts/setup.sh --only ${ONLY:-cpp}"
   return 1
 }
 
@@ -135,7 +137,7 @@ if want python || [ "$START" = 1 ]; then
   if [ -z "$PY" ]; then
     warn "Python 3.8+ not found. Installing..."
     if [ "$OS" = "Darwin" ] && ! have brew; then
-      warn "Install Python from https://www.python.org/downloads/macos/ (or install Homebrew from https://brew.sh), then run this script again."
+      warn "Install Python from https://www.python.org/downloads/macos/ (or install Homebrew from https://brew.sh), then run ./scripts/setup.sh again."
       exit 1
     fi
     pkg_install python3 python3 python python3 python3 python || { warn "Couldn't install Python automatically. Install Python 3.8+ and run this again."; exit 1; }
@@ -166,7 +168,7 @@ if want cpp; then
       if clt_ready; then ok "$(/usr/bin/clang++ --version | head -1) (Apple clang works: the runner supplies <bits/stdc++.h>)"
       else warn "The Command Line Tools aren't installed yet. Finish the installer, then try again."; RESULT=1; fi
     else
-      warn "Finish the installer window, then run ./setup.sh again. (Apple clang works: the runner supplies <bits/stdc++.h>.)"
+      warn "Finish the installer window, then run ./scripts/setup.sh again. (Apple clang works: the runner supplies <bits/stdc++.h>.)"
     fi
   else
     warn "Installing g++..."
@@ -230,19 +232,50 @@ fi
 
 if [ -n "$ONLY" ]; then exit $RESULT; fi
 
-# ---------- launcher ----------
-cat > start.sh <<'EOF'
-#!/usr/bin/env bash
-# Start the OA mock. Stop it with Ctrl+C (Ctrl+Z only pauses it and keeps the port busy).
-cd "$(dirname "$0")"
-for c in python3 python; do command -v "$c" >/dev/null 2>&1 && exec "$c" run.py "$@"; done
-echo "Python 3 not found. Run ./setup.sh first."; exit 1
-EOF
-chmod +x start.sh
+# ---------- the oa-mock command ----------
+CMD_NOTE=""
+if [ "$MAKE_CMD" = 1 ]; then
+  step "The oa-mock command"
+  BIN="$HOME/.local/bin"
+  here="$(pwd)"; q="$(printf '%s' "$here" | sed "s/'/'\\\\''/g")"   # quoted for the script below
+  if mkdir -p "$BIN" && cat > "$BIN/oa-mock" <<LAUNCHER
+#!/bin/sh
+# Starts OA Mock from any folder. Made by scripts/setup.sh; run that again if you move the app.
+if [ ! -x '$q/start.sh' ]; then
+  echo "OA Mock isn't in $here any more. Run ./scripts/setup.sh --no-start in its new folder."; exit 1
+fi
+exec '$q/start.sh' "\$@"
+LAUNCHER
+  then
+    chmod +x "$BIN/oa-mock"
+    case ":$PATH:" in
+      *":$BIN:"*) ok "Type oa-mock in any terminal to start the mock." ;;
+      *)
+        case "$(basename "${SHELL:-sh}")" in
+          zsh)  RC="$HOME/.zshrc" ;;
+          bash) if [ "$OS" = "Darwin" ]; then RC="$HOME/.bash_profile"; else RC="$HOME/.bashrc"; fi ;;
+          *)    RC="$HOME/.profile" ;;
+        esac
+        if ! grep -qs 'OA Mock setup' "$RC"; then
+          printf '\n# added by OA Mock setup, for the oa-mock command\nexport PATH="$HOME/.local/bin:$PATH"\n' >> "$RC"
+        fi
+        ok "Type oa-mock in a new terminal window to start the mock (~/.local/bin was added to PATH in ~/${RC##*/})."
+        CMD_NOTE=" (in new terminal windows)" ;;
+    esac
+  else
+    warn "Couldn't create $BIN/oa-mock. Start the mock with ./start.sh instead."
+  fi
+fi
+
 step "Done"
-ok "Start the mock any time with ./start.sh (stop it with Ctrl+C)."
+if [ "$OS" = "Darwin" ]; then
+  ok "Start the mock any time: oa-mock$CMD_NOTE, ./start.sh in this folder, or double-click Start OA Mock.command in Finder."
+else
+  ok "Start the mock any time: oa-mock$CMD_NOTE, or ./start.sh in this folder."
+fi
+ok "Stop it with Ctrl+C."
 
 if [ "$START" = 1 ]; then
   echo
-  exec "$PY" run.py
+  exec "$PY" app/run.py
 fi

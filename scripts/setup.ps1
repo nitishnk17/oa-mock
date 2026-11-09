@@ -1,16 +1,18 @@
 # OA Mock setup for Windows 10/11 (PowerShell).
-#   Double-click setup.bat, or run:  powershell -ExecutionPolicy Bypass -File setup.ps1
+#   Double-click scripts\setup.bat, or run:  powershell -ExecutionPolicy Bypass -File scripts\setup.ps1
 #   -NoJava   skip the JDK
 #   -NoStart  set up only, don't start the runner
+#   -NoCommand  don't add the oa-mock command
 #   -Only cpp set up just one language (python, cpp or java); implies -NoStart
 #             (the app runs this when you install a language from the language menu; Windows shows UAC if an installer needs it)
-param([switch]$NoJava, [switch]$NoStart, [string]$Only = "")
+param([switch]$NoJava, [switch]$NoStart, [switch]$NoCommand, [string]$Only = "")
 if ($Only -and @("python", "cpp", "java") -notcontains $Only) { Write-Host "-Only needs python, cpp or java"; exit 2 }
 if ($Only) { $NoStart = $true }
 function Want($l) { return (-not $Only) -or ($Only -eq $l) }
 $result = 0
 $ErrorActionPreference = "Continue"
-Set-Location -Path $PSScriptRoot
+$AppDir = Split-Path -Parent $PSScriptRoot   # the app's folder (this script is in scripts\)
+Set-Location -Path $AppDir
 
 function Ok($m)   { Write-Host "  [ok] $m" -ForegroundColor Green }
 function Warn($m) { Write-Host "  [!]  $m" -ForegroundColor Yellow }
@@ -91,14 +93,25 @@ else {
 }
 if ($Only) { exit $result }
 
-# ---------- launcher ----------
-$launcher = "@echo off`r`ncd /d `"%~dp0`"`r`nrem Stop the mock with Ctrl+C.`r`nwhere py >nul 2>nul && (py -3 run.py %* & goto :eof)`r`npython run.py %*`r`n"
-Set-Content -Path (Join-Path $PSScriptRoot "start.bat") -Value $launcher -Encoding ASCII -NoNewline
+# ---------- the oa-mock command ----------
+# WindowsApps is on every user's PATH, so a small .cmd there works from any folder (in new windows).
+if (-not $NoCommand) {
+  Step "The oa-mock command"
+  $apps = Join-Path $env:LOCALAPPDATA "Microsoft\WindowsApps"
+  try {
+    $cmd = "@echo off`r`nrem Starts OA Mock from any folder. Made by scripts\setup.ps1; run it again if you move the app.`r`n" +
+           "if not exist `"$AppDir\start.bat`" (echo OA Mock isn't in $AppDir any more. Run scripts\setup.bat in its new folder.& exit /b 1)`r`n" +
+           "call `"$AppDir\start.bat`" %*`r`n"
+    Set-Content -Path (Join-Path $apps "oa-mock.cmd") -Value $cmd -Encoding ASCII -NoNewline -ErrorAction Stop
+    Ok "Type oa-mock in a new terminal window to start the mock."
+  } catch { Warn "Couldn't add the oa-mock command. Double-click start.bat instead." }
+}
+
 Step "Done"
-Ok "Start the mock any time by double-clicking start.bat (stop it with Ctrl+C)."
+Ok "Start the mock any time: double-click start.bat, or type oa-mock in a new terminal (stop it with Ctrl+C)."
 Ok "If a compiler was just installed and isn't detected, close this window and open a new one."
 
 if (-not $NoStart) {
   Write-Host ""
-  & $pyExe @pyArgs run.py
+  & $pyExe @pyArgs (Join-Path "app" "run.py")
 }

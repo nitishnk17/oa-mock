@@ -1,4 +1,4 @@
-"""Start the OA mock:  python3 run.py  (or  python3 -m oa_mock).
+"""Start the OA mock:  ./start.sh  (or  python3 app/run.py).
 
 Options:  --port N   (default 8765, or $OA_PORT)
           --no-browser
@@ -9,7 +9,7 @@ from . import __version__, data, judge, server, submissions
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(prog="oa_mock", description="Practice OA mocks, served on 127.0.0.1.")
+    ap = argparse.ArgumentParser(prog="oa-mock", description="Practice OA mocks, served on 127.0.0.1.")
     ap.add_argument("--port", type=int, default=int(os.environ.get("OA_PORT", "8765")))
     ap.add_argument("--no-browser", action="store_true", help="don't open a browser tab")
     args = ap.parse_args(argv)

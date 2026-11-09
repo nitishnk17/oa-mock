@@ -11,10 +11,10 @@ import json, os, subprocess, sys, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
-sys.path[:0] = [HERE, ROOT]
+sys.path[:0] = [HERE, os.path.join(ROOT, "app")]
 from specs import SPECS          # noqa: E402
 import convert                   # noqa: E402
-from oa_mock import judge        # noqa: E402
+from server import judge        # noqa: E402
 
 RET = {  # value the probe returns, per language, and how the driver must print it
     "int": ("7", "7", "7", "7", "7"), "long": ("12345678901", "12345678901LL", "12345678901L", "12345678901", "12345678901"),

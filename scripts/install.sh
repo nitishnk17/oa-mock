@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # One-line install for macOS and Linux:
-#   curl -fsSL https://raw.githubusercontent.com/rgabhi/oa-mock/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/rgabhi/oa-mock/main/scripts/install.sh | bash
 # Makes a slim clone in ./oa-mock (the app + Flipkart's questions, ~4 MB; download more companies on the
-# home page), then runs ./setup.sh. Options after "bash -s --" go to setup.sh, e.g.  | bash -s -- --no-java
+# home page), then runs scripts/setup.sh. Options after "bash -s --" go to setup.sh, e.g.  | bash -s -- --no-java
 # OA_DIR=path changes the folder; OA_FULL=1 clones every company.
 set -eu
 REPO="${OA_REPO:-https://github.com/rgabhi/oa-mock.git}"
@@ -50,4 +50,4 @@ fi
 
 cd "$DIR"
 say "Setting up in $(pwd)"
-exec bash ./setup.sh "$@"
+exec bash ./scripts/setup.sh "$@"

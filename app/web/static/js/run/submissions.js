@@ -1,5 +1,5 @@
 "use strict";
-// Past submissions: saved by the local server in .oa-cache/submissions/ (see oa_mock/submissions.py).
+// Past submissions: saved by the local server in .oa-cache/submissions/ (see app/server/submissions.py).
 
 const COMPANY = window.OA_COMPANY;   // URL key of this company, e.g. "amazon"
 

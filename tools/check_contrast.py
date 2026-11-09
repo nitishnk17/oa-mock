@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Checks the colour contrast of web/static/css/tokens.css, in light and dark (WCAG 2 ratios).
+"""Checks the colour contrast of app/web/static/css/tokens.css, in light and dark (WCAG 2 ratios).
 
     python3 tools/check_contrast.py
 
@@ -7,7 +7,7 @@ Text pairs need 4.5:1; line numbers, placeholders and comments inside a selectio
 """
 import os, re, sys
 
-CSS = os.path.join(os.path.dirname(__file__), "..", "web", "static", "css", "tokens.css")
+CSS = os.path.join(os.path.dirname(__file__), "..", "app", "web", "static", "css", "tokens.css")
 TEXT, UI = 4.5, 3.0
 
 

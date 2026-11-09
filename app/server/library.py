@@ -146,6 +146,31 @@ def _tidy():
 _tidy.python = True
 
 
+def _remember_head():
+    """Before an update: where the app was, so _app_changed can tell whether the app itself changed."""
+    with _lock:
+        _job["before"] = _git("rev-parse", "HEAD", timeout=20)[1].strip()
+
+
+_remember_head.python = True
+
+
+def _app_changed():
+    """After an update: if files of the app changed (not just questions), the running server is out of date."""
+    before = _job.get("before")
+    if not before:
+        return None
+    rc, out = _git("diff", "--name-only", before, "HEAD", "--", "app", "scripts", "start.sh", "start.bat", timeout=30)
+    if rc == 0 and out.strip():
+        with _lock:
+            _job["restart"] = True
+        return "The app itself changed: restart it to use the new version."
+    return None
+
+
+_app_changed.python = True
+
+
 def _run_job(steps):
     log = []
     def say(line):
@@ -199,9 +224,10 @@ def start(kind, key=None):
         steps = [("remove", _cone([k for k in installed if k != key]), 120)]
     elif kind == "update":
         if st.get("dirty"): raise ValueError("you have uncommitted changes to files from the repository; commit or stash them first")
-        steps = [tidy, pull]
+        steps = [("note", _remember_head, 0), tidy, pull]
         if st["sparse"]:
             steps.append(("refresh", _cone(installed), 900))
+        steps.append(("restart?", _app_changed, 0))
     elif kind == "check":
         steps = [("check", ["fetch", "--quiet", "origin"], 120)]
     else:

@@ -9,10 +9,10 @@ import json, os, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
-sys.path[:0] = [HERE, ROOT]
+sys.path[:0] = [HERE, os.path.join(ROOT, "app")]
 from specs import SPECS          # noqa: E402
 import convert                   # noqa: E402
-from oa_mock import judge        # noqa: E402
+from server import judge        # noqa: E402
 
 I32, JS_SAFE = 2**31 - 1, 2**53
 

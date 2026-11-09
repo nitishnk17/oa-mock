@@ -1,7 +1,7 @@
 """Installing C++ or Java from the app: runs the setup script for just that language in the background.
 
   status()               {langs: {cpp: {ok, desc, plan}, java: ...}, job}
-  start("install", lang) ./setup.sh --only <lang> --gui-auth   (setup.ps1 -Only <lang> on Windows)
+  start("install", lang) scripts/setup.sh --only <lang> --gui-auth   (scripts/setup.ps1 -Only <lang> on Windows)
   start("cancel")        stops the running install
 
 The password is never typed into the page. The operating system asks for it:
@@ -51,11 +51,11 @@ def _sudo_free():
 
 
 def _script():
-    return os.path.join(ROOT, "setup.ps1" if IS_WIN else "setup.sh")
+    return os.path.join(ROOT, "scripts", "setup.ps1" if IS_WIN else "setup.sh")
 
 
 def _terminal_cmd(lang):
-    return ("powershell -ExecutionPolicy Bypass -File setup.ps1 -Only %s" % lang) if IS_WIN else ("./setup.sh --only %s" % lang)
+    return ("powershell -ExecutionPolicy Bypass -File scripts\\setup.ps1 -Only %s" % lang) if IS_WIN else ("./scripts/setup.sh --only %s" % lang)
 
 
 def plan(lang):

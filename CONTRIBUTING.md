@@ -30,7 +30,7 @@ The app, `tools/add_question.py` and the pull-request check on GitHub all run th
 ## Add a question by hand
 
 1. Fork the repo and clone it (a slim clone is enough; see the README). For a new company, run `git sparse-checkout add data/<key>` before creating its folder so git tracks it.
-2. Write the question JSON. The format is in [`web/static/llm-prompt.md`](web/static/llm-prompt.md), which is the same prompt the app gives your LLM.
+2. Write the question JSON. The format is in [`app/web/static/llm-prompt.md`](app/web/static/llm-prompt.md), which is the same prompt the app gives your LLM.
 3. Check and save it:
    ```
    python3 tools/add_question.py <company> question.json                 # run the checks
@@ -55,4 +55,4 @@ Older questions keep their function specs in `tools/style/specs.py`. New ones ca
 - If a statement is too incomplete to grade, add it to `offlist` in `company.json` with a short reason instead of guessing.
 - `main` is protected: everything goes through a pull request. Pull requests that only touch `data/` and `sources/` can be merged once the PR checks pass. Changes to anything else (the app, tools, setup scripts) also need the maintainer's review (`.github/CODEOWNERS`). Open an issue first for big changes.
 - Keep the server dependency-free (Python standard library only) and the frontend build-free.
-- Styling: use the variables in `web/static/css/tokens.css` rather than raw colours, and run `python3 tools/check_contrast.py` if you change them.
+- Styling: use the variables in `app/web/static/css/tokens.css` rather than raw colours, and run `python3 tools/check_contrast.py` if you change them.

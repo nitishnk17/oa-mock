@@ -1,4 +1,4 @@
-// Home page: the companies on this computer and the ones you can download (see oa_mock/library.py).
+// Home page: the companies on this computer and the ones you can download (see app/server/library.py).
 (function () {
   "use strict";
   const $ = (id) => document.getElementById(id);
@@ -64,6 +64,7 @@
     let msg = "", cls = "notice";
     if (j && j.state === "running") msg = "<b>" + VERB[j.kind] + (j.company ? " " + esc(nameOf(j.company)) : "") + "…</b>";
     else if (j && j.state === "failed") { msg = "That didn't work: " + esc(j.error); cls += " bad"; }
+    else if (j && j.state === "done" && j.restart) { msg = "<b>The app was updated.</b> Restart it to use the new version: press Ctrl+C where it's running, then start it again (<code>oa-mock</code>, <code>start.bat</code> or <b>Start OA Mock.command</b>)."; cls += " info"; }
     else if (!st.git) msg = "Showing the companies in this folder. To download more, install the app with git (see the README).";
     else if (!st.remote) msg = "This copy has no GitHub remote to download from.";
     else if (st.behind) { msg = "<b>An update is available.</b> " + plural(st.behind, "new change") + ' on GitHub.<span class="sp"></span><button class="btn primary sm" data-act="update">Update</button>'; cls += " info"; }

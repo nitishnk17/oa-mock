@@ -240,7 +240,7 @@ def describe():
     """One line per language, printed at start-up."""
     return [
         ("C++", (GPP_DESC + ("  [bits/stdc++.h provided by the runner]" if USE_SHIM else "")
-                + ("\n          old MinGW GCC %d: it works, but run setup.bat to install a current GCC" % GPP_MAJOR if OLD_MINGW else "")) if GPP else "NOT FOUND: install it from the language menu in the app, or run the setup script"),
+                + ("\n          old MinGW GCC %d: it works, but run scripts\\setup.bat to install a current GCC" % GPP_MAJOR if OLD_MINGW else "")) if GPP else "NOT FOUND: install it from the language menu in the app, or run the setup script"),
         ("Java", JAVAC or "NOT FOUND: install it from the language menu in the app, or run the setup script"),
         ("Python", PY),
     ]

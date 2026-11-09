@@ -1,4 +1,4 @@
-// Installing C++ or Java from the app (see oa_mock/toolchain.py). Shared by the home page and the test app.
+// Installing C++ or Java from the app (see app/server/toolchain.py). Shared by the home page and the test app.
 //   OAInstall.missing(lang)     true when this computer can't run that language yet
 //   OAInstall.installing(lang)  true while its install runs
 //   OAInstall.button(lang)      the download icon for a missing language ("" otherwise); a click opens the dialog

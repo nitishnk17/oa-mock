@@ -31,7 +31,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from . import contribute, data, grading, judge, library, submissions, toolchain
 
-WEB_DIR = os.path.join(data.ROOT, "web")
+WEB_DIR = os.path.join(data.ROOT, "app", "web")
 STATIC_DIR = os.path.join(WEB_DIR, "static")
 TOKEN = secrets.token_hex(16)   # /run only accepts requests from pages this server rendered
 MAX_INPUTS = 50

@@ -22,8 +22,25 @@ One command downloads the app with Flipkart's questions (about 4 MB) into an `oa
 
 | OS | Install (first time) | Start (after that) |
 |---|---|---|
-| **macOS / Linux** | `curl -fsSL https://raw.githubusercontent.com/rgabhi/oa-mock/main/install.sh \| bash` | `cd oa-mock && ./start.sh` |
-| **Windows 10/11** (PowerShell) | `irm https://raw.githubusercontent.com/rgabhi/oa-mock/main/install.ps1 \| iex` | double-click **`start.bat`** in `oa-mock` |
+| **macOS** | `curl -fsSL https://raw.githubusercontent.com/rgabhi/oa-mock/main/scripts/install.sh \| bash` | `oa-mock` in a terminal, or double-click **`Start OA Mock.command`** in the `oa-mock` folder |
+| **Linux** | the same command | `oa-mock` in a terminal (or `./start.sh` in the folder) |
+| **Windows 10/11** (PowerShell) | `irm https://raw.githubusercontent.com/rgabhi/oa-mock/main/scripts/install.ps1 \| iex` | double-click **`start.bat`** in the `oa-mock` folder, or `oa-mock` in a terminal |
+
+The `oa-mock` command works in any new terminal window after setup. Stop the mock with **Ctrl+C**.
+
+In the `oa-mock` folder, the only things you use are the start files and the README:
+
+```
+oa-mock/
+  Start OA Mock.command    macOS: double-click to start
+  start.sh / start.bat     start (Linux and macOS / Windows)
+  README.md, CONTRIBUTING.md
+  app/        the app itself (server and web pages)
+  data/       the question banks, one folder per company
+  scripts/    setup and install scripts
+  tools/      checks for contributors
+  docs/  sources/
+```
 
 Then pick more companies on the home page and press **Download**; only those are fetched. Options: `| bash -s -- --no-java` skips the JDK, `| OA_DIR=path bash` picks another folder, and `| OA_FULL=1 bash` gets every company (about 40 MB).
 
@@ -32,18 +49,18 @@ Then pick more companies on the home page and press **Download**; only those are
 ```
 git clone --filter=blob:none --sparse https://github.com/rgabhi/oa-mock.git
 cd oa-mock
-git sparse-checkout set --cone .github docs oa_mock sources tools web data/flipkart
+git sparse-checkout set --cone .github app docs scripts sources tools data/flipkart
 ```
 
 Then run the setup script below. A plain `git clone` (every company) works too, and you can remove companies from the home page later.
 
-| OS | Setup (in the folder) | After that |
+| OS | Setup (in the folder, first time) | After that |
 |---|---|---|
-| **Windows 10/11** | double-click **`setup.bat`** | double-click **`start.bat`** |
-| **macOS** | `./setup.sh` | `./start.sh` |
-| **Linux** | `./setup.sh` | `./start.sh` |
+| **Windows 10/11** | double-click **`scripts\setup.bat`** | double-click **`start.bat`**, or `oa-mock` |
+| **macOS** | `./scripts/setup.sh` | `oa-mock`, or double-click **`Start OA Mock.command`** |
+| **Linux** | `./scripts/setup.sh` | `oa-mock`, or `./start.sh` |
 
-The setup script installs whatever is missing, then opens **http://127.0.0.1:8765** in your browser.
+The setup script installs whatever is missing, adds the `oa-mock` command, then opens **http://127.0.0.1:8765** in your browser.
 
 | Tool | Needed for | Windows | macOS | Linux |
 |---|---|---|---|---|
@@ -56,16 +73,19 @@ The setup script installs whatever is missing, then opens **http://127.0.0.1:876
 Linux setup supports apt, dnf, yum, pacman, zypper and apk (with `sudo`). Options:
 
 ```
-./setup.sh --no-java      # skip the JDK
-./setup.sh --no-start     # set up only, don't launch
-./setup.sh --only cpp     # just one language: python, cpp or java
-setup.bat -NoJava -NoStart
-setup.bat -Only java
+./scripts/setup.sh --no-java      # skip the JDK
+./scripts/setup.sh --no-start     # set up only, don't launch
+./scripts/setup.sh --no-command   # don't add the oa-mock command
+./scripts/setup.sh --only cpp     # just one language: python, cpp or java
+scripts\setup.bat -NoJava -NoStart -NoCommand
+scripts\setup.bat -Only java
 ```
 
-**Missing C++ or Java later?** You don't need a terminal. In the editor's language menu, a language that isn't installed shows a download icon (so do the language dots on the home page). Click it and the app runs the setup script for just that language in the background while you keep working. Your password is asked by the system, never by the page: macOS shows its own dialog (or Apple's Command Line Tools installer for C++), Linux shows the desktop's password dialog (`pkexec`, or `zenity`/`kdialog`), and Windows shows UAC if the installer needs it. When it finishes, Run and Submit work in that language without restarting the mock. On a Linux machine without a desktop session, the app shows the `./setup.sh --only …` command to run instead.
+The `oa-mock` command is a small script in `~/.local/bin` (on Windows, `oa-mock.cmd` in `%LOCALAPPDATA%\Microsoft\WindowsApps`). If `~/.local/bin` isn't on your PATH yet, setup adds it to your shell's startup file (`~/.zshrc`, `~/.bashrc` or `~/.bash_profile`). Moved the folder? Run setup again there.
 
-**No scripts?** If you have Python, just run `python3 run.py` (`py run.py` on Windows). Options: `--port 9000`, `--no-browser`. You can also set `OA_PORT`.
+**Missing C++ or Java later?** You don't need a terminal. In the editor's language menu, a language that isn't installed shows a download icon (so do the language dots on the home page). Click it and the app runs the setup script for just that language in the background while you keep working. Your password is asked by the system, never by the page: macOS shows its own dialog (or Apple's Command Line Tools installer for C++), Linux shows the desktop's password dialog (`pkexec`, or `zenity`/`kdialog`), and Windows shows UAC if the installer needs it. When it finishes, Run and Submit work in that language without restarting the mock. On a Linux machine without a desktop session, the app shows the `./scripts/setup.sh --only …` command to run instead.
+
+**No scripts?** If you have Python, just run `python3 app/run.py` (`py app\run.py` on Windows). Options: `--port 9000`, `--no-browser`. You can also set `OA_PORT`.
 
 ### Companies: download only what you need
 
@@ -117,7 +137,7 @@ Shortcuts (`Cmd` instead of `Ctrl` on a Mac; **F1** shows them all): `Ctrl+Enter
 
 ## Look and feel
 
-Light by default, with a dark theme (the moon button on the home page and in the top bars, or the editor settings). Warm ivory surfaces, charcoal text and a muted forest green for actions; Geist Sans for the interface and JetBrains Mono for code. Everything comes from one file of design tokens, [`web/static/css/tokens.css`](web/static/css/tokens.css), and `python3 tools/check_contrast.py` checks that every pairing of text and background stays readable (WCAG 4.5:1 for text) in both themes.
+Light by default, with a dark theme (the moon button on the home page and in the top bars, or the editor settings). Warm ivory surfaces, charcoal text and a muted forest green for actions; Geist Sans for the interface and JetBrains Mono for code. Everything comes from one file of design tokens, [`app/web/static/css/tokens.css`](app/web/static/css/tokens.css), and `python3 tools/check_contrast.py` checks that every pairing of text and background stays readable (WCAG 4.5:1 for text) in both themes.
 
 ## Past submissions
 
@@ -190,10 +210,12 @@ Formats: **Software Engineer** (3 questions, 90 min; the real test required at l
 | Problem | Fix |
 |---|---|
 | `OSError: Address already in use` | An older runner is still running, often because **Ctrl+Z** paused it instead of stopping it. Run `kill %1` or `lsof -ti tcp:8765 \| xargs kill`. The runner also falls back to the next free port. Always stop it with **Ctrl+C**. |
-| "No C++ compiler found" | Click the download icon next to C++17 in the language menu, or run setup again. On Windows, open a **new** terminal after installing so `g++` is on your PATH. On macOS, finish the Command Line Tools installer and re-run `./setup.sh`. |
-| Windows: C++ "Compilation error" mentioning `fs_path.h` / `filesystem` | An old MinGW (GCC 8.1, from the 2018 installer) is on your PATH, and its C++17 headers are broken. The mock now works around this automatically. For a proper fix, run `setup.bat`: it installs a current GCC alongside the old one, and the mock picks the newest. To force a specific compiler, run `set OA_CXX=C:\path\to\g++.exe` before `start.bat`. |
+| "No C++ compiler found" | Click the download icon next to C++17 in the language menu, or run setup again. On Windows, open a **new** terminal after installing so `g++` is on your PATH. On macOS, finish the Command Line Tools installer and re-run `./scripts/setup.sh`. |
+| Windows: C++ "Compilation error" mentioning `fs_path.h` / `filesystem` | An old MinGW (GCC 8.1, from the 2018 installer) is on your PATH, and its C++17 headers are broken. The mock now works around this automatically. For a proper fix, run `scripts\setup.bat`: it installs a current GCC alongside the old one, and the mock picks the newest. To force a specific compiler, run `set OA_CXX=C:\path\to\g++.exe` before `start.bat`. |
 | Java not detected on macOS | Install it from the language menu, or `brew install openjdk`. The mock finds Homebrew's JDK by itself; for `java` in Terminal too, run the `sudo ln -sfn …` command that brew prints. |
-| Blank page or "not found" | Open the mock through the server (`python3 run.py`), at the `127.0.0.1` address it prints. Opening the HTML files directly won't work. |
+| Blank page or "not found" | Open the mock through the server (`oa-mock` or `./start.sh`), at the `127.0.0.1` address it prints. Opening the HTML files directly won't work. |
+| `oa-mock: command not found` | Open a new terminal window (setup added `~/.local/bin` to your PATH), or run `./scripts/setup.sh --no-start` again in the app's folder. |
+| After updating, `./start.sh` says it's fetching new folders | A one-time step: since November 2026 the app lives in `app/` and the scripts in `scripts/`, and a slim copy checks those folders out. |
 
 ---
 
@@ -202,18 +224,20 @@ Formats: **Software Engineer** (3 questions, 90 min; the real test required at l
 A small web app with a Python standard-library backend. There's nothing to `pip install` or `npm install`.
 
 ```
-run.py                     entry point (python3 run.py [--port N] [--no-browser])
-oa_mock/                   backend (Python 3.8+, stdlib only)
+start.sh, start.bat        start the app (start.sh also moves old copies to this layout, once)
+Start OA Mock.command      macOS: double-click to start (runs start.sh in Terminal)
+app/run.py                 entry point (python3 app/run.py [--port N] [--no-browser])
+app/server/                backend (Python 3.8+, stdlib only; tools import it as `server`)
   __main__.py              start-up: prints compilers, binds 127.0.0.1, opens the browser
   server.py                HTTP routes: pages, static files, /api/companies, /api/library, /api/toolchain, /api/grade, POST /run
   judge.py                 compiles and runs code: g++/clang (C++17), javac/java, Python; detect() finds them again
-  toolchain.py             installs C++ / Java from the app: runs setup.sh --only <lang> --gui-auth in the background
+  toolchain.py             installs C++ / Java from the app: runs scripts/setup.sh --only <lang> --gui-auth in the background
   grading.py               runs an answer on a question's tests on the server (hidden tests never reach the page)
   library.py               companies here vs on GitHub; download / update / remove with git sparse checkout
   contribute.py            checks a new question, saves it, opens a pull request with the GitHub CLI
   submissions.py           saves / lists / reads past submissions in .oa-cache/
   data.py                  loads data/<company>/, reloading when files change
-web/                       frontend (plain HTML/CSS/JS, no build step)
+app/web/                   frontend (plain HTML/CSS/JS, no build step)
   index.html, app.html     home page (static/js/landing.js); the test app (one template for every company)
   contribute.html          "Add a question" (static/js/contribute.js; static/llm-prompt.md is the prompt for your LLM)
   static/css/tokens.css    the design tokens every page uses: colours (light and dark), type, radii, shadows, motion
@@ -246,12 +270,12 @@ tools/
                            in 4 languages; verify.py and selftest.py check them
   meta_backfill.py         one-off: year / role / college from each question's source
   amazon/                  generators that build data/amazon/ (statements, tests, debugging repo, SJT)
-install.sh, install.ps1    one-line installers: slim clone, then setup
-setup.sh, setup.ps1/.bat   install Python / C++ / Java if missing (--only <lang> for one); start.sh / start.bat launch
+scripts/install.sh, .ps1   one-line installers: slim clone, then setup
+scripts/setup.sh, .ps1/.bat  install Python / C++ / Java if missing (--only <lang> for one) and add the oa-mock command
 .github/                   PR checks workflow, CODEOWNERS
 ```
 
-**Request flow.** `GET /amazon` renders `web/app.html`, which loads the vendored editor, then `/api/companies/amazon/data.js` (that company's config and questions, without hidden tests), then the app scripts. C++, Java and Python answers go to `POST /api/grade`: the server runs them on the samples or on all tests and returns a verdict per test, with the data of only the first failing hidden test. JavaScript answers and the debugging repo run in a Web Worker in the page, which fetches that one question's hidden tests when you submit. The server only listens on `127.0.0.1`, checks the `Host` header, and requires a per-run token on `/run`, `/api/grade`, `/api/library` and `/api/submissions`.
+**Request flow.** `GET /amazon` renders `app/web/app.html`, which loads the vendored editor, then `/api/companies/amazon/data.js` (that company's config and questions, without hidden tests), then the app scripts. C++, Java and Python answers go to `POST /api/grade`: the server runs them on the samples or on all tests and returns a verdict per test, with the data of only the first failing hidden test. JavaScript answers and the debugging repo run in a Web Worker in the page, which fetches that one question's hidden tests when you submit. The server only listens on `127.0.0.1`, checks the `Host` header, and requires a per-run token on `/run`, `/api/grade`, `/api/library` and `/api/submissions`.
 
 ### Adding or editing questions
 
