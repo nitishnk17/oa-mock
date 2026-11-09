@@ -1,0 +1,42 @@
+/* Installing a language from the app (install.js): the download icon, the dialog and its message.
+   Loaded by the home page and the test app; colours and type come from tokens.css. */
+
+.oi-btn{flex:none;width:26px;height:26px;display:inline-grid;place-items:center;padding:0;border:1px solid var(--border);border-radius:var(--r-sm);
+  background:var(--surface);color:var(--accent);cursor:pointer;transition:border-color var(--dur) var(--ease),background var(--dur) var(--ease)}
+.oi-btn:hover{border-color:var(--accent);background:var(--accent-soft)}
+.oi-btn:focus-visible{outline:0;box-shadow:var(--focus)}
+.oi-btn svg{width:14px;height:14px}
+.oi-btn.sm{width:22px;height:22px}
+.oi-btn.sm svg{width:12px;height:12px}
+.oi-btn.busy{color:var(--text-2)}
+
+.oi-spin{display:inline-block;width:12px;height:12px;border-radius:50%;border:2px solid var(--border-strong);border-top-color:var(--accent);
+  animation:oi-spin .8s linear infinite;vertical-align:-1px}
+h3 .oi-spin{width:15px;height:15px;margin-right:6px}
+@keyframes oi-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.oi-spin{animation-duration:2.4s}}
+
+.oi-dlg{border:0;padding:0;background:transparent;max-width:min(520px,94vw);width:100%;color:var(--text)}
+.oi-dlg::backdrop{background:var(--overlay)}
+.oi-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px;display:grid;gap:12px;box-shadow:var(--sh-pop);
+  font:var(--fs-14)/var(--lh) var(--sans)}
+.oi-box h3{margin:0;font:600 var(--fs-20)/var(--lh-tight) var(--sans);letter-spacing:var(--track-head);display:flex;align-items:center}
+.oi-box p{margin:0}
+.oi-box .oi-ok{color:var(--success-ink)}
+.oi-muted{color:var(--text-2);font-size:var(--fs-13)}
+.oi-note{padding:9px 12px;border-radius:var(--r-sm);background:var(--surface-2);border:1px solid var(--border-soft)}
+.oi-note:empty{display:none}
+.oi-box code{font:.9em var(--mono);background:var(--surface-2);border:1px solid var(--border-soft);border-radius:5px;padding:1px 5px}
+.oi-cmd{margin:0;font:13px/1.5 var(--mono);background:var(--code-bg);color:var(--code-ink);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 12px;
+  white-space:pre-wrap;word-break:break-all;user-select:all}
+.oi-log summary{cursor:pointer;color:var(--text-2);font-size:var(--fs-13)}
+.oi-log pre{margin:8px 0 0;max-height:220px;overflow:auto;white-space:pre-wrap;font:12px/1.5 var(--mono);color:var(--text-2);background:var(--surface-2);
+  border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:10px 12px}
+.oi-log pre:empty::before{content:"Starting…"}
+.oi-row{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:4px}
+
+.oi-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(16px);opacity:0;pointer-events:none;z-index:80;max-width:min(560px,92vw);
+  background:var(--text);color:var(--bg);padding:10px 16px;border-radius:var(--r);font:500 var(--fs-14)/1.4 var(--sans);box-shadow:var(--sh-pop);
+  transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease)}
+.oi-toast.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
+.oi-link{border:0;background:none;padding:0;margin-left:6px;color:inherit;font:inherit;text-decoration:underline;text-underline-offset:2px;cursor:pointer}

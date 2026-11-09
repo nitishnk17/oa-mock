@@ -156,7 +156,24 @@ body.dragging{user-select:none;cursor:grabbing}
 .work{display:grid;grid-template-rows:auto minmax(0,1fr) auto;min-height:0;background:var(--bg-2)}
 .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--border);background:var(--surface)}
 .toolbar select{height:34px;border:1px solid var(--border);background-color:var(--surface);border-radius:var(--r-sm);padding:0 30px 0 10px;font-size:var(--fs-13);font-weight:500}
-.toolbar select#lang{max-width:160px}
+/* language menu (langpick.js): a button + popover so a missing language can carry an install icon */
+.lp{position:relative;display:inline-flex}
+.lp-btn{height:34px;max-width:240px;border:1px solid var(--border);background:var(--surface) var(--chevron) no-repeat right 11px center/10px 6px;border-radius:var(--r-sm);
+  padding:0 30px 0 10px;font:500 var(--fs-13)/1 var(--sans);color:var(--text);display:inline-flex;align-items:center;gap:8px;white-space:nowrap;
+  transition:border-color var(--dur) var(--ease)}
+.lp-btn:hover{border-color:var(--border-strong)}
+.lp-btn:focus-visible,.lp-btn[aria-expanded="true"]{outline:0;border-color:var(--accent);box-shadow:var(--focus)}
+.lp-flag{font-size:var(--fs-12);font-weight:500;color:var(--amber-ink);background:var(--amber-soft);border-radius:4px;padding:3px 6px}
+.lp-pop{position:absolute;top:calc(100% + 6px);left:0;z-index:40;min-width:250px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:var(--sh-pop);padding:5px;display:grid;gap:2px}
+.lp-row{display:flex;align-items:center;gap:6px;padding-right:4px;border-radius:var(--r-sm)}
+.lp-row:hover{background:var(--surface-2)}
+.lp-opt{flex:1;display:flex;align-items:center;gap:8px;min-height:34px;padding:0 8px;border:0;background:none;border-radius:var(--r-sm);text-align:left;
+  font:500 var(--fs-13)/1.2 var(--sans);color:var(--text)}
+.lp-opt:focus-visible{outline:0;box-shadow:var(--focus)}
+.lp-opt[aria-pressed="true"]{color:var(--accent)}
+.lp-check{width:12px;flex:none;font-size:12px}
+.lp-note{margin-left:auto;font-size:var(--fs-12);font-weight:400;color:var(--text-2)}
 .toolbar .spacer{flex:1}
 .toolbar .btn{padding:0 11px}
 .status{font-size:var(--fs-12);color:var(--text-2)}

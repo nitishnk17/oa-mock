@@ -24,6 +24,12 @@ function bindPanels(){
   $("#ctoggle").addEventListener("click", () => setConsole(!UI.min));
 }
 function setStat(text, cls){ const s = $("#cstat"); if (s){ s.textContent = text; s.className = "cstat " + (cls || ""); } }
+function missingHelp(lang){
+  const n = OAInstall.NAME[lang], busy = OAInstall.installing(lang), what = lang === "cpp" ? "a C++ compiler" : "a Java JDK";
+  return `<div class="missing-help"><div class="verdict warn">${busy ? `Installing ${n}…` : `${LANGS[lang].label} isn't installed on this computer`}</div>`
+    + `<p style="margin:0 0 10px">${busy ? `When it finishes, Run and Submit work in ${n}. You can keep writing code meanwhile.` : `Run and Submit need ${what}. You can keep writing code; install it here, or switch to Python or JavaScript.`}</p>`
+    + `<button class="btn ${busy ? "" : "primary"}" data-install="${lang}">${busy ? "Show progress" : `Install ${n}`}</button></div>`;
+}
 function localHelp(){
   return `<div class="verdict warn">C++ and Java run on your own computer</div><p style="margin:0 0 6px">A browser page can't compile C++, so this page only runs Python, JavaScript and SQL. To use C++ or Java, run the local runner that came with this test:</p><pre class="tc" style="padding:8px 10px;margin:0 0 6px">python3 oa_mock_local.py</pre><p class="muted" style="margin:0">On a Mac, double-click <b>Start OA Mock.command</b> instead. It opens this same test at http://127.0.0.1:8765 and compiles with your g++ (C++17) and javac. You can keep writing C++ here, but Run and Submit need the local runner.</p>`;
 }

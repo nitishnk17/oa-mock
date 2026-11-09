@@ -53,9 +53,16 @@ def _candidates():
         p = shutil.which(n)
         if p:
             c.append(p)
+    # macOS: /usr/bin/g++ and clang++ are stubs that open Apple's installer until the Command Line Tools are in
+    clt = True
+    if IS_MAC:
+        try: clt = subprocess.run(["xcode-select", "-p"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=20).returncode == 0
+        except Exception: clt = False
     seen, out = set(), []
     for p in c:
         k = os.path.normcase(os.path.realpath(p))
+        if not clt and k.startswith("/usr/bin/"):
+            continue
         if k not in seen and os.path.isfile(p):
             seen.add(k); out.append(p)
     return out
@@ -83,13 +90,85 @@ def find_cxx():
     return best[1] if best else (None, False, 0, "")
 
 
-GPP, GPP_IS_CLANG, GPP_MAJOR, GPP_DESC = find_cxx()   # resolved once at import
-OLD_MINGW = bool(GPP) and IS_WIN and not GPP_IS_CLANG and 0 < GPP_MAJOR < 10
 SHIM_DIR = os.path.join(tempfile.gettempdir(), "oamock_shim")
 os.makedirs(os.path.join(SHIM_DIR, "bits"), exist_ok=True)
 with open(os.path.join(SHIM_DIR, "bits", "stdc++.h"), "w") as f:
     f.write(SHIM_HEADERS)
-USE_SHIM = GPP_IS_CLANG or OLD_MINGW or os.environ.get("OA_FORCE_SHIM") == "1"
+
+
+def _java_dirs():
+    """JDK bin folders that often aren't on PATH: Homebrew's keg-only openjdk, Temurin/Microsoft JDKs on Windows."""
+    if IS_MAC:
+        return ["/opt/homebrew/opt/openjdk/bin", "/usr/local/opt/openjdk/bin"]
+    if IS_WIN:
+        out = []
+        for base in (os.environ.get("ProgramFiles", r"C:\Program Files"),):
+            for vendor in ("Eclipse Adoptium", "Microsoft", "Java", "Zulu"):
+                out += sorted(glob.glob(os.path.join(base, vendor, "*", "bin")), reverse=True)
+        return out
+    return []
+
+
+def _javac_works(javac):
+    # macOS ships /usr/bin/javac as a stub that pops up an "install Java" dialog when there's no JDK;
+    # java_home answers the same question silently.
+    if IS_MAC and os.path.realpath(javac).startswith("/usr/bin/"):
+        try:
+            if subprocess.run(["/usr/libexec/java_home"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=20).returncode:
+                return False
+        except Exception:
+            return False
+    try:
+        return subprocess.run([javac, "-version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=60).returncode == 0
+    except Exception:
+        return False
+
+
+def find_java():
+    """(javac, java) from a working JDK, or (None, None)."""
+    for d in [None] + _java_dirs():
+        javac, java = shutil.which("javac", path=d), shutil.which("java", path=d)
+        if javac and java and _javac_works(javac):
+            return javac, java
+    return None, None
+
+
+def _refresh_windows_path():
+    """A compiler installed after this server started is on the registry PATH, not on ours yet."""
+    try:
+        import winreg
+        parts = []
+        for root, key in ((winreg.HKEY_LOCAL_MACHINE, r"SYSTEM\CurrentControlSet\Control\Session Manager\Environment"),
+                          (winreg.HKEY_CURRENT_USER, r"Environment")):
+            try:
+                with winreg.OpenKey(root, key) as k:
+                    parts += os.path.expandvars(winreg.QueryValueEx(k, "Path")[0]).split(";")
+            except OSError:
+                pass
+        parts.append(os.path.join(os.environ.get("LOCALAPPDATA", ""), "Microsoft", "WinGet", "Links"))
+        cur = os.environ.get("PATH", "").split(";")
+        os.environ["PATH"] = ";".join(cur + [p for p in parts if p and p not in cur])
+    except Exception:
+        pass
+
+
+def detect():
+    """Find the compilers (again). Called at import, and after the app installs a language."""
+    global GPP, GPP_IS_CLANG, GPP_MAJOR, GPP_DESC, OLD_MINGW, USE_SHIM, JAVAC, JAVA
+    if IS_WIN:
+        _refresh_windows_path()
+    GPP, GPP_IS_CLANG, GPP_MAJOR, GPP_DESC = find_cxx()
+    OLD_MINGW = bool(GPP) and IS_WIN and not GPP_IS_CLANG and 0 < GPP_MAJOR < 10
+    USE_SHIM = GPP_IS_CLANG or OLD_MINGW or os.environ.get("OA_FORCE_SHIM") == "1"
+    JAVAC, JAVA = find_java()
+
+
+def available():
+    """{lang: True/False} for the languages that run here (JavaScript runs in the page)."""
+    return {"cpp": bool(GPP), "java": bool(JAVAC and JAVA), "py": True, "js": True}
+
+
+detect()
 
 
 def cxx_args(src, exe, shim=None):
@@ -114,7 +193,6 @@ def compile_cxx(src, exe):
     return c.returncode, err
 
 
-JAVAC, JAVA = which("javac"), which("java")
 PY = sys.executable
 
 def run_cmd(args, inp, limit_s, cwd):
@@ -135,14 +213,14 @@ def judge(lang, code, inputs, limit_ms):
     d = tempfile.mkdtemp(prefix="oamock_")
     try:
         if lang == "cpp":
-            if not GPP: return {"compile_error": "No C++ compiler found. On macOS run: xcode-select --install  (or: brew install gcc). On Windows install MinGW-w64 and add g++ to PATH. Then restart this runner."}
+            if not GPP: return {"compile_error": "No C++ compiler found. Install it from the language menu (the download icon next to C++17), or run the setup script."}
             src = os.path.join(d, "main.cpp"); exe = os.path.join(d, "main.exe" if IS_WIN else "main")
             open(src, "w", encoding="utf-8").write(code)
             rc, err = compile_cxx(src, exe)
             if rc != 0: return {"compile_error": err[-6000:]}
             args = [exe]
         elif lang == "java":
-            if not (JAVAC and JAVA): return {"compile_error": "javac/java were not found. Install a JDK and restart this runner."}
+            if not (JAVAC and JAVA): return {"compile_error": "javac/java were not found. Install a JDK from the language menu (the download icon next to Java), or run the setup script."}
             open(os.path.join(d, "Main.java"), "w", encoding="utf-8").write(code)
             c = subprocess.run([JAVAC, "-encoding", "UTF-8", "Main.java"], cwd=d, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
             if c.returncode != 0: return {"compile_error": c.stderr.decode("utf-8", "replace")[-6000:]}
@@ -162,8 +240,8 @@ def describe():
     """One line per language, printed at start-up."""
     return [
         ("C++", (GPP_DESC + ("  [bits/stdc++.h provided by the runner]" if USE_SHIM else "")
-                + ("\n          old MinGW GCC %d: it works, but run setup.bat to install a current GCC" % GPP_MAJOR if OLD_MINGW else "")) if GPP else "NOT FOUND (macOS: xcode-select --install or brew install gcc; Windows: run setup.bat)"),
-        ("Java", JAVAC or "NOT FOUND (install a JDK, or run the setup script)"),
+                + ("\n          old MinGW GCC %d: it works, but run setup.bat to install a current GCC" % GPP_MAJOR if OLD_MINGW else "")) if GPP else "NOT FOUND: install it from the language menu in the app, or run the setup script"),
+        ("Java", JAVAC or "NOT FOUND: install it from the language menu in the app, or run the setup script"),
         ("Python", PY),
     ]
 

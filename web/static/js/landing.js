@@ -76,8 +76,10 @@
     const L = lib.langs || {}, mine = lib.companies.filter((c) => c.installed);
     const qs = mine.reduce((n, c) => n + (c.questions || 0), 0), years = new Set();
     mine.forEach((c) => (c.years || []).forEach((y) => years.add(y)));
-    $("langs").innerHTML = [["C++17", L.cpp], ["Java", L.java], ["Python", true], ["JavaScript", true]]
-      .map(([n, ok]) => "<li" + (ok ? "" : ' class="no" title="Not installed on this computer"') + ">" + n + "</li>").join("");
+    const I = window.OAInstall, ok = (l) => (I && I.tools ? !I.missing(l) : L[l]);
+    $("langs").innerHTML = [["C++17", "cpp"], ["Java", "java"], ["Python", "py"], ["JavaScript", "js"]]
+      .map(([n, l]) => l === "py" || l === "js" || ok(l) ? "<li>" + n + "</li>"
+        : '<li class="no" title="Not installed on this computer">' + n + (I ? I.button(l, "sm") : "") + "</li>").join("");
     const facts = [["Companies", mine.length], ["Questions", qs], ["Available", lib.companies.length - mine.length], ["Years", years.size ? Math.min(...years) + "–" + String(Math.max(...years)).slice(2) : "—"]];
     $("facts").innerHTML = facts.map(([k, v]) => "<div><dt>" + k + "</dt><dd>" + v + "</dd></div>").join("");
     $("facts").hidden = false;
@@ -132,5 +134,6 @@
     const t = e.target;
     if (e.key === "/" && !/INPUT|TEXTAREA|SELECT/.test(t.tagName) && !e.ctrlKey && !e.metaKey) { e.preventDefault(); $("q").focus(); }
   });
+  if (window.OAInstall) window.OAInstall.onChange(() => { if (lib) header(); });
   load();
 })();

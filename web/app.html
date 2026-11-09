@@ -12,8 +12,9 @@
   <link rel="stylesheet" href="/static/vendor/codemirror/addon/foldgutter.css">
   <link rel="stylesheet" href="/static/vendor/codemirror/addon/dialog.css">
   <link rel="stylesheet" href="/static/css/app.css">
+  <link rel="stylesheet" href="/static/css/install.css">
   <script src="/static/js/theme.js"></script>
-  <script>window.LOCAL_JUDGE = true; window.LOCAL_TOKEN = {{token}}; window.OA_COMPANY = "{{company}}";</script>
+  <script>window.LOCAL_JUDGE = true; window.LOCAL_TOKEN = {{token}}; window.OA_COMPANY = "{{company}}"; window.OA_TOOLS = {{tools}};</script>
 </head>
 <body>
   <div id="app"></div>
@@ -47,10 +48,14 @@
   <!-- this company's questions and config, from data/{{company}}/ -->
   <script src="/api/companies/{{company}}/data.js"></script>
 
+  <!-- installing C++ / Java from the language menu (shared with the home page) -->
+  <script src="/static/js/install.js"></script>
+
   <!-- the app; order matters: core first, main last -->
   <script src="/static/js/core/config.js"></script>
   <script src="/static/js/core/util.js"></script>
   <script src="/static/js/exam/editor.js"></script>
+  <script src="/static/js/exam/langpick.js"></script>
   <script src="/static/js/run/workers.js"></script>
   <script src="/static/js/run/sql.js"></script>
   <script src="/static/js/run/judge.js"></script>

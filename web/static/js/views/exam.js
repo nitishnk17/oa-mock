@@ -30,19 +30,18 @@ function examHTML(){
   const tabs = e.ids.map((x, i) => { const b = e.best[x], qq = QMAP[x], na = qq.type === "sjt" ? sjtAnswered(qq, e.ans && e.ans[x]) : 0;
     const cls = qq.type === "sjt" ? (na === qq.items.length ? "full" : na ? "part" : "") : !b ? "" : b.score === 100 ? "full" : b.score > 0 ? "part" : ""; return `<button class="qtab" data-q="${i}" aria-current="${i === e.cur}" title="${esc(qq.title)}">Q${i + 1}<span class="dot ${cls}"></span></button>`; }).join("");
   if (q.type === "sjt") return examBar(e, tabs) + sjtHTML(q, e);
-  const langOpts = (q.type === "sql" ? ["sql"] : q.type === "debug" ? ["js"] : CODE_LANGS).map(l => `<option value="${l}" ${l === lang ? "selected" : ""}>${LANGS[l].label}</option>`).join("");
+  const langs = q.type === "sql" ? ["sql"] : q.type === "debug" ? ["js"] : CODE_LANGS;
   return examBar(e, tabs) + `
   <div class="exam">
     <article class="stmt" id="stmt">${stmtHTML(q)}</article>
     <div class="rz-v" id="rz-v" role="separator" aria-orientation="vertical" aria-label="Resize the problem panel" tabindex="0"></div>
     <section class="work" aria-label="Code editor">
       <div class="toolbar">
-        <label for="lang" class="sr-only">Language</label>
-        <select id="lang" title="${q.type === "sql" ? "SQL engine: AlaSQL" : lang === "js" ? "JavaScript runs in your browser" : "Runs on your computer"}">${langOpts}</select>
+        ${langPickerHTML(langs, lang, "Language: " + (q.type === "sql" ? "SQL engine: AlaSQL" : lang === "js" ? "JavaScript runs in your browser" : "runs on your computer"))}
         <button class="btn" id="reset" title="Replace the code with the starter template">Reset</button>
         <button class="btn" id="subs-btn" title="Your past submissions for this question">Submissions</button>
         <span class="ed-wrap"><button class="icon-btn" id="edset" title="Editor and appearance settings: suggestions, brackets, font size, keys, theme…" aria-haspopup="dialog" aria-label="Editor settings"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4.5h7M12.5 4.5h1M2.5 11.5h1M6.5 11.5h7"/><circle cx="11" cy="4.5" r="1.5"/><circle cx="5" cy="11.5" r="1.5"/></svg></button></span>
-        <span class="status" id="rt">${q.type === "sql" ? "SQL engine: AlaSQL" : NEEDS_LOCAL(lang) ? "Needs the local runner" : LOCAL && lang !== "js" ? "Runs on your computer" + (lang === "cpp" ? " (g++)" : lang === "java" ? " (javac)" : " (python)") : lang === "py" ? "Python runs in your browser (first run loads it)" : "JavaScript runs in your browser"}</span>
+        <span class="status" id="rt">${runtimeNote(q, lang)}</span>
         <div class="spacer"></div>
         <button class="btn" id="run">Run code</button>
         <button class="btn primary" id="submit">Submit code</button>
@@ -59,11 +58,17 @@ function examHTML(){
         </div>
         <div class="console-body" id="cbody">
           <textarea class="custom-in" id="custom" hidden placeholder="Type custom input here"></textarea>
-          <div id="out">${NEEDS_LOCAL(lang) ? localHelp() : `<p class="muted">Run your code to see the results here.</p>`}</div>
+          <div id="out">${NEEDS_LOCAL(lang) ? localHelp() : langMissing(lang) ? missingHelp(lang) : `<p class="muted">Run your code to see the results here.</p>`}</div>
         </div>
       </div>
     </section>
   </div>`;
+}
+function runtimeNote(q, lang){
+  return q.type === "sql" ? "SQL engine: AlaSQL" : NEEDS_LOCAL(lang) ? "Needs the local runner"
+    : langMissing(lang) ? (OAInstall.installing(lang) ? "Installing " + OAInstall.NAME[lang] + "…" : LANGS[lang].label + " isn't installed on this computer")
+    : LOCAL && lang !== "js" ? "Runs on your computer" + (lang === "cpp" ? " (g++)" : lang === "java" ? " (javac)" : " (python)")
+    : lang === "py" ? "Python runs in your browser (first run loads it)" : "JavaScript runs in your browser";
 }
 function examBar(e, tabs){
   return `

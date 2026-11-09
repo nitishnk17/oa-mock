@@ -49,7 +49,7 @@ The setup script installs whatever is missing, then opens **http://127.0.0.1:876
 |---|---|---|---|---|
 | Python 3.8+ | the mock itself (**required**) | `winget` Python 3.12 | python.org / Homebrew | package manager |
 | C++ compiler | C++ answers | MinGW-w64 (WinLibs) via `winget` | Apple Command Line Tools* | `g++` |
-| Java JDK | Java answers | Temurin 21 via `winget` | `brew install openjdk` | OpenJDK |
+| Java JDK | Java answers | Temurin 21 via `winget` | `brew install openjdk` (or the Temurin installer without Homebrew) | OpenJDK |
 
 \*Apple clang works: the runner supplies `<bits/stdc++.h>` itself.
 
@@ -58,8 +58,12 @@ Linux setup supports apt, dnf, yum, pacman, zypper and apk (with `sudo`). Option
 ```
 ./setup.sh --no-java      # skip the JDK
 ./setup.sh --no-start     # set up only, don't launch
+./setup.sh --only cpp     # just one language: python, cpp or java
 setup.bat -NoJava -NoStart
+setup.bat -Only java
 ```
+
+**Missing C++ or Java later?** You don't need a terminal. In the editor's language menu, a language that isn't installed shows a download icon (so do the language dots on the home page). Click it and the app runs the setup script for just that language in the background while you keep working. Your password is asked by the system, never by the page: macOS shows its own dialog (or Apple's Command Line Tools installer for C++), Linux shows the desktop's password dialog (`pkexec`, or `zenity`/`kdialog`), and Windows shows UAC if the installer needs it. When it finishes, Run and Submit work in that language without restarting the mock. On a Linux machine without a desktop session, the app shows the `./setup.sh --only …` command to run instead.
 
 **No scripts?** If you have Python, just run `python3 run.py` (`py run.py` on Windows). Options: `--port 9000`, `--no-browser`. You can also set `OA_PORT`.
 
@@ -186,9 +190,9 @@ Formats: **Software Engineer** (3 questions, 90 min; the real test required at l
 | Problem | Fix |
 |---|---|
 | `OSError: Address already in use` | An older runner is still running, often because **Ctrl+Z** paused it instead of stopping it. Run `kill %1` or `lsof -ti tcp:8765 \| xargs kill`. The runner also falls back to the next free port. Always stop it with **Ctrl+C**. |
-| "No C++ compiler found" | Run setup again. On Windows, open a **new** terminal after installing so `g++` is on your PATH. On macOS, finish the Command Line Tools installer and re-run `./setup.sh`. |
+| "No C++ compiler found" | Click the download icon next to C++17 in the language menu, or run setup again. On Windows, open a **new** terminal after installing so `g++` is on your PATH. On macOS, finish the Command Line Tools installer and re-run `./setup.sh`. |
 | Windows: C++ "Compilation error" mentioning `fs_path.h` / `filesystem` | An old MinGW (GCC 8.1, from the 2018 installer) is on your PATH, and its C++17 headers are broken. The mock now works around this automatically. For a proper fix, run `setup.bat`: it installs a current GCC alongside the old one, and the mock picks the newest. To force a specific compiler, run `set OA_CXX=C:\path\to\g++.exe` before `start.bat`. |
-| Java not detected on macOS | `brew install openjdk`, then run the `sudo ln -sfn …` command that brew prints. |
+| Java not detected on macOS | Install it from the language menu, or `brew install openjdk`. The mock finds Homebrew's JDK by itself; for `java` in Terminal too, run the `sudo ln -sfn …` command that brew prints. |
 | Blank page or "not found" | Open the mock through the server (`python3 run.py`), at the `127.0.0.1` address it prints. Opening the HTML files directly won't work. |
 
 ---
@@ -201,8 +205,9 @@ A small web app with a Python standard-library backend. There's nothing to `pip 
 run.py                     entry point (python3 run.py [--port N] [--no-browser])
 oa_mock/                   backend (Python 3.8+, stdlib only)
   __main__.py              start-up: prints compilers, binds 127.0.0.1, opens the browser
-  server.py                HTTP routes: pages, static files, /api/companies, /api/library, /api/grade, POST /run
-  judge.py                 compiles and runs code: g++/clang (C++17), javac/java, Python
+  server.py                HTTP routes: pages, static files, /api/companies, /api/library, /api/toolchain, /api/grade, POST /run
+  judge.py                 compiles and runs code: g++/clang (C++17), javac/java, Python; detect() finds them again
+  toolchain.py             installs C++ / Java from the app: runs setup.sh --only <lang> --gui-auth in the background
   grading.py               runs an answer on a question's tests on the server (hidden tests never reach the page)
   library.py               companies here vs on GitHub; download / update / remove with git sparse checkout
   contribute.py            checks a new question, saves it, opens a pull request with the GitHub CLI
@@ -214,11 +219,12 @@ web/                       frontend (plain HTML/CSS/JS, no build step)
   static/css/tokens.css    the design tokens every page uses: colours (light and dark), type, radii, shadows, motion
   static/css/site.css      shared parts of the home and contribute pages; app.css is the test app
   static/vendor/fonts/     Geist Sans and JetBrains Mono (OFL), bundled so pages work offline
-  static/css/              app.css, index.css
+  static/css/              app.css, index.css, install.css (the install icon and dialog)
+  static/js/install.js     installing a missing language: icon, dialog with the script's log, progress (both pages)
   static/js/core/          config.js (data, languages, saved state), util.js
   static/js/run/           workers.js (JavaScript answers in a Web Worker), sql.js, judge.js (calls /run, grades),
                            submissions.js (talks to /api/submissions)
-  static/js/exam/          editor.js (settings, indentation, suggestions, snippets, shortcuts), session.js (start/end),
+  static/js/exam/          editor.js (settings, indentation, suggestions, snippets, shortcuts), langpick.js (language menu), session.js (start/end),
                            panels.js, controls.js (timer, navigation, Run/Submit)
   static/js/views/         render.js, home.js, exam.js, report.js, submissions.js (list + viewer)
   static/js/main.js        global listeners and first render (loaded last)
@@ -241,7 +247,7 @@ tools/
   meta_backfill.py         one-off: year / role / college from each question's source
   amazon/                  generators that build data/amazon/ (statements, tests, debugging repo, SJT)
 install.sh, install.ps1    one-line installers: slim clone, then setup
-setup.sh, setup.ps1/.bat   install Python / C++ / Java if missing; start.sh / start.bat launch
+setup.sh, setup.ps1/.bat   install Python / C++ / Java if missing (--only <lang> for one); start.sh / start.bat launch
 .github/                   PR checks workflow, CODEOWNERS
 ```
 

@@ -4,6 +4,8 @@ GET  /                               home page: your companies, and ones you can
 GET  /api/library                    companies here and on GitHub, git status, the running job
 POST /api/library                    {action: check|download|update|remove, company} -> starts a job (see library.py)
 GET  /api/library/job                progress of the running job
+GET  /api/toolchain                  C++ / Java: installed?, how installing would work here, the running install
+POST /api/toolchain                  {action: install|cancel, lang} -> runs the setup script for that language (see toolchain.py)
 GET  /contribute                     "Add a question" page
 GET  /api/contribute/status          companies here, and what sending a pull request needs (git, gh, sign-in)
 POST /api/contribute/check           {company, question} -> the checks (see contribute.py)
@@ -27,7 +29,7 @@ import html, json, mimetypes, os, secrets
 from urllib.parse import parse_qs, urlsplit
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from . import contribute, data, grading, judge, library, submissions
+from . import contribute, data, grading, judge, library, submissions, toolchain
 
 WEB_DIR = os.path.join(data.ROOT, "web")
 STATIC_DIR = os.path.join(WEB_DIR, "static")
@@ -120,7 +122,8 @@ class Handler(BaseHTTPRequestHandler):
             links = "".join('<div class="tile mine"><a class="cover" href="/%s" aria-label="%s"></a><div class="tile-head"><div class="logo">'
                             '<span class="mono-gram">%s</span></div><div><div class="tile-name">%s</div><div class="tile-tag">%s</div></div></div></div>'
                             % (k, html.escape(n), html.escape(k[:1].upper() + k[1:2]), html.escape(n), html.escape(t)) for k, n, t in data.companies())
-            return self._send(200, _template("index.html", companies=links, token=json.dumps(TOKEN)), "text/html; charset=utf-8")
+            return self._send(200, _template("index.html", companies=links, token=json.dumps(TOKEN), tools=_script_json(toolchain.status())),
+                              "text/html; charset=utf-8")
 
         if parts == ["contribute"]:
             return self._send(200, _template("contribute.html", token=json.dumps(TOKEN)), "text/html; charset=utf-8")
@@ -131,6 +134,11 @@ class Handler(BaseHTTPRequestHandler):
             st["companies"] = [{"key": k, "name": n} for k, n, _ in data.companies()]
             return self._json(200, st)
 
+        if parts == ["api", "toolchain"]:
+            if not self._token_ok():
+                return self._json(403, {"error": "forbidden"})
+            return self._json(200, toolchain.status())
+
         if parts[:2] == ["api", "library"]:
             if not self._token_ok():
                 return self._json(403, {"error": "forbidden"})
@@ -138,7 +146,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(200, library.job())
             if not parts[2:]:
                 out = library.listing()
-                out["langs"] = {"cpp": bool(judge.GPP), "java": bool(judge.JAVAC and judge.JAVA), "py": True, "js": True}
+                out["langs"] = judge.available()
                 return self._json(200, out)
             return self._not_found()
 
@@ -165,7 +173,7 @@ class Handler(BaseHTTPRequestHandler):
             if p is None:
                 return self._not_found()
             page = _template("app.html", title=html.escape(p["config"].get("name", parts[0])),
-                             token=json.dumps(TOKEN), company=parts[0])
+                             token=json.dumps(TOKEN), company=parts[0], tools=_script_json(toolchain.status()))
             return self._send(200, page, "text/html; charset=utf-8")
         self._not_found()
 
@@ -219,6 +227,14 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(200, library.start(str(req.get("action", "")), req.get("company")))
             except (ValueError, submissions.BadRequest) as e:
                 return self._json(400, {"error": str(e)})
+        if urlsplit(self.path).path == "/api/toolchain":
+            if not self._token_ok():
+                return self._json(403, {"error": "forbidden"})
+            try:
+                req = self._body()
+                return self._json(200, toolchain.start(str(req.get("action", "")), req.get("lang")))
+            except (ValueError, submissions.BadRequest) as e:
+                return self._json(400, {"error": str(e)})
         if urlsplit(self.path).path == "/api/grade":
             if not self._token_ok():
                 return self._json(403, {"error": "forbidden"})
@@ -239,6 +255,11 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as e:
             res = {"compile_error": "Runner error: %s" % e}
         self._send(200, json.dumps(res), "application/json")
+
+
+def _script_json(obj):
+    """JSON to put inside a <script> tag: no "</" (a compiler's version line could hold anything)."""
+    return json.dumps(obj).replace("</", "<\\/")
 
 
 def _preview(q):

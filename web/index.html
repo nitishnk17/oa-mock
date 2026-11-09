@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="/static/css/tokens.css">
   <link rel="stylesheet" href="/static/css/site.css">
   <link rel="stylesheet" href="/static/css/index.css">
+  <link rel="stylesheet" href="/static/css/install.css">
   <script src="/static/js/theme.js"></script>
 </head>
 <body>
@@ -65,7 +66,8 @@
     <details id="joblog" class="log" hidden><summary>Details</summary><pre></pre></details>
     <footer class="foot"><span>Made by students, for students</span><a href="https://github.com/rgabhi/oa-mock/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a><span class="sp"></span><span><kbd>/</kbd> filter &nbsp; <kbd>↵</kbd> open the first match</span></footer>
   </main>
-  <script>window.LOCAL_TOKEN = {{token}};</script>
+  <script>window.LOCAL_TOKEN = {{token}}; window.OA_TOOLS = {{tools}};</script>
+  <script src="/static/js/install.js"></script>
   <script src="/static/js/landing.js"></script>
 </body>
 </html>

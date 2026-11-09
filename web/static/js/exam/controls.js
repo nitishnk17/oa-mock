@@ -45,6 +45,7 @@ function bindExam(){
   const kh = $("#keys-help"); if (kh) kh.addEventListener("click", showShortcuts);
   mountEditor($("#editor"), codeOf(id, e.lang[id]), e.lang[id]);
   bindNav(e);
+  bindLangPicker();
   $("#lang").addEventListener("change", ev => { saveCode(); e.lang[id] = ev.target.value; if (q.type === "code") { S.lang = ev.target.value; store.set(K + "-lang", S.lang); } saveExam(); render(); });
   $("#reset").addEventListener("click", () => { const v = starterOf(q, bufKey(q, e.lang[id])); if (cm) cm.setValue(v); else if (ta) ta.value = v; saveCode(); });
   $("#run").addEventListener("click", () => doRun(false));
@@ -59,6 +60,7 @@ async function doRun(full){
   saveCode();
   const e = S.exam, id = e.ids[e.cur], q = QMAP[id], lang = e.lang[id];
   if (q.type === "sjt") return;
+  if (langMissing(lang)){ $("#out").innerHTML = missingHelp(lang); if (UI.min) setConsole(false); setStat(LANGS[lang].label + " isn't installed", "bad"); return; }
   const code = srcOf(q, codeOf(id, lang), lang);
   const out = $("#out"), runB = $("#run"), subB = $("#submit");
   busy = true; runB.disabled = subB.disabled = true;
