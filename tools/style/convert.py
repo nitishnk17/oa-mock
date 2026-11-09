@@ -26,28 +26,41 @@ PRE = {
     "java": "import java.util.*;\nimport java.io.*;\n",
     "js": "",
 }
-SCALAR = {"int", "long", "str", "line", "bool"}
+SCALAR = {"int", "long", "double", "str", "line", "bool"}
+# "double" values print with a fixed number of decimals: the spec's "dp" (required when "ret" is double).
+# Every language rounds the exact binary value (Java through BigDecimal, HALF_EVEN like printf), so the four agree
+# unless a value sits exactly on a tie; tests should keep exact answers away from ties.
 
 # ---------------------------------------------------------------- types per language
-PY_T = {"int": "int", "long": "int", "str": "str", "line": "str", "bool": "bool", "int[]": "List[int]", "long[]": "List[int]",
-        "str[]": "List[str]", "bool[]": "List[bool]", "int[][]": "List[List[int]]"}
-CPP_T = {"int": "int", "long": "long long", "str": "string", "line": "string", "bool": "bool", "int[]": "vector<int>",
-         "long[]": "vector<long long>", "str[]": "vector<string>", "bool[]": "vector<bool>", "int[][]": "vector<vector<int>>"}
-JAVA_T = {"int": "int", "long": "long", "str": "String", "line": "String", "bool": "boolean", "int[]": "int[]", "long[]": "long[]",
-          "str[]": "String[]", "bool[]": "boolean[]", "int[][]": "int[][]"}
-JS_T = {"int": "number", "long": "number", "str": "string", "line": "string", "bool": "boolean", "int[]": "number[]",
-        "long[]": "number[]", "str[]": "string[]", "bool[]": "boolean[]", "int[][]": "number[][]"}
+PY_T = {"int": "int", "long": "int", "double": "float", "str": "str", "line": "str", "bool": "bool", "int[]": "List[int]", "long[]": "List[int]",
+        "double[]": "List[float]", "str[]": "List[str]", "bool[]": "List[bool]", "int[][]": "List[List[int]]"}
+CPP_T = {"int": "int", "long": "long long", "double": "double", "str": "string", "line": "string", "bool": "bool", "int[]": "vector<int>",
+         "long[]": "vector<long long>", "double[]": "vector<double>", "str[]": "vector<string>", "bool[]": "vector<bool>", "int[][]": "vector<vector<int>>"}
+JAVA_T = {"int": "int", "long": "long", "double": "double", "str": "String", "line": "String", "bool": "boolean", "int[]": "int[]", "long[]": "long[]",
+          "double[]": "double[]", "str[]": "String[]", "bool[]": "boolean[]", "int[][]": "int[][]"}
+JS_T = {"int": "number", "long": "number", "double": "number", "str": "string", "line": "string", "bool": "boolean", "int[]": "number[]",
+        "long[]": "number[]", "double[]": "number[]", "str[]": "string[]", "bool[]": "boolean[]", "int[][]": "number[][]"}
 DEFAULT = {  # value an untouched stub returns, so it compiles and prints something of the right shape
-    "py": {"int": "0", "long": "0", "str": '""', "bool": "False", "arr": "[]"},
-    "cpp": {"int": "0", "long": "0", "str": '""', "bool": "false", "arr": "{}"},
-    "java": {"int": "0", "long": "0", "str": '""', "bool": "false", "int[]": "new int[0]", "long[]": "new long[0]", "str[]": "new String[0]",
-             "bool[]": "new boolean[0]", "int[][]": "new int[0][]"},
-    "js": {"int": "0", "long": "0", "str": '""', "bool": "false", "arr": "[]"},
+    "py": {"int": "0", "long": "0", "double": "0.0", "str": '""', "bool": "False", "arr": "[]"},
+    "cpp": {"int": "0", "long": "0", "double": "0.0", "str": '""', "bool": "false", "arr": "{}"},
+    "java": {"int": "0", "long": "0", "double": "0.0", "str": '""', "bool": "false", "int[]": "new int[0]", "long[]": "new long[0]",
+             "double[]": "new double[0]", "str[]": "new String[0]", "bool[]": "new boolean[0]", "int[][]": "new int[0][]"},
+    "js": {"int": "0", "long": "0", "double": "0", "str": '""', "bool": "false", "arr": "[]"},
 }
 
 
 def ret_base(ret):
     return ret.split("/")[0]
+
+
+def dp(spec):
+    """Decimals for a double result."""
+    if not ret_base(spec["ret"]).startswith("double"):
+        return None
+    d = spec.get("dp")
+    if not isinstance(d, int) or not 0 <= d <= 12:
+        raise ValueError('a "double" result needs "dp": the number of decimals to print (0-12)')
+    return d
 
 
 def params(spec):
@@ -88,22 +101,27 @@ def py_post(spec):
             L.append("    " + "; ".join("%s = []" % n for n, _ in cols))
             L.append("    for _ in range(%s):" % lenexpr(it[1]))
             for j, (n, t) in enumerate(cols):
-                L.append("        %s.append(%s)" % (n, "int(_t[_p + %d])" % j if t in ("int", "long") else "_t[_p + %d]" % j))
+                L.append("        %s.append(%s)" % (n, ("int(_t[_p + %d])" if t in ("int", "long") else "float(_t[_p + %d])" if t == "double" else "_t[_p + %d]") % j))
             L.append("        _p += %d" % len(cols))
             continue
         n, t = it[0], it[1]
         if t in ("int", "long"): L.append("    %s = int(_t[_p]); _p += 1" % n)
+        elif t == "double": L.append("    %s = float(_t[_p]); _p += 1" % n)
         elif t == "str": L.append("    %s = _t[_p]; _p += 1" % n)
         elif t == "line": L.append('    %s = _raw.rstrip("\\r\\n")' % n)
         elif t in ("int[]", "long[]"): L.append("    %s = list(map(int, _t[_p:_p + %s])); _p += %s" % (n, lenexpr(it[2]), lenexpr(it[2])))
+        elif t == "double[]": L.append("    %s = list(map(float, _t[_p:_p + %s])); _p += %s" % (n, lenexpr(it[2]), lenexpr(it[2])))
         elif t == "str[]": L.append("    %s = _t[_p:_p + %s]; _p += %s" % (n, lenexpr(it[2]), lenexpr(it[2])))
         elif t == "int[][]":
             R, C = lenexpr(it[2]), lenexpr(it[3])
             L.append("    %s = [list(map(int, _t[_p + _i * %s:_p + (_i + 1) * %s])) for _i in range(%s)]; _p += %s * %s" % (n, C, C, R, R, C))
         else: raise ValueError(t)
     L.append("    _r = Solution().%s(%s)" % (spec["fn"], ", ".join(n for n, _ in params(spec))))
-    r = spec["ret"]
-    if r in ("int", "long", "str"): L.append("    print(_r)")
+    r, d = spec["ret"], dp(spec)
+    if r == "double": L.append('    print("%%.%df" %% _r)' % d)
+    elif r == "double[]": L.append('    print(" ".join("%%.%df" %% _x for _x in _r))' % d)
+    elif r == "double[]/lines": L.append('    print("\\n".join("%%.%df" %% _x for _x in _r))' % d)
+    elif r in ("int", "long", "str"): L.append("    print(_r)")
     elif r == "bool": L.append('    print("true" if _r else "false")')
     elif r == "bool[]/lines": L.append('    print("\\n".join("true" if _x else "false" for _x in _r))')
     elif r.endswith("/lines"): L.append('    print("\\n".join(map(str, _r)))')
@@ -132,18 +150,19 @@ def cpp_post(spec):
             L.append("    for (int _i = 0; _i < %s; _i++) cin%s;" % (n_, "".join(" >> %s[_i]" % n for n, _ in cols)))
             continue
         n, t = it[0], it[1]
-        if t in ("int", "long", "str"): L.append("    %s %s; cin >> %s;" % (CPP_T[t], n, n))
+        if t in ("int", "long", "double", "str"): L.append("    %s %s; cin >> %s;" % (CPP_T[t], n, n))
         elif t == "line":
             L.append("    string %s((istreambuf_iterator<char>(cin)), istreambuf_iterator<char>());" % n)
             L.append("    while (!%s.empty() && (%s.back() == '\\n' || %s.back() == '\\r')) %s.pop_back();" % (n, n, n, n))
-        elif t in ("int[]", "long[]", "str[]"):
+        elif t in ("int[]", "long[]", "double[]", "str[]"):
             L.append("    %s %s(%s); for (auto& _x : %s) cin >> _x;" % (CPP_T[t], n, lenexpr(it[2]), n))
         elif t == "int[][]":
             L.append("    vector<vector<int>> %s(%s, vector<int>(%s)); for (auto& _row : %s) for (auto& _x : _row) cin >> _x;" % (n, lenexpr(it[2]), lenexpr(it[3]), n))
         else: raise ValueError(t)
     L.append("    auto _r = Solution().%s(%s);" % (spec["fn"], ", ".join(n for n, _ in params(spec))))
-    r = spec["ret"]
-    if r in ("int", "long", "str"): L.append('    cout << _r << "\\n";')
+    r, d = spec["ret"], dp(spec)
+    if d is not None: L.append("    cout << fixed << setprecision(%d);" % d)
+    if r in ("int", "long", "str", "double"): L.append('    cout << _r << "\\n";')
     elif r == "bool": L.append('    cout << (_r ? "true" : "false") << "\\n";')
     elif r == "bool[]/lines": L.append('    for (bool _x : _r) cout << (_x ? "true" : "false") << "\\n";')
     elif r.endswith("/lines"): L.append('    for (auto& _x : _r) cout << _x << "\\n";')
@@ -154,7 +173,8 @@ def cpp_post(spec):
 
 
 # ---------------------------------------------------------------- Java
-J_PARSE = {"int": "Integer.parseInt(_t[_p++])", "long": "Long.parseLong(_t[_p++])", "str": "_t[_p++]"}
+J_PARSE = {"int": "Integer.parseInt(_t[_p++])", "long": "Long.parseLong(_t[_p++])", "double": "Double.parseDouble(_t[_p++])", "str": "_t[_p++]"}
+J_FMT = "new java.math.BigDecimal(%s).setScale(%d, java.math.RoundingMode.HALF_EVEN).toPlainString()"   # rounds like printf
 
 
 def java_stub(spec):
@@ -177,7 +197,7 @@ def java_post(spec):
         n, t = it[0], it[1]
         if t in J_PARSE: L.append("        %s %s = %s;" % (JAVA_T[t], n, J_PARSE[t]))
         elif t == "line": L.append('        String %s = _raw.replaceAll("[\\\\r\\\\n]+$", "");' % n)
-        elif t in ("int[]", "long[]", "str[]"):
+        elif t in ("int[]", "long[]", "double[]", "str[]"):
             e = t[:-2]
             L.append("        %s %s = new %s[%s]; for (int _i = 0; _i < %s.length; _i++) %s[_i] = %s;" % (JAVA_T[t], n, JAVA_T[e], lenexpr(it[2]), n, n, J_PARSE[e]))
         elif t == "int[][]":
@@ -186,8 +206,11 @@ def java_post(spec):
     rt = JAVA_T[ret_base(spec["ret"])]
     L.append("        %s _r = new Solution().%s(%s);" % (rt, spec["fn"], ", ".join(n for n, _ in params(spec))))
     L.append("        StringBuilder _sb = new StringBuilder();")
-    r = spec["ret"]
-    if r in ("int", "long", "str"): L.append("        _sb.append(_r).append('\\n');")
+    r, d = spec["ret"], dp(spec)
+    if r == "double": L.append("        _sb.append(%s).append('\\n');" % (J_FMT % ("_r", d)))
+    elif r == "double[]": L.append("        for (int _i = 0; _i < _r.length; _i++) { if (_i > 0) _sb.append(' '); _sb.append(%s); }\n        _sb.append('\\n');" % (J_FMT % ("_r[_i]", d)))
+    elif r == "double[]/lines": L.append("        for (int _i = 0; _i < _r.length; _i++) _sb.append(%s).append('\\n');" % (J_FMT % ("_r[_i]", d)))
+    elif r in ("int", "long", "str"): L.append("        _sb.append(_r).append('\\n');")
     elif r == "bool": L.append('        _sb.append(_r ? "true" : "false").append(\'\\n\');')
     elif r == "bool[]/lines": L.append('        for (boolean _x : _r) _sb.append(_x ? "true" : "false").append(\'\\n\');')
     elif r.endswith("/lines"): L.append("        for (int _i = 0; _i < _r.length; _i++) _sb.append(_r[_i]).append('\\n');")
@@ -211,20 +234,23 @@ def js_post(spec):
         if it[0] == "rows":
             cols, n_ = it[2], lenexpr(it[1])
             L.append("    const %s;" % ", ".join("%s = []" % n for n, _ in cols))
-            L.append("    for (let _i = 0; _i < %s; _i++) { %s }" % (n_, " ".join("%s.push(%s);" % (n, "Number(_t[_p++])" if t in ("int", "long") else "_t[_p++]") for n, t in cols)))
+            L.append("    for (let _i = 0; _i < %s; _i++) { %s }" % (n_, " ".join("%s.push(%s);" % (n, "Number(_t[_p++])" if t in ("int", "long", "double") else "_t[_p++]") for n, t in cols)))
             continue
         n, t = it[0], it[1]
-        if t in ("int", "long"): L.append("    const %s = Number(_t[_p++]);" % n)
+        if t in ("int", "long", "double"): L.append("    const %s = Number(_t[_p++]);" % n)
         elif t == "str": L.append("    const %s = _t[_p++];" % n)
         elif t == "line": L.append('    const %s = _raw.replace(/[\\r\\n]+$/, "");' % n)
-        elif t in ("int[]", "long[]"): L.append("    const %s = _t.slice(_p, _p + %s).map(Number); _p += %s;" % (n, lenexpr(it[2]), lenexpr(it[2])))
+        elif t in ("int[]", "long[]", "double[]"): L.append("    const %s = _t.slice(_p, _p + %s).map(Number); _p += %s;" % (n, lenexpr(it[2]), lenexpr(it[2])))
         elif t == "str[]": L.append("    const %s = _t.slice(_p, _p + %s); _p += %s;" % (n, lenexpr(it[2]), lenexpr(it[2])))
         elif t == "int[][]":
             L.append("    const %s = []; for (let _i = 0; _i < %s; _i++) { %s.push(_t.slice(_p, _p + %s).map(Number)); _p += %s; }" % (n, lenexpr(it[2]), n, lenexpr(it[3]), lenexpr(it[3])))
         else: raise ValueError(t)
     L.append("    const _r = %s(%s);" % (spec["fn"], ", ".join(n for n, _ in params(spec))))
-    r = spec["ret"]
-    if r in ("int", "long", "str"): L.append("    console.log(String(_r));")
+    r, d = spec["ret"], dp(spec)
+    if r == "double": L.append("    console.log(_r.toFixed(%d));" % d)
+    elif r == "double[]": L.append('    console.log(_r.map(_x => _x.toFixed(%d)).join(" "));' % d)
+    elif r == "double[]/lines": L.append('    console.log(_r.map(_x => _x.toFixed(%d)).join("\\n"));' % d)
+    elif r in ("int", "long", "str"): L.append("    console.log(String(_r));")
     elif r == "bool": L.append('    console.log(_r ? "true" : "false");')
     elif r == "bool[]/lines": L.append('    console.log(_r.map(_x => _x ? "true" : "false").join("\\n"));')
     elif r.endswith("/lines"): L.append('    console.log(_r.join("\\n"));')

@@ -27,8 +27,21 @@ RET = {  # value the probe returns, per language, and how the driver must print 
     "str[]/lines": ('["x", "y z"]', '{"x", "y z"}', 'new String[]{"x", "y z"}', '["x", "y z"]', "x\ny z"),
     "bool[]/lines": ("[True, False]", "{true, false}", "new boolean[]{true, false}", "[true, false]", "true\nfalse"),
     "int[][]": ("[[1, 2], [3]]", "{{1, 2}, {3}}", "new int[][]{{1, 2}, {3}}", "[[1, 2], [3]]", "1 2\n3"),
+    # doubles: the last items are the values and separator; probes() formats them with the spec's "dp"
+    "double": ("2.375", "2.375", "2.375", "2.375", (2.375,), " "),
+    "double[]": ("[1.5, 0.0625, 3.0]", "{1.5, 0.0625, 3.0}", "new double[]{1.5, 0.0625, 3.0}", "[1.5, 0.0625, 3.0]", (1.5, 0.0625, 3.0), " "),
+    "double[]/lines": ("[1.5, 3.0]", "{1.5, 3.0}", "new double[]{1.5, 3.0}", "[1.5, 3.0]", (1.5, 3.0), "\n"),
 }
 
+# parameters that hold doubles print with 6 decimals in every language (_D), so the probes compare exactly
+PY_D = '    @staticmethod\n    def _D(x):\n        return " ".join("%.6f" % v for v in x) if isinstance(x, list) else "%.6f" % x\n'
+CPP_D = """string _D(double x){char b[64]; snprintf(b, sizeof b, "%.6f", x); return b;}
+string _D(const vector<double>& v){string s; for(size_t i=0;i<v.size();i++){if(i) s+=' '; s+=_D(v[i]);} return s;}
+"""
+JAVA_D = """    static String _D(double x){return String.format(java.util.Locale.ROOT, "%.6f", x);}
+    static String _D(double[] a){StringBuilder b=new StringBuilder(); for(int i=0;i<a.length;i++){if(i>0)b.append(' ');b.append(_D(a[i]));} return b.toString();}
+"""
+JS_D = 'const _D = x => Array.isArray(x) ? x.map(v => v.toFixed(6)).join(" ") : x.toFixed(6);\n'
 PY_H = 'def _S(x):\n    if isinstance(x, list): return "|".join(" ".join(map(str, r)) for r in x) if x and isinstance(x[0], list) else " ".join(map(str, x))\n    return str(x)\n'
 CPP_H = """string _S(long long x){return to_string(x);} string _S(const string& x){return x;}
 template<class T> string _S(const vector<T>& v){string s; for(size_t i=0;i<v.size();i++){if(i) s+=' '; s+=_S(v[i]);} return s;}
@@ -45,17 +58,20 @@ JS_H = 'const _S = x => Array.isArray(x) ? (x.length && Array.isArray(x[0]) ? x.
 
 def probes(spec):
     ps = convert.params(spec); r = RET[spec["ret"]]
+    if isinstance(r[4], tuple):   # a double result: the driver prints it with "dp" decimals
+        r = r[:4] + (r[5].join("%.*f" % (convert.dp(spec), v) for v in r[4]),)
     names = [n for n, _ in ps]
-    py = "class Solution:\n" + "\n".join("    " + l for l in PY_H.splitlines()) + "\n    def %s(self, %s):\n%s        return %s\n" % (
-        spec["fn"], ", ".join(names), "".join('        print("%s=" + Solution._S(%s))\n' % (n, n) for n in names), r[0])
+    pr = {n: ("_D" if t.startswith("double") else "_S") for n, t in ps}
+    py = "class Solution:\n" + "\n".join("    " + l for l in PY_H.splitlines()) + "\n" + PY_D + "    def %s(self, %s):\n%s        return %s\n" % (
+        spec["fn"], ", ".join(names), "".join('        print("%s=" + Solution.%s(%s))\n' % (n, pr[n], n) for n in names), r[0])
     py = py.replace("    def _S(x):", "    @staticmethod\n    def _S(x):")
-    cpp = CPP_H + "class Solution {\npublic:\n    %s %s(%s) {\n%s        return %s;\n    }\n};\n" % (
+    cpp = CPP_H + CPP_D + "class Solution {\npublic:\n    %s %s(%s) {\n%s        return %s;\n    }\n};\n" % (
         convert.CPP_T[convert.ret_base(spec["ret"])], spec["fn"], ", ".join(convert.cpp_param(n, t) for n, t in ps),
-        "".join('        cout << "%s=" << _S(%s) << "\\n";\n' % (n, n) for n in names), r[1])
-    java = "class Solution {\n" + JAVA_H + "    public %s %s(%s) {\n%s        return %s;\n    }\n}\n" % (
+        "".join('        cout << "%s=" << %s(%s) << "\\n";\n' % (n, pr[n], n) for n in names), r[1])
+    java = "class Solution {\n" + JAVA_H + JAVA_D + "    public %s %s(%s) {\n%s        return %s;\n    }\n}\n" % (
         convert.JAVA_T[convert.ret_base(spec["ret"])], spec["fn"], ", ".join("%s %s" % (convert.JAVA_T[t], n) for n, t in ps),
-        "".join('        System.out.println("%s=" + _S(%s));\n' % (n, n) for n in names), r[2])
-    js = JS_H + "var %s = function(%s) {\n%s    return %s;\n};\n" % (spec["fn"], ", ".join(names), "".join('    console.log("%s=" + _S(%s));\n' % (n, n) for n in names), r[3])
+        "".join('        System.out.println("%s=" + %s(%s));\n' % (n, pr[n], n) for n in names), r[2])
+    js = JS_H + JS_D + "var %s = function(%s) {\n%s    return %s;\n};\n" % (spec["fn"], ", ".join(names), "".join('    console.log("%s=" + %s(%s));\n' % (n, pr[n], n) for n in names), r[3])
     return {"py": py, "cpp": cpp, "java": java, "js": js}, r[4]
 
 

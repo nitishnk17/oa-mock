@@ -42,14 +42,15 @@ Rules:
 - Tests are plain stdin text and the exact expected stdout. `samples`: 1-2 with an explanation in `ex`. `hidden`: 8-15 tests covering edge cases (smallest n, duplicates, negatives, all equal, answer 0, overflow) and at least one maximum-size input. Hidden tests must not all have the same answer.
 - Compute every expected output by running the reference solution. Don't work outputs out by hand.
 - `spec` says how the hidden driver reads the input and calls the function (LeetCode style). `read` items, in input order:
-  - `[name, "int"|"long"|"str"]` reads one token.
-  - `[name, "int[]"|"long[]"|"str[]", L]` reads L tokens. L is a number or the name of an earlier item.
+  - `[name, "int"|"long"|"double"|"str"]` reads one token.
+  - `[name, "int[]"|"long[]"|"double[]"|"str[]", L]` reads L tokens. L is a number or the name of an earlier item.
   - `[name, "int[][]", R, C]` reads R rows of C ints.
   - `[name, "line"]` reads the whole input as one string.
   - `["rows", L, [[name, type], ...]]` reads L rows of mixed columns, one array per column.
   - Names starting with `_` are read but not passed to the function (counts the arrays already carry).
   - Use `long` for values that can exceed 2^31.
   - `ret` is one of `int`, `long`, `str`, `bool`, `int[]`, `long[]`, `str[]` (printed on one line), `int[]/lines`, `long[]/lines`, `str[]/lines`, `bool[]/lines` (one value per line) or `int[][]` (one row per line).
+  - Decimals: read them as `double` / `double[]` (also as `rows` columns). A `double`, `double[]` or `double[]/lines` result needs `"dp": <decimals>` in the spec, and the driver prints it with exactly that many digits after the point (like `%.4f`). Keep every expected answer clearly away from a rounding tie, so all four languages print the same text.
 - `ref`: Python 3, `class Solution` with the function named in `spec.fn`. Its parameters are the `read` names without `_`, in order. `List`, `Counter`, `defaultdict`, `heapq`, `bisect`, `math` and so on are already imported. It must be fast enough for the maximum input (about 1-2 s).
 - `refcpp` (optional): C++17 `class Solution` with the same function.
 - `wrong`: 1-2 plausible wrong solutions in the same shape as `ref`, such as brute force that is too slow, an off-by-one, or a missed edge case. The checks make sure the hidden tests catch them.

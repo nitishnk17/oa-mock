@@ -51,6 +51,22 @@
    "download": 234000
   },
   {
+   "key": "goldmansachs",
+   "name": "Goldman Sachs OA Mock",
+   "tagline": "Coding · October 2025",
+   "questions": 1,
+   "years": [
+    2025
+   ],
+   "roles": [],
+   "colleges": [],
+   "formats": [
+    "Coding question"
+   ],
+   "bytes": 114305,
+   "download": 40000
+  },
+  {
    "key": "juspay",
    "name": "Juspay OA Mock",
    "tagline": "Converging Maze · HackerEarth · Unstop challenge · Elimination round",

@@ -1,0 +1,33 @@
+{
+  "key": "gs",
+  "name": "Goldman Sachs OA Mock",
+  "tagline": "Coding · October 2025",
+  "headline": "Sit a timed Goldman Sachs OA, then see what passed.",
+  "blurb": "a coding question reported from a Goldman Sachs OA (October 2025)",
+  "defaultFmt": "oa",
+  "custom": [
+    "termrates"
+  ],
+  "formats": {
+    "oa": {
+      "name": "Coding question",
+      "desc": "The reported question: Reading Rates Off a Sparse Term Structure · 30 min",
+      "mins": 30,
+      "pools": [
+        [
+          "termrates"
+        ]
+      ]
+    },
+    "custom": {
+      "name": "Custom",
+      "desc": "Pick the questions and the time",
+      "mins": 60,
+      "pools": []
+    }
+  },
+  "offlist": [],
+  "order": [
+    "termrates"
+  ]
+}
