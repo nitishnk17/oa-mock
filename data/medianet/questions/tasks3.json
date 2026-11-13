@@ -1,0 +1,139 @@
+{
+ "type": "code",
+ "college": "IIT Patna",
+ "id": "tasks3",
+ "title": "Sharing Tasks Among Three",
+ "diff": "Medium",
+ "src": "Media.net OA, IIT Patna. Coding question 3 of 3.",
+ "body": "<p>You and two friends, Tom and Jerry, have <code>A</code> distinct tasks. Each task must go to at least one of the three of you, and a task may also go to two of you or to all three.</p><p>You must end up with exactly <code>B</code> tasks, Tom with exactly <code>C</code> and Jerry with exactly <code>D</code>. Count the ways to assign the tasks, modulo 10<sup>9</sup> + 7.</p><h3>Function to complete</h3><p>Complete <code>countAssignments(A, B, C, D)</code>. It returns the number of assignments modulo 10^9 + 7.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
+ "inp": "One line: <code>A B C D</code>.",
+ "out": "One integer: the number of assignments modulo 10<sup>9</sup> + 7.",
+ "cons": [
+  "1 ≤ A, B, C, D ≤ 30"
+ ],
+ "spec": {
+  "fn": "countAssignments",
+  "read": [
+   [
+    "A",
+    "int"
+   ],
+   [
+    "B",
+    "int"
+   ],
+   [
+    "C",
+    "int"
+   ],
+   [
+    "D",
+    "int"
+   ]
+  ],
+  "ret": "int",
+  "returns": "the number of assignments modulo 10^9 + 7"
+ },
+ "ref": "class Solution:\n    def countAssignments(self, A: int, B: int, C: int, D: int) -> int:\n        # Inclusion-exclusion over the k tasks that nobody takes.\n        total = 0\n        for k in range(A + 1):\n            free = A - k\n            total += (-1) ** k * math.comb(A, k) * math.comb(free, B) * math.comb(free, C) * math.comb(free, D)\n        return total % (10**9 + 7)\n",
+ "refcpp": "class Solution {\npublic:\n    int countAssignments(int A, int B, int C, int D) {\n        const long long MOD = 1000000007;\n        vector<vector<long long>> c(31, vector<long long>(31, 0));\n        for (int i = 0; i <= 30; i++) { c[i][0] = 1; for (int j = 1; j <= i; j++) c[i][j] = (c[i - 1][j - 1] + c[i - 1][j]) % MOD; }\n        auto C_ = [&](int n, int k) { return (k < 0 || k > n) ? 0LL : c[n][k]; };\n        long long total = 0;\n        for (int k = 0; k <= A; k++) {\n            long long t = C_(A, k) * C_(A - k, B) % MOD * C_(A - k, C) % MOD * C_(A - k, D) % MOD;\n            total = (total + (k % 2 ? MOD - t : t)) % MOD;\n        }\n        return (int) total;\n    }\n};\n",
+ "wrong": [
+  {
+   "why": "forgets that every task needs someone: C(A,B)·C(A,C)·C(A,D)",
+   "ref": "class Solution:\n    def countAssignments(self, A, B, C, D):\n        return math.comb(A, B) * math.comb(A, C) * math.comb(A, D) % (10**9 + 7)\n"
+  },
+  {
+   "why": "assumes nobody shares a task (B + C + D must equal A)",
+   "ref": "class Solution:\n    def countAssignments(self, A, B, C, D):\n        if B + C + D != A: return 0\n        return math.comb(A, B) * math.comb(A - B, C) % (10**9 + 7)\n"
+  }
+ ],
+ "samples": [
+  {
+   "in": "3 1 1 1\n",
+   "out": "6",
+   "ex": "Each person takes a different task: 3! = 6 ways."
+  },
+  {
+   "in": "2 1 1 1\n",
+   "out": "6",
+   "ex": "One task is shared by two people and the other goes to the third. Choose who works alone (3) and which task is theirs (2): 6 ways."
+  }
+ ],
+ "hidden": [
+  {
+   "in": "1 1 1 1\n",
+   "out": "1"
+  },
+  {
+   "in": "3 1 1 1\n",
+   "out": "6"
+  },
+  {
+   "in": "2 1 1 1\n",
+   "out": "6"
+  },
+  {
+   "in": "1 2 1 1\n",
+   "out": "0"
+  },
+  {
+   "in": "4 2 2 2\n",
+   "out": "114"
+  },
+  {
+   "in": "5 5 5 5\n",
+   "out": "1"
+  },
+  {
+   "in": "30 10 10 9\n",
+   "out": "0"
+  },
+  {
+   "in": "30 10 10 10\n",
+   "out": "996752490"
+  },
+  {
+   "in": "30 30 30 30\n",
+   "out": "1"
+  },
+  {
+   "in": "30 15 20 25\n",
+   "out": "199817670"
+  },
+  {
+   "in": "17 9 4 13\n",
+   "out": "184625327"
+  },
+  {
+   "in": "29 12 18 7\n",
+   "out": "108322269"
+  },
+  {
+   "in": "20 1 1 30\n",
+   "out": "0"
+  }
+ ],
+ "stub": {
+  "py": "class Solution:\n    def countAssignments(self, A: int, B: int, C: int, D: int) -> int:\n        return 0\n",
+  "cpp": "class Solution {\npublic:\n    int countAssignments(int A, int B, int C, int D) {\n        \n        return 0;\n    }\n};\n",
+  "java": "class Solution {\n    public int countAssignments(int A, int B, int C, int D) {\n        \n        return 0;\n    }\n}\n",
+  "js": "/**\n * @param {number} A\n * @param {number} B\n * @param {number} C\n * @param {number} D\n * @return {number}\n */\nvar countAssignments = function(A, B, C, D) {\n    \n    return 0;\n};\n"
+ },
+ "driver": {
+  "py": {
+   "pre": "from typing import *\nimport sys, math, collections, heapq, bisect, itertools, functools\nfrom collections import *\n",
+   "post": "\n\nif __name__ == \"__main__\":\n    _raw = sys.stdin.read(); _t = _raw.split(); _p = 0\n    A = int(_t[_p]); _p += 1\n    B = int(_t[_p]); _p += 1\n    C = int(_t[_p]); _p += 1\n    D = int(_t[_p]); _p += 1\n    _r = Solution().countAssignments(A, B, C, D)\n    print(_r)\n"
+  },
+  "cpp": {
+   "pre": "#include <bits/stdc++.h>\nusing namespace std;\n",
+   "post": "\n\nint main() {\n    ios::sync_with_stdio(false); cin.tie(nullptr);\n    int A; cin >> A;\n    int B; cin >> B;\n    int C; cin >> C;\n    int D; cin >> D;\n    auto _r = Solution().countAssignments(A, B, C, D);\n    cout << _r << \"\\n\";\n    return 0;\n}\n"
+  },
+  "java": {
+   "pre": "import java.util.*;\nimport java.io.*;\n",
+   "post": "\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        String _raw = new String(System.in.readAllBytes());\n        String[] _t = _raw.trim().isEmpty() ? new String[0] : _raw.trim().split(\"\\\\s+\");\n        int _p = 0;\n        int A = Integer.parseInt(_t[_p++]);\n        int B = Integer.parseInt(_t[_p++]);\n        int C = Integer.parseInt(_t[_p++]);\n        int D = Integer.parseInt(_t[_p++]);\n        int _r = new Solution().countAssignments(A, B, C, D);\n        StringBuilder _sb = new StringBuilder();\n        _sb.append(_r).append('\\n');\n        System.out.print(_sb);\n    }\n}\n"
+  },
+  "js": {
+   "pre": "",
+   "post": "\n\n;(() => {\n    const _raw = require(\"fs\").readFileSync(0, \"utf8\");\n    const _t = _raw.split(/\\s+/).filter(Boolean); let _p = 0;\n    const A = Number(_t[_p++]);\n    const B = Number(_t[_p++]);\n    const C = Number(_t[_p++]);\n    const D = Number(_t[_p++]);\n    const _r = countAssignments(A, B, C, D);\n    console.log(String(_r));\n})();\n"
+  }
+ }
+}
