@@ -1,14 +1,14 @@
 {
   "key": "medianet",
   "name": "Media.net OA Mock",
-  "tagline": "Coding · IIT Patna",
+  "tagline": "Coding · IIT Patna · IIT Guwahati · more sets",
   "headline": "Sit a timed Media.net OA, then see what passed.",
-  "blurb": "coding questions reported from a Media.net OA at IIT Patna",
+  "blurb": "coding questions reported from Media.net OAs (IIT Patna, IIT Guwahati and two sets whose college wasn't given)",
   "defaultFmt": "iitp",
   "custom": [
     "trapwater3d",
-    "towers",
-    "eggdrop"
+    "xor2x2",
+    "guards"
   ],
   "formats": {
     "iitp": {
@@ -24,6 +24,54 @@
         ],
         [
           "tasks3"
+        ]
+      ]
+    },
+    "iitg": {
+      "name": "IIT Guwahati OA",
+      "desc": "Flip 2×2 Blocks to Match, Find the Two Swapped BST Values, Guards Sweeping a Line of Posts · 90 min (time assumed)",
+      "mins": 90,
+      "pools": [
+        [
+          "xor2x2"
+        ],
+        [
+          "bstswap"
+        ],
+        [
+          "guards"
+        ]
+      ]
+    },
+    "set2": {
+      "name": "Set 2 (college not given)",
+      "desc": "Strongest Bit-Prefix Array, Rainwater on a Height Grid, Unreachable Multiples Pass-Code · 90 min (time assumed)",
+      "mins": 90,
+      "pools": [
+        [
+          "powerarr"
+        ],
+        [
+          "trapwater3d"
+        ],
+        [
+          "sedvalue"
+        ]
+      ]
+    },
+    "pdf": {
+      "name": "Set 3 (college not given)",
+      "desc": "Sign of the Magic Number, Allied Nations' Tour, Flip 2×2 Blocks to Match · 90 min (time assumed)",
+      "mins": 90,
+      "pools": [
+        [
+          "magicnum"
+        ],
+        [
+          "tour"
+        ],
+        [
+          "xor2x2"
         ]
       ]
     },
@@ -52,6 +100,13 @@
     "trapwater3d",
     "arrpairs",
     "tasks3",
+    "xor2x2",
+    "bstswap",
+    "guards",
+    "powerarr",
+    "sedvalue",
+    "magicnum",
+    "tour",
     "towers",
     "eggdrop"
   ]

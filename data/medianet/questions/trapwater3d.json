@@ -4,7 +4,7 @@
  "id": "trapwater3d",
  "title": "Rainwater on a Height Grid",
  "diff": "Hard",
- "src": "Media.net OA, IIT Patna. Coding question 1 of 3 (the same problem as LeetCode 407).",
+ "src": "Media.net OA, IIT Patna. Coding question 1 of 3 (the same problem as LeetCode 407). Also reported in a second Media.net set (\"Rainwater Harvesting\", N, M ≤ 110, heights ≥ 1).",
  "body": "<p>A rectangular island is described by an <code>m × n</code> grid <code>heightMap</code>, where each cell is a 1 × 1 column of the given height. After heavy rain, water collects on top of the cells wherever it can't run off. Water flows from a cell to its four side neighbours and leaves the island across the outer border.</p><p>Return the total volume of water that stays on the island.</p><h3>Function to complete</h3><p>Complete <code>trapRainWater(heightMap)</code>. It returns the volume of trapped water.</p><p class=\"muted\">Input reading and printing are handled for you, like on LeetCode. The input format below is what the tests and <i>Custom input</i> use.</p>",
  "inp": "First line: <code>m</code> and <code>n</code>. Then <code>m</code> lines of <code>n</code> integers each.",
  "out": "One integer: the trapped volume.",

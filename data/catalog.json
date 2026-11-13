@@ -114,19 +114,23 @@
   {
    "key": "medianet",
    "name": "Media.net OA Mock",
-   "tagline": "Coding · IIT Patna",
-   "questions": 5,
+   "tagline": "Coding · IIT Patna · IIT Guwahati · more sets",
+   "questions": 12,
    "years": [],
    "roles": [],
    "colleges": [
+    "IIT Guwahati",
     "IIT Patna"
    ],
    "formats": [
     "IIT Patna OA",
+    "IIT Guwahati OA",
+    "Set 2 (college not given)",
+    "Set 3 (college not given)",
     "Also reported"
    ],
-   "bytes": 3887214,
-   "download": 1739000
+   "bytes": 22169971,
+   "download": 7246000
   }
  ]
 }
