@@ -1,0 +1,58 @@
+{
+  "key": "medianet",
+  "name": "Media.net OA Mock",
+  "tagline": "Coding · IIT Patna",
+  "headline": "Sit a timed Media.net OA, then see what passed.",
+  "blurb": "coding questions reported from a Media.net OA at IIT Patna",
+  "defaultFmt": "iitp",
+  "custom": [
+    "trapwater3d",
+    "towers",
+    "eggdrop"
+  ],
+  "formats": {
+    "iitp": {
+      "name": "IIT Patna OA",
+      "desc": "Rainwater on a Height Grid, Rising and Falling Array Pairs, Sharing Tasks Among Three · 90 min (time assumed)",
+      "mins": 90,
+      "pools": [
+        [
+          "trapwater3d"
+        ],
+        [
+          "arrpairs"
+        ],
+        [
+          "tasks3"
+        ]
+      ]
+    },
+    "more": {
+      "name": "Also reported",
+      "desc": "Level the Towers by ±B, Egg Drop: Fewest Moves (from screenshots) · 60 min",
+      "mins": 60,
+      "pools": [
+        [
+          "towers"
+        ],
+        [
+          "eggdrop"
+        ]
+      ]
+    },
+    "custom": {
+      "name": "Custom",
+      "desc": "Pick the questions and the time",
+      "mins": 60,
+      "pools": []
+    }
+  },
+  "offlist": [],
+  "order": [
+    "trapwater3d",
+    "arrpairs",
+    "tasks3",
+    "towers",
+    "eggdrop"
+  ]
+}
